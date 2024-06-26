@@ -124,9 +124,9 @@ void PsRender::DrawBack(const PsProject &p, float x, float y)
 	}
 	else
 	{
-		glColor3f(	p.fColor[0] / 255.f, 
-					p.fColor[1] / 255.f, 
-					p.fColor[2] / 255.f);
+		glColor3f(	p.iColor[0] / 255.f, 
+					p.iColor[1] / 255.f, 
+					p.iColor[2] / 255.f);
 	}
 	
 	glBegin(GL_QUADS);

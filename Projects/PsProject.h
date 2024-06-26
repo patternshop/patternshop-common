@@ -112,7 +112,7 @@ public:
 	ImageList		images;
 	
 public:
-	float				fColor[3];
+	int					iColor[3];
 	bool				bHideColor;
 	
 public:

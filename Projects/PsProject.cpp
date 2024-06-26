@@ -58,9 +58,9 @@ shape(0),
 center(true),
 log_insert(false)
 {
-	fColor[0] = 255;
-	fColor[1] = 255;
-	fColor[2] = 255;
+	iColor[0] = 255;
+	iColor[1] = 255;
+	iColor[2] = 255;
 	bHideColor = false;
 	bNeedSave = false;
 	iLayerId = 0;
@@ -453,7 +453,7 @@ ErrID			PsProject::FileLoad(const char* path)
 	}
 	
 	fread(&bHideColor, sizeof(bHideColor), 1, file);
-	fread(&fColor, sizeof(fColor), 1, file);
+	fread(&iColor, sizeof(iColor), 1, file);
 	
 	fclose(file);
 	
@@ -521,7 +521,7 @@ ErrID			PsProject::FileSave(const char* path)
 	}
 	
 	fwrite(&bHideColor, sizeof(bHideColor), 1, file);
-	fwrite(&fColor, sizeof(fColor), 1, file);
+	fwrite(&iColor, sizeof(iColor), 1, file);
 	
 	fclose(file);
 	

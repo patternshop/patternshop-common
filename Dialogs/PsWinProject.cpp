@@ -189,12 +189,12 @@ void PsWinProject::OnLeftMouseButtonDown(PsPoint point)
 				else
 				{
 					PsDlgColor dlg;
-					dlg.SetColor(project->fColor[0], project->fColor[1], project->fColor[2]);
+					dlg.SetColor(project->iColor[0], project->iColor[1], project->iColor[2]);
 					if (dlg.ShowModal()) 
 					{
-						project->fColor[0] = dlg.GetColorRValue();
-						project->fColor[1] = dlg.GetColorGValue();
-						project->fColor[2] = dlg.GetColorBValue();
+						project->iColor[0] = dlg.GetColorRValue();
+						project->iColor[1] = dlg.GetColorGValue();
+						project->iColor[2] = dlg.GetColorBValue();
 					}
 				}
 				Update();
@@ -740,7 +740,7 @@ void PsWinProject::DrawBackgroundBloc()
 			int p = 15 + 26;
 			int u = ypos_precalc;
 
-			SetBrushColor(project->fColor[0], project->fColor[1], project->fColor[2]);
+			SetBrushColor(project->iColor[0], project->iColor[1], project->iColor[2]);
 			SetPenColor(0, 0, 0);
 			DrawRectangle(35, ypos_precalc + 5, 70, ypos_precalc + item_count_size - 5);
 

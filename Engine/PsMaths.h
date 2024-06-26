@@ -85,7 +85,7 @@ PsVector *LinePlaneIntersection(PsVector&, PsVector&, PsVector&, PsVector&);
 ** Fonctions spécfiques Windows.
 */
 #ifdef _WINDOWS
-double round(double);
+double round(double); 
 #endif /* _WINDOWS */
 
 /**********************************************************************

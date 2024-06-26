@@ -38,9 +38,9 @@ void	DrawBackSoftwareFile()
 	PsProject *project = PsController::Instance().project;	
 	if (!project->bHideColor)
 	{
-		color[0] = project->fColor[0];
-		color[1] = project->fColor[1];
-		color[2] = project->fColor[2];
+		color[0] = project->iColor[0];
+		color[1] = project->iColor[1];
+		color[2] = project->iColor[2];
 		color[3] = 255;
 	}
 	else
