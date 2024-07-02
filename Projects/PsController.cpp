@@ -1,16 +1,16 @@
 /**
  * This file is part of Patternshop Project.
- * 
+ *
  * Patternshop is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * Patternshop is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with Patternshop.  If not, see <http://www.gnu.org/licenses/>
 */
@@ -31,7 +31,7 @@
 #include "PsWinProject.h"
 #include "PsWinOverview.h"
 
-PsController*	PsController::instance = 0;
+PsController* PsController::instance = 0;
 
 /*
 ** Constructeur
@@ -62,9 +62,9 @@ PsController::PsController() :
 	cursor[CURSOR_TORSIO1] = AfxGetApp()->LoadCursor(IDC_HAND1);
 	cursor[CURSOR_TORSIO2] = AfxGetApp()->LoadCursor(IDC_HAND2);
 #endif
- 
+
 	option[OPTION_AUTOMATIC] = true;
-//	option[OPTION_BOX_MOVE] = true;
+	//	option[OPTION_BOX_MOVE] = true;
 	option[OPTION_BOX_SHOW] = true;
 	option[OPTION_CONSTRAIN] = false;
 	option[OPTION_DOCUMENT_BLEND] = true;
@@ -72,16 +72,16 @@ PsController::PsController() :
 	option[OPTION_HIGHLIGHT_SHOW] = true;
 	option[OPTION_REFLECT] = false;
 
-  bMouseButtonIsDown = false;
+	bMouseButtonIsDown = false;
 }
 
 PsController::~PsController()
 {
 }
 
-PsController&	PsController::Instance()
+PsController& PsController::Instance()
 {
-	if(!instance)
+	if (!instance)
 		instance = new PsController();
 
 	return *instance;
@@ -89,7 +89,7 @@ PsController&	PsController::Instance()
 
 void	PsController::Delete()
 {
-	if(instance)
+	if (instance)
 	{
 		delete instance;
 		instance = 0;
@@ -98,24 +98,24 @@ void	PsController::Delete()
 
 void PsController::UpdateWindow()
 {
-  if(active)
-    active->Update();
+	if (active)
+		active->Update();
 }
 
 void PsController::UpdateDialogProject()
 {
-  PsWinProject::Instance().Update();
+	PsWinProject::Instance().Update();
 }
 
 void PsController::UpdateDialogOverview(bool bQuick)
 {
-	PsWinProject::Instance().Update();  
-	#ifdef _WINDOWS
+	PsWinProject::Instance().Update();
+#ifdef _WINDOWS
 	if (bQuick) PsWinOverview::Instance().Invalidate(true);
 	else PsWinOverview::Instance().Update();
-	#else /* _MACOSX */
+#else /* _MACOSX */
 	PsWinOverview::Instance().Update();
-	#endif
+#endif
 }
 
 
@@ -127,15 +127,15 @@ void PsController::UpdateDialogOverview(bool bQuick)
 */
 bool	PsController::GetOption(Option index, bool real_state) const
 {
-	if(!real_state)
-		switch(index)
+	if (!real_state)
+		switch (index)
 		{
-			case OPTION_BOX_SHOW:
-			case OPTION_HIGHLIGHT_SHOW:
-				if(tool != TOOL_MAGNIFY_ZOOM && tool != TOOL_SCROLL_DRAG)
-					return option[index];
-				//else
-					//return !option[OPTION_BOX_MOVE];
+		case OPTION_BOX_SHOW:
+		case OPTION_HIGHLIGHT_SHOW:
+			if (tool != TOOL_MAGNIFY_ZOOM && tool != TOOL_SCROLL_DRAG)
+				return option[index];
+			//else
+				//return !option[OPTION_BOX_MOVE];
 		}
 
 	return option[index];
@@ -147,34 +147,34 @@ bool	PsController::GetOption(Option index, bool real_state) const
 */
 void	PsController::MouseClick(int num, int x, int y)
 {
-	if(!project)
+	if (!project)
 		return;
 
-  bMouseButtonIsDown = true;
+	bMouseButtonIsDown = true;
 
 	project->LogInit();
 	prev_x = x;
 	prev_y = y;
 
-	switch(tool)
+	switch (tool)
 	{
-		case TOOL_MAGNIFY:
-			if(num == 0)
-				tool = project->ToolMagnifyStart();
-			break;
+	case TOOL_MAGNIFY:
+		if (num == 0)
+			tool = project->ToolMagnifyStart();
+		break;
 
-		case TOOL_MODIFY:
-			if(num == 0)
-				tool = project->ToolModifyScan(x, y, true);
-			break;
+	case TOOL_MODIFY:
+		if (num == 0)
+			tool = project->ToolModifyScan(x, y, true);
+		break;
 
-		case TOOL_SCROLL:
-			if(num == 0)
-			{
-				SetCursor(CURSOR_SCROLL2);
-				tool = project->ToolScrollStart();
-			}
-			break;
+	case TOOL_SCROLL:
+		if (num == 0)
+		{
+			SetCursor(CURSOR_SCROLL2);
+			tool = project->ToolScrollStart();
+		}
+		break;
 	}
 }
 
@@ -183,29 +183,29 @@ void	PsController::MouseClick(int num, int x, int y)
 */
 void	PsController::MouseMove(int x, int y)
 {
-	if(!project)
+	if (!project)
 		return;
 
-	switch(tool)
+	switch (tool)
 	{
-		case TOOL_MAGNIFY_ZOOM:
-			project->ToolMagnifyDrag(y, prev_x, prev_y);
-			break;
+	case TOOL_MAGNIFY_ZOOM:
+		project->ToolMagnifyDrag(y, prev_x, prev_y);
+		break;
 
-		case TOOL_MODIFY:
-			project->ToolModifyScan(x, y, false);
-			break;
+	case TOOL_MODIFY:
+		project->ToolModifyScan(x, y, false);
+		break;
 
-		case TOOL_MODIFY_MOVE:
-		case TOOL_MODIFY_ROTATE:
-		case TOOL_MODIFY_SIZE:
-		case TOOL_MODIFY_TORSIO:
-			project->ToolModifyMove(x, y, prev_x, prev_y, tool);
-			break;
+	case TOOL_MODIFY_MOVE:
+	case TOOL_MODIFY_ROTATE:
+	case TOOL_MODIFY_SIZE:
+	case TOOL_MODIFY_TORSIO:
+		project->ToolModifyMove(x, y, prev_x, prev_y, tool);
+		break;
 
-		case TOOL_SCROLL_DRAG:
-			project->ToolScrollDrag(x, y, prev_x, prev_y);
-			break;
+	case TOOL_SCROLL_DRAG:
+		project->ToolScrollDrag(x, y, prev_x, prev_y);
+		break;
 	}
 }
 
@@ -214,45 +214,45 @@ void	PsController::MouseMove(int x, int y)
 */
 void	PsController::MouseRelease(int num, int x, int y)
 {
-	if(!project)
+	if (!project)
 		return;
 
-  bMouseButtonIsDown = false;
+	bMouseButtonIsDown = false;
 
-	switch(tool)
+	switch (tool)
 	{
-		case TOOL_MAGNIFY_ZOOM:
-			if(num == 0)
-			{
-				SetCursor(CURSOR_MAGNIFY1);
-				tool = TOOL_MAGNIFY;
-			}
-			break;
+	case TOOL_MAGNIFY_ZOOM:
+		if (num == 0)
+		{
+			SetCursor(CURSOR_MAGNIFY1);
+			tool = TOOL_MAGNIFY;
+		}
+		break;
 
-		case TOOL_MODIFY_MOVE:
-		case TOOL_MODIFY_ROTATE:
-		case TOOL_MODIFY_SIZE:
-		case TOOL_MODIFY_TORSIO:
-			if(num == 0)
-				tool = TOOL_MODIFY;
-			break;
+	case TOOL_MODIFY_MOVE:
+	case TOOL_MODIFY_ROTATE:
+	case TOOL_MODIFY_SIZE:
+	case TOOL_MODIFY_TORSIO:
+		if (num == 0)
+			tool = TOOL_MODIFY;
+		break;
 
-		case TOOL_SCROLL_DRAG:
-			if(num == 0)
-			{
-				SetCursor(CURSOR_SCROLL1);
-				tool = TOOL_SCROLL;
-			}
-			break;
+	case TOOL_SCROLL_DRAG:
+		if (num == 0)
+		{
+			SetCursor(CURSOR_SCROLL1);
+			tool = TOOL_SCROLL;
+		}
+		break;
 	}
 }
 
 #ifdef _WINDOWS
 void	PsController::SetActive(CPatternshopView* view)
 {
-	if(view != this->active || view && view->project != project)
+	if (view != this->active || view && view->project != project)
 	{
-		if(view)
+		if (view)
 		{
 			this->active = view;
 			this->project = view->project;
@@ -285,10 +285,10 @@ void	PsController::SetActive(PsProject* p)
 */
 void	PsController::SetCursor(PsCursor num)
 {
-  #ifdef _WINDOWS
-	if(active)
+#ifdef _WINDOWS
+	if (active)
 		active->SetMouseCursor(cursor[num]);
-  #else /* _MACOSX */
+#else /* _MACOSX */
 	SetMacCursor(num);
 #endif
 }
@@ -306,11 +306,11 @@ void	PsController::SetOption(Option index, bool value)
 */
 void	PsController::SetProgress(int pos)
 {
-  #ifdef _WINDOWS
-	CMainFrame*	main =(CMainFrame*)theApp.GetMainWnd();
-	if(main)
+#ifdef _WINDOWS
+	CMainFrame* main = (CMainFrame*)theApp.GetMainWnd();
+	if (main)
 		main->ProgressBar(pos);
-  #endif /* _WINDOWS */
+#endif /* _WINDOWS */
 }
 
 /*
@@ -319,29 +319,29 @@ void	PsController::SetProgress(int pos)
 void	PsController::SetTool(Tool tool)
 {
 
-	switch(tool)
+	switch (tool)
 	{
-		case TOOL_MAGNIFY:
-			SetCursor(CURSOR_MAGNIFY1);
-			break;
+	case TOOL_MAGNIFY:
+		SetCursor(CURSOR_MAGNIFY1);
+		break;
 
-		case TOOL_MODIFY:
-			SetCursor(CURSOR_DEFAULT);
-			break;
+	case TOOL_MODIFY:
+		SetCursor(CURSOR_DEFAULT);
+		break;
 
-		case TOOL_SCROLL:
-			SetCursor(CURSOR_SCROLL1);
-			break;
+	case TOOL_SCROLL:
+		SetCursor(CURSOR_SCROLL1);
+		break;
 	}
 
-  #ifdef _WINDOWS
-	if(active) 
+#ifdef _WINDOWS
+	if (active)
 		active->Update();
-  #endif /* _WINDOWS */
+#endif /* _WINDOWS */
 
 	prev_tool = this->tool;
 	this->tool = tool;
-	
+
 	if (this->tool == TOOL_MODIFY)
 		prev_tool = TOOL_MODIFY;
 }

@@ -1,16 +1,16 @@
 /**
  * This file is part of Patternshop Project.
- * 
+ *
  * Patternshop is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * Patternshop is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with Patternshop.  If not, see <http://www.gnu.org/licenses/>
 */
@@ -28,22 +28,22 @@
 */
 struct PsVector
 {
-  float X;
-  float Y;
-  float Z;
+	float X;
+	float Y;
+	float Z;
 
-  PsVector();
+	PsVector();
 
-  PsVector(float,float,float);
-  PsVector operator+(const PsVector&) const;
-  PsVector &operator+=(const PsVector&);
-  PsVector operator-(const PsVector&) const;
-  PsVector &operator-=(const PsVector&);
-  PsVector operator*(const float) const;
-  PsVector operator/(const float) const;
-  PsVector &operator/=(const float);
+	PsVector(float, float, float);
+	PsVector operator+(const PsVector&) const;
+	PsVector& operator+=(const PsVector&);
+	PsVector operator-(const PsVector&) const;
+	PsVector& operator-=(const PsVector&);
+	PsVector operator*(const float) const;
+	PsVector operator/(const float) const;
+	PsVector& operator/=(const float);
 
-  float Size();
+	float Size();
 };
 
 /*
@@ -51,23 +51,23 @@ struct PsVector
 */
 struct PsRotator
 {
-  float Roll;
-  float Pitch;
-  float Yaw;
-  
-  PsRotator();
+	float Roll;
+	float Pitch;
+	float Yaw;
 
-  static float ToDegree(float);
-  static float FromDegree(float);
+	PsRotator();
+
+	static float ToDegree(float);
+	static float FromDegree(float);
 };
 
 /**********************************************************************
 ** Fonctions variées.
 */
 
-void TranslateVertex(float *A, float *V, float *R);
-void RotateVertex(float *V, float *R, float fRoll, float fPitch, float fYaw);
-void MultiplyVectorByMatrix(float *M, float *V, float *R);
+void TranslateVertex(float* A, float* V, float* R);
+void RotateVertex(float* V, float* R, float fRoll, float fPitch, float fYaw);
+void MultiplyVectorByMatrix(float* M, float* V, float* R);
 bool GenerateInverseMatrix4f(float i[16], const float m[16]);
 bool SameSign(float a, float b);
 
@@ -75,17 +75,17 @@ bool SameSign(float a, float b);
 ** Fonctions variées appliquées aux PsVector
 */
 
-float DotProduct2x2(PsVector &a, PsVector &b);
-float DotProduct(PsVector &a, PsVector &b);
+float DotProduct2x2(PsVector& a, PsVector& b);
+float DotProduct(PsVector& a, PsVector& b);
 
-PsVector RotateVertex(PsVector &V, float fRoll, float fPitch, float fYaw);
-PsVector *LinePlaneIntersection(PsVector&, PsVector&, PsVector&, PsVector&);
+PsVector RotateVertex(PsVector& V, float fRoll, float fPitch, float fYaw);
+PsVector* LinePlaneIntersection(PsVector&, PsVector&, PsVector&, PsVector&);
 
 /**********************************************************************
 ** Fonctions spécfiques Windows.
 */
 #ifdef _WINDOWS
-double round(double); 
+double round(double);
 #endif /* _WINDOWS */
 
 /**********************************************************************

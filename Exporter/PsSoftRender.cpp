@@ -1,16 +1,16 @@
 /**
  * This file is part of Patternshop Project.
- * 
+ *
  * Patternshop is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * Patternshop is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with Patternshop.  If not, see <http://www.gnu.org/licenses/>
 */
@@ -20,7 +20,7 @@
 #include "FreeImage.h"
 #include <map>
 
-FIBITMAP *bigImage;
+FIBITMAP* bigImage;
 typedef std::map<PsImage*, FIBITMAP*> PrecalcImages;
 PrecalcImages imageSoftwareMap;
 bool freeImageInititialized = false;
@@ -34,8 +34,8 @@ FREE_IMAGE_FILTER free_image_filter = FILTER_BICUBIC;
 void	DrawBackSoftwareFile()
 {
 	//-- sélection de la couleur de fond
-	uint8 color[4]; 
-	PsProject *project = PsController::Instance().project;	
+	uint8 color[4];
+	PsProject* project = PsController::Instance().project;
 	if (!project->bHideColor)
 	{
 		color[0] = project->iColor[0];
@@ -54,15 +54,15 @@ void	DrawBackSoftwareFile()
 
 	//-- application de la couleur de fond
 	int bytespp = FreeImage_GetLine(bigImage) / FreeImage_GetWidth(bigImage);
-	for (uint32 y = 0; y < FreeImage_GetHeight(bigImage); y++) 
+	for (uint32 y = 0; y < FreeImage_GetHeight(bigImage); y++)
 	{
-		BYTE *bits = FreeImage_GetScanLine(bigImage, y);
-		for (uint32 x = 0; x < FreeImage_GetWidth(bigImage); x++) 
+		BYTE* bits = FreeImage_GetScanLine(bigImage, y);
+		for (uint32 x = 0; x < FreeImage_GetWidth(bigImage); x++)
 		{
 			bits[FI_RGBA_RED] = color[0];
 			bits[FI_RGBA_GREEN] = color[1];
 			bits[FI_RGBA_BLUE] = color[2];
-			bits[FI_RGBA_ALPHA] = color[3]; 
+			bits[FI_RGBA_ALPHA] = color[3];
 			bits += bytespp;
 		}
 	}
@@ -74,7 +74,7 @@ void	DrawBackSoftwareFile()
 */
 void InitSoftwareFile(int sx, int sy)
 {
-   if (!freeImageInititialized)
+	if (!freeImageInititialized)
 	{
 		FreeImage_Initialise();
 		freeImageInititialized = true;
@@ -82,10 +82,10 @@ void InitSoftwareFile(int sx, int sy)
 
 	bigImage = FreeImage_Allocate(sx, sy, 32);
 
-   unsigned int pixelsPerMeter = round( (double)PsController::Instance().project->GetDpi() / 0.0254 );
+	unsigned int pixelsPerMeter = round((double)PsController::Instance().project->GetDpi() / 0.0254);
 
-   FreeImage_SetDotsPerMeterX( bigImage, pixelsPerMeter );
-   FreeImage_SetDotsPerMeterY( bigImage, pixelsPerMeter );
+	FreeImage_SetDotsPerMeterX(bigImage, pixelsPerMeter);
+	FreeImage_SetDotsPerMeterY(bigImage, pixelsPerMeter);
 
 	FreeImage_SetTransparent(bigImage, true);
 
@@ -118,29 +118,29 @@ void PasteSoftwareFile(PsPattern& pattern/*, bool mask*/)
 	int dsx = FreeImage_GetWidth(bigImage);
 	int dsy = FreeImage_GetHeight(bigImage);
 	int sx, sy, bpp = 4;
-	pattern.texture.GetSize(sx, sy);	
-	uint8 *realbuffer = pattern.texture.GetBufferUncompressed(bpp);
+	pattern.texture.GetSize(sx, sy);
+	uint8* realbuffer = pattern.texture.GetBufferUncompressed(bpp);
 	//--
 
 	//-- creation de l'image
-	FIBITMAP *im = FreeImage_Allocate(sx, sy, 32, FI_RGBA_RED_MASK, FI_RGBA_GREEN_MASK, FI_RGBA_BLUE_MASK);
+	FIBITMAP* im = FreeImage_Allocate(sx, sy, 32, FI_RGBA_RED_MASK, FI_RGBA_GREEN_MASK, FI_RGBA_BLUE_MASK);
 	FreeImage_SetTransparent(im, true);
 
 	int bytespp = FreeImage_GetLine(im) / FreeImage_GetWidth(im);
-	for (uint32 y = 0; y < FreeImage_GetHeight(im); y++) 
+	for (uint32 y = 0; y < FreeImage_GetHeight(im); y++)
 	{
-		BYTE *bits = FreeImage_GetScanLine(im, FreeImage_GetHeight(im) - y - 1);
-		for (uint32 x = 0; x < FreeImage_GetWidth(im); x++) 
+		BYTE* bits = FreeImage_GetScanLine(im, FreeImage_GetHeight(im) - y - 1);
+		for (uint32 x = 0; x < FreeImage_GetWidth(im); x++)
 		{
 			uint8* location = realbuffer + (x + (y * (int)sx)) * bpp;
-			if (bpp == 3) 
+			if (bpp == 3)
 			{
 				bits[FI_RGBA_RED] = location[2];
 				bits[FI_RGBA_GREEN] = location[1];
 				bits[FI_RGBA_BLUE] = location[0];
-				bits[FI_RGBA_ALPHA] = 255; 
+				bits[FI_RGBA_ALPHA] = 255;
 			}
-			else 
+			else
 			{
 				if (location[3] > PsPattern::minimumAlpha)
 				{
@@ -162,7 +162,7 @@ void PasteSoftwareFile(PsPattern& pattern/*, bool mask*/)
 	}
 	delete[] realbuffer;
 
-	FIBITMAP *cp = FreeImage_Rescale(im, dsx, dsy, FILTER_BSPLINE);
+	FIBITMAP* cp = FreeImage_Rescale(im, dsx, dsy, FILTER_BSPLINE);
 	FreeImage_BlendPaste(bigImage, cp, 0, 0);
 	FreeImage_Unload(cp);
 	FreeImage_Unload(im);
@@ -173,7 +173,7 @@ void PasteSoftwareFile(PsPattern& pattern/*, bool mask*/)
 */
 void PasteSoftwareFile(PsImage& image, int x, int y)
 {
-	FIBITMAP *im = imageSoftwareMap[&image];
+	FIBITMAP* im = imageSoftwareMap[&image];
 
 	if (!im)
 	{
@@ -182,8 +182,8 @@ void PasteSoftwareFile(PsImage& image, int x, int y)
 
 		// transormation de l'image dans le format demandé
 		int sx, sy, bpp;
-		image.GetTexture().GetSize(sx, sy);	
-		uint8 *realbuffer = image.GetTexture().GetBufferUncompressed(bpp);
+		image.GetTexture().GetSize(sx, sy);
+		uint8* realbuffer = image.GetTexture().GetBufferUncompressed(bpp);
 		im = FreeImage_FromBuffer(realbuffer, sx, sy, bpp);
 		delete[] realbuffer;
 		//--
@@ -194,7 +194,7 @@ void PasteSoftwareFile(PsImage& image, int x, int y)
 		//--
 
 		// redimensionement
-		FIBITMAP *resim = FreeImage_Rescale(im, dsx, dsy, FILTER_BSPLINE);
+		FIBITMAP* resim = FreeImage_Rescale(im, dsx, dsy, FILTER_BSPLINE);
 		FreeImage_SetTransparent(resim, true);
 		FreeImage_Unload(im);
 		im = resim;
@@ -202,12 +202,12 @@ void PasteSoftwareFile(PsImage& image, int x, int y)
 
 		// rotation
 		if (image.GetAngle())
-		{ 
-			FIBITMAP *rotated = FreeImage_RotateClassic(im, image.GetAngle() * 180.0f / 3.14159265f);
+		{
+			FIBITMAP* rotated = FreeImage_RotateClassic(im, image.GetAngle() * 180.0f / 3.14159265f);
 			FreeImage_SetTransparent(rotated, true);
 			FreeImage_Unload(im);
 			im = rotated;
-		} 
+		}
 
 		// map de pre-calcul
 		imageSoftwareMap[&image] = im;
@@ -223,13 +223,13 @@ void PasteSoftwareFile(PsImage& image, int x, int y)
 }
 
 /*
-** Fonction utilitaire de controle des extensions 
+** Fonction utilitaire de controle des extensions
 */
-static bool FileCheckExtention(const char* path, const char *ext)
+static bool FileCheckExtention(const char* path, const char* ext)
 {
-	char *mpath = strdup(path); 
+	char* mpath = strdup(path);
 	mpath = strupr(mpath);
-	char *mext = strdup(ext); 
+	char* mext = strdup(ext);
 	mext = strupr(mext);
 	bool result = (strstr(mpath, mext) == (char*)(mpath + (strlen(path) - strlen(ext))));
 	delete mpath;
@@ -240,8 +240,8 @@ static bool FileCheckExtention(const char* path, const char *ext)
 /*
 ** Creation d'un buffer à partir d'un fichier
 */
-bool FreeImage_BufferFromFile (const char* path, uint8* &realbuffer, int &sx, int &sy, int &bpp)
-{ 
+bool FreeImage_BufferFromFile(const char* path, uint8*& realbuffer, int& sx, int& sy, int& bpp)
+{
 	FREE_IMAGE_FORMAT frmt = FIF_UNKNOWN;
 
 	if (FileCheckExtention(path, ".bmp")) frmt = FIF_BMP;
@@ -287,14 +287,14 @@ bool FreeImage_BufferFromFile (const char* path, uint8* &realbuffer, int &sx, in
 	}
 
 	//-- chargement en RGBA
-	FIBITMAP *im = FreeImage_Load(frmt, path); 
-	FIBITMAP *rgba = FreeImage_ConvertTo32Bits(im);
+	FIBITMAP* im = FreeImage_Load(frmt, path);
+	FIBITMAP* rgba = FreeImage_ConvertTo32Bits(im);
 	FreeImage_Unload(im);
 	im = rgba;
 	if (!im) return false;
 	//--
 
-	realbuffer = (uint8*) FreeImage_GetBits(im);
+	realbuffer = (uint8*)FreeImage_GetBits(im);
 	sx = FreeImage_GetWidth(im);
 	sy = FreeImage_GetHeight(im);
 	bpp = FreeImage_GetBPP(im) / 8;
@@ -338,7 +338,7 @@ void flushSoftwareFile(const char* filename, bool warning_alpha)
 	{
 		if (warning_alpha && !GetQuestion(QUESTION_LOOSE_ALPHA))
 			return;
-		FIBITMAP *bk = FreeImage_ConvertTo24Bits(bigImage);
+		FIBITMAP* bk = FreeImage_ConvertTo24Bits(bigImage);
 		FreeImage_Unload(bigImage);
 		bigImage = bk;
 	}
@@ -359,47 +359,47 @@ void flushSoftwareFile(const char* filename, bool warning_alpha)
 /*
 ** Déformation de l'image dans le quatrangle donné
 */
-FIBITMAP *DrawSoftwareMapping(PsLayer *layer, FIBITMAP *src_img)
+FIBITMAP* DrawSoftwareMapping(PsLayer* layer, FIBITMAP* src_img)
 {
-	PsProject *project = PsController::Instance().project;
-	PsRender &renderer = PsController::Instance().project->renderer;
+	PsProject* project = PsController::Instance().project;
+	PsRender& renderer = PsController::Instance().project->renderer;
 
 	int iWidth = FreeImage_GetWidth(src_img);
 	int iHeight = FreeImage_GetHeight(src_img);
 
 	//-- HACK : rendu en opengl (n'utilise même pas 'src_img' en haute résolution)
 	int iTextureSize = renderer.iLayerTextureSize;
-	uint8 *result_data = new uint8[iTextureSize * iTextureSize * 4];
-	int iOldLayerTextureSize = renderer.iLayerTextureSize; 
+	uint8* result_data = new uint8[iTextureSize * iTextureSize * 4];
+	int iOldLayerTextureSize = renderer.iLayerTextureSize;
 	renderer.iLayerTextureSize = iTextureSize;
 	renderer.engine = PsRender::ENGINE_HARDWARE;
 	GLuint iDocTexture = renderer.CreateDocumentTexture(*project);
 	renderer.engine = PsRender::ENGINE_SOFTWARE;
 	renderer.UpdateLayerTexture(*project, layer, iDocTexture);
 	glEnable(GL_TEXTURE_2D);
-	glBindTexture (GL_TEXTURE_2D, layer->iFinalTextureId);
+	glBindTexture(GL_TEXTURE_2D, layer->iFinalTextureId);
 	glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, result_data);
 	glDisable(GL_TEXTURE_2D);
 	renderer.iLayerTextureSize = iOldLayerTextureSize;
-	FIBITMAP *conv = FreeImage_FromBuffer(result_data, iTextureSize, iTextureSize, 4);
+	FIBITMAP* conv = FreeImage_FromBuffer(result_data, iTextureSize, iTextureSize, 4);
 
 	int bytespp = FreeImage_GetLine(conv) / FreeImage_GetWidth(conv);
-	for (uint32 y = 0; y < FreeImage_GetHeight(conv); y++) 
+	for (uint32 y = 0; y < FreeImage_GetHeight(conv); y++)
 	{
-		BYTE *bits = FreeImage_GetScanLine(conv, FreeImage_GetHeight(conv) - y - 1);
-		for (uint32 x = 0; x < FreeImage_GetWidth(conv); x++) 
+		BYTE* bits = FreeImage_GetScanLine(conv, FreeImage_GetHeight(conv) - y - 1);
+		for (uint32 x = 0; x < FreeImage_GetWidth(conv); x++)
 		{
 			uint8 swap = bits[FI_RGBA_RED];
 			bits[FI_RGBA_RED] = bits[FI_RGBA_BLUE];
-			bits[FI_RGBA_BLUE] = swap;  
+			bits[FI_RGBA_BLUE] = swap;
 			bits += bytespp;
 		}
 	}
 
-	FIBITMAP *dst_img = FreeImage_Rescale(conv, iWidth, iHeight, FILTER_BSPLINE);
+	FIBITMAP* dst_img = FreeImage_Rescale(conv, iWidth, iHeight, FILTER_BSPLINE);
 	FreeImage_Unload(conv);
-	glDeleteTextures (1, &iDocTexture);
-	glDeleteTextures (1, &layer->iFinalTextureId);
+	glDeleteTextures(1, &iDocTexture);
+	glDeleteTextures(1, &layer->iFinalTextureId);
 	layer->iFinalTextureId = NULL;
 	//--
 
@@ -409,12 +409,12 @@ FIBITMAP *DrawSoftwareMapping(PsLayer *layer, FIBITMAP *src_img)
 void DrawLayerSoftwareFile(int iIndex)
 {
 	//-- récupération des paramètres du projet
-	PsProject *project = PsController::Instance().project;
+	PsProject* project = PsController::Instance().project;
 	if (!project) return;
 	if (!project->pattern) return;
 	if (project->pattern->aLayers.size() <= iIndex) return;
-	PsLayer *layer = project->pattern->aLayers[iIndex];
-	PsRender &renderer = PsController::Instance().project->renderer;
+	PsLayer* layer = project->pattern->aLayers[iIndex];
+	PsRender& renderer = PsController::Instance().project->renderer;
 	PsPattern* pattern = project->pattern;
 	//--
 
@@ -422,7 +422,7 @@ void DrawLayerSoftwareFile(int iIndex)
 	int iHeight = FreeImage_GetHeight(bigImage);
 
 	//-- création du buffer
-	FIBITMAP *buffer = FreeImage_Allocate(iWidth, iHeight, 32);
+	FIBITMAP* buffer = FreeImage_Allocate(iWidth, iHeight, 32);
 	FreeImage_SetTransparent(buffer, true);
 	//--
 
@@ -431,23 +431,23 @@ void DrawLayerSoftwareFile(int iIndex)
 	FIBITMAP *bigImageBackup = bigImage;
 	bigImage = buffer;
 	renderer.DrawMatrices(*project);
-	bigImage = bigImageBackup; 
+	bigImage = bigImageBackup;
 	*/
 	//--
 
 	//-- application de la transformation
-	FIBITMAP *transformed = DrawSoftwareMapping(layer, buffer);
+	FIBITMAP* transformed = DrawSoftwareMapping(layer, buffer);
 	FreeImage_Unload(buffer);
 	buffer = transformed;
 	//--
 
 	//-- application du masque alpha
 	int bytespp = FreeImage_GetLine(buffer) / FreeImage_GetWidth(buffer);
-	for (uint32 y = 0; y < FreeImage_GetHeight(buffer); y++) 
+	for (uint32 y = 0; y < FreeImage_GetHeight(buffer); y++)
 	{
-		BYTE *bits = FreeImage_GetScanLine(buffer, y);
+		BYTE* bits = FreeImage_GetScanLine(buffer, y);
 		int _y = (int)((float)y / (float)pattern->fScaleHeight);
-		for (uint32 x = 0; x < FreeImage_GetWidth(buffer); x++)  
+		for (uint32 x = 0; x < FreeImage_GetWidth(buffer); x++)
 		{
 			int _x = (int)((float)x / (float)pattern->fScaleWidth);
 			uint8 alpha = layer->ucData[_y * pattern->texture.width + _x];

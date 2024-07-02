@@ -1,16 +1,16 @@
 /**
  * This file is part of Patternshop Project.
- * 
+ *
  * Patternshop is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * Patternshop is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with Patternshop.  If not, see <http://www.gnu.org/licenses/>
 */
@@ -19,16 +19,9 @@
 
 #define PS_TEXTURE_H__
 
-#include "PsTypes.h"
+#include "PsOpenGL.h"
 
-#ifdef _MACOSX
-# include <OpenGL/gl.h>
-# include <OpenGL/glu.h>
-#else
-# include "stdafx.h"
-# include <GL/gl.h>
-# include <GL/glu.h>
-#endif
+#include "PsTypes.h"
 
 typedef	void	(*TGetPixel)(uint8*, int, int, int, int, int*);
 
@@ -43,30 +36,30 @@ public:
 	PsTexture();
 	~PsTexture();
 
-	bool			LoadFromBuffer (uint8*);
-	bool			LoadFromFile (const char*);
+	bool			LoadFromBuffer(uint8*);
+	bool			LoadFromFile(const char*);
 
-	uint8*	GetBuffer (size_t&) const;
+	uint8* GetBuffer(size_t&) const;
 	GLuint			GetID() const;
-	void			GetSize (int&, int&) const;
+	void			GetSize(int&, int&) const;
 
 	void			Reload();
 
-	static void		SetMaxResol (int);
+	static void		SetMaxResol(int);
 
-	uint8*	GetBufferUncompressed (int &bpp) const;
+	uint8* GetBufferUncompressed(int& bpp) const;
 
-	int				GetBits() { return *(int*)(buffer + 2 * sizeof (int)); }
+	int				GetBits() { return *(int*)(buffer + 2 * sizeof(int)); }
 
 	const uint32	GetAutoGenId() { return autogen_id; }
 
 public:
 	void			LogFlush();
-	bool			Register (int, int, int, uint8*);
-	bool			RegisterAndSave (int, int, int, uint8*);
+	bool			Register(int, int, int, uint8*);
+	bool			RegisterAndSave(int, int, int, uint8*);
 
 	static int		max_resol;
-	uint8*			buffer;
+	uint8* buffer;
 	GLuint			id;
 	int				width;
 	int				height;
