@@ -1,16 +1,16 @@
 /**
  * This file is part of Patternshop Project.
- * 
+ *
  * Patternshop is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * Patternshop is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with Patternshop.  If not, see <http://www.gnu.org/licenses/>
 */
@@ -27,10 +27,10 @@
 
 #include <assert.h>
 
-const int	PsWinProjectModel::bloc_count_size = 22; 
+const int	PsWinProjectModel::bloc_count_size = 22;
 const int	PsWinProjectModel::item_count_size = 29;
 
-PsWinProject*	PsWinProject::instance = 0;
+PsWinProject* PsWinProject::instance = 0;
 
 PsWinProjectModel::PsWinProjectModel()
 {
@@ -59,19 +59,19 @@ PsWinProjectModel::~PsWinProjectModel()
 		i->second = 0;
 	}
 	imageList.clear();
-	
+
 }
 
 PsWinProject& PsWinProject::Instance()
 {
-	if(!instance)
+	if (!instance)
 		instance = new PsWinProject();
 	return *instance;
 }
 
 void PsWinProject::Delete()
 {
-	if(instance)
+	if (instance)
 	{
 		delete instance;
 		instance = 0;
@@ -83,11 +83,11 @@ void PsWinProject::OnLeftMouseButtonDown(PsPoint point)
 	//PsRect k;
 	//scrollbar->GetClientRect(&k);
 	fromPoint = point;
-	PsProject *project = PsController::Instance().project;
+	PsProject* project = PsController::Instance().project;
 	if (!project) return;
 	if (project->bPatternsIsSelected)
 		project->bPatternsIsSelected = false;
-	if (point.y > 0 && point.x < iWidth - scrollbar->GetWidth() 
+	if (point.y > 0 && point.x < iWidth - scrollbar->GetWidth()
 		&& point.y < totalHSize - scrollbar->GetPos())
 	{
 		if (project)
@@ -99,7 +99,7 @@ void PsWinProject::OnLeftMouseButtonDown(PsPoint point)
 			MatrixList::reverse_iterator matrix = project->matrices.rbegin();
 			for (; matrix != project->matrices.rend(); matrix++)
 			{
-				if (point.y > ypos_precalc && 
+				if (point.y > ypos_precalc &&
 					point.y < ypos_precalc + bloc_count_size)
 				{
 					if (point.x > 42)
@@ -138,10 +138,10 @@ void PsWinProject::OnLeftMouseButtonDown(PsPoint point)
 			// patron
 			if (project->pattern)
 			{
-				if (point.y > ypos_precalc && 
+				if (point.y > ypos_precalc &&
 					point.y < ypos_precalc + bloc_count_size)
 				{
-					PsPattern *pattern = project->pattern;
+					PsPattern* pattern = project->pattern;
 					if (point.x < 25)
 					{
 						if (pattern->hide) pattern->hide = false;
@@ -151,14 +151,14 @@ void PsWinProject::OnLeftMouseButtonDown(PsPoint point)
 					{
 						/*
 						SoftwareBuffer* img = imageList[pattern->GetAutoGenId()];
-						if (!img) 
-						img = loadThumb(&pattern->texture); 
+						if (!img)
+						img = loadThumb(&pattern->texture);
 						int p = (32 - img->GetWidth()) / 2 + 26 + img->GetWidth() + 5;
 						if (point.x > p && point.x < p + 18)
 						{
 						PsDlgInfoLight dlg2;
-						if (dlg2.ShowModal()) 
-						{								
+						if (dlg2.ShowModal())
+						{
 						pattern->SetLinearLight(dlg2.p, dlg2.e);
 						PsController::Instance().UpdateWindow();
 						}
@@ -190,7 +190,7 @@ void PsWinProject::OnLeftMouseButtonDown(PsPoint point)
 				{
 					PsDlgColor dlg;
 					dlg.SetColor(project->iColor[0], project->iColor[1], project->iColor[2]);
-					if (dlg.ShowModal()) 
+					if (dlg.ShowModal())
 					{
 						project->iColor[0] = dlg.GetColorRValue();
 						project->iColor[1] = dlg.GetColorGValue();
@@ -205,14 +205,14 @@ void PsWinProject::OnLeftMouseButtonDown(PsPoint point)
 	}
 }
 
-void PsWinProject::OnLButtonDownIn(PsPoint point, PsImage *image)
+void PsWinProject::OnLButtonDownIn(PsPoint point, PsImage* image)
 {
 	if (point.y > ypos_precalc &&
 		point.y < ypos_precalc + item_count_size)
-	{ 
+	{
 		if (point.x > 25)
 		{
-			PsProject *project = PsController::Instance().project;
+			PsProject* project = PsController::Instance().project;
 			project->SelectImage(image);
 			bDrawDragging = false;
 			bDragging = true;
@@ -235,7 +235,7 @@ void PsWinProject::OnLButtonDownIn(PsPoint point, PsImage *image)
 
 void PsWinProject::OnLeftMouseButtonUp(PsPoint point)
 {
-	PsProject *project = PsController::Instance().project;
+	PsProject* project = PsController::Instance().project;
 	if (!project) return;
 	if (bDragging)
 	{
@@ -244,9 +244,9 @@ void PsWinProject::OnLeftMouseButtonUp(PsPoint point)
 		{
 			if (dragBefore)
 			{
-				PsImage *imageSource = (PsImage*)selected;
-				PsMatrix *matrixSource = (PsMatrix*)imageSource->parent;
-				PsMatrix *matrixDest = (PsMatrix*)dragBefore->parent;
+				PsImage* imageSource = (PsImage*)selected;
+				PsMatrix* matrixSource = (PsMatrix*)imageSource->parent;
+				PsMatrix* matrixDest = (PsMatrix*)dragBefore->parent;
 				if (imageSource)
 				{
 					// > log
@@ -270,7 +270,7 @@ void PsWinProject::OnLeftMouseButtonUp(PsPoint point)
 					if (matrixSource) matrixSource->images.remove(imageSource);
 					else project->images.remove(imageSource);
 					imageSource->parent = matrixDest;
-					ImageList *images = &project->images;
+					ImageList* images = &project->images;
 					if (matrixDest) images = &matrixDest->images;
 					ImageList::iterator i = images->begin();
 					bool operation_succesfull = false;
@@ -292,16 +292,16 @@ void PsWinProject::OnLeftMouseButtonUp(PsPoint point)
 						imageSource->y = 0;
 					}
 					else if (matrixDest || matrixSource)
-						imageSource->SetPosition (project->GetWidth() / 2, project->renderer.doc_y / 2);
-					project->LogAdd (new LogSwapImage (*project, imageSource, matrixDest, matrixSource, j));
+						imageSource->SetPosition(project->GetWidth() / 2, project->renderer.doc_y / 2);
+					project->LogAdd(new LogSwapImage(*project, imageSource, matrixDest, matrixSource, j));
 					project->SelectImage(imageSource);
 				}
 			}
 			else if (dragLast)
 			{
-				PsImage *imageSource = (PsImage*)selected;
-				PsMatrix *matrixSource = (PsMatrix*)imageSource->parent;
-				PsMatrix *matrixDest = (PsMatrix*)dragLast;
+				PsImage* imageSource = (PsImage*)selected;
+				PsMatrix* matrixSource = (PsMatrix*)imageSource->parent;
+				PsMatrix* matrixDest = (PsMatrix*)dragLast;
 				if (imageSource)
 				{
 					// > log
@@ -332,15 +332,15 @@ void PsWinProject::OnLeftMouseButtonUp(PsPoint point)
 						imageSource->y = 0;
 					}
 					else if (matrixDest || matrixSource)
-						imageSource->SetPosition (project->GetWidth() / 2, project->renderer.doc_y / 2);
-					project->LogAdd (new LogSwapImage (*project, imageSource, matrixDest, matrixSource, j));
+						imageSource->SetPosition(project->GetWidth() / 2, project->renderer.doc_y / 2);
+					project->LogAdd(new LogSwapImage(*project, imageSource, matrixDest, matrixSource, j));
 					project->SelectImage(imageSource);
 				}
 			}
 			else if (dragTopmost)
 			{
-				PsImage *imageSource = (PsImage*)selected;
-				PsMatrix *matrixSource = (PsMatrix*)imageSource->parent;
+				PsImage* imageSource = (PsImage*)selected;
+				PsMatrix* matrixSource = (PsMatrix*)imageSource->parent;
 				if (imageSource)
 				{
 					// > log
@@ -371,8 +371,8 @@ void PsWinProject::OnLeftMouseButtonUp(PsPoint point)
 						imageSource->y = 0;
 					}
 					else if (matrixSource)
-						imageSource->SetPosition (project->GetWidth() / 2, project->renderer.doc_y / 2);
-					project->LogAdd (new LogSwapImage (*project, imageSource, 0, matrixSource, j));
+						imageSource->SetPosition(project->GetWidth() / 2, project->renderer.doc_y / 2);
+					project->LogAdd(new LogSwapImage(*project, imageSource, 0, matrixSource, j));
 					project->SelectImage(imageSource);
 				}
 			}
@@ -381,8 +381,8 @@ void PsWinProject::OnLeftMouseButtonUp(PsPoint point)
 		{
 			if (dragLast && project)
 			{
-				PsMatrix *matrixSource = (PsMatrix*)selected;
-				PsMatrix *matrixDest = (PsMatrix*)dragLast;
+				PsMatrix* matrixSource = (PsMatrix*)selected;
+				PsMatrix* matrixDest = (PsMatrix*)dragLast;
 				if (matrixSource && matrixDest && matrixSource != matrixDest)
 				{
 					// > log
@@ -393,7 +393,7 @@ void PsWinProject::OnLeftMouseButtonUp(PsPoint point)
 					if (j == project->matrices.size())
 						j = -1;
 					// < log
-					project->matrices.remove (matrixSource);
+					project->matrices.remove(matrixSource);
 					MatrixList::iterator i = project->matrices.begin();
 					bool operation_succesfull = false;
 					for (; i != project->matrices.end(); ++i)
@@ -402,12 +402,12 @@ void PsWinProject::OnLeftMouseButtonUp(PsPoint point)
 						{
 							project->matrices.insert(i, matrixSource);
 							operation_succesfull = true;
-							break; 
+							break;
 						}
 					}
 					if (!operation_succesfull) // Garde fou
 						project->matrices.push_back(matrixSource);
-					project->LogAdd (new LogSwapMatrix (*project, matrixSource, j));
+					project->LogAdd(new LogSwapMatrix(*project, matrixSource, j));
 				}
 			}
 		}
@@ -436,7 +436,7 @@ void PsWinProject::OnMyMouseMove(PsPoint point)
 				mouseCursor = CURSOR_FINGER;
 				UpdateMouseCursor();
 			}
-		} 
+		}
 		else
 		{
 			if (mouseCursor != CURSOR_DEFAULT)
@@ -454,18 +454,18 @@ void PsWinProject::OnMyMouseMove(PsPoint point)
 			mouseCursor = CURSOR_SCROLL2;
 			UpdateMouseCursor();
 		}
-		draggingPoint = point;						
+		draggingPoint = point;
 		Update();
 	}
 }
 
-SoftwareBuffer *PsWinProject::loadThumb(PsTexture *g)
+SoftwareBuffer* PsWinProject::loadThumb(PsTexture* g)
 {
 	//-- transformation dans le format de manipulation
 	int bpp;
 	int size_x = g->width, size_y = g->height;
-	uint8 *buffer = g->GetBufferUncompressed(bpp);
-	FIBITMAP *im = FreeImage_FromBuffer(buffer, size_x, size_y, bpp);
+	uint8* buffer = g->GetBufferUncompressed(bpp);
+	FIBITMAP* im = FreeImage_FromBuffer(buffer, size_x, size_y, bpp);
 	delete[] buffer;
 	//--
 
@@ -486,7 +486,7 @@ SoftwareBuffer *PsWinProject::loadThumb(PsTexture *g)
 	//--
 
 	//-- creation de la miniature
-	FIBITMAP *thumbnail = FreeImage_Rescale(im, tw, th, FILTER_BOX);
+	FIBITMAP* thumbnail = FreeImage_Rescale(im, tw, th, FILTER_BOX);
 	FreeImage_Unload(im);
 	im = thumbnail;
 	//--
@@ -499,12 +499,12 @@ SoftwareBuffer *PsWinProject::loadThumb(PsTexture *g)
 	//--
 
 	//-- transformation en SoftwareBuffer
-	SoftwareBuffer *img = new SoftwareBuffer;
+	SoftwareBuffer* img = new SoftwareBuffer;
 	img->Create(tw, th, 24);
 	int bytespp = FreeImage_GetLine(im) / FreeImage_GetWidth(im);
 	for (int j = 0; j < th; ++j)
 	{
-		BYTE *bits = FreeImage_GetScanLine(im, j);
+		BYTE* bits = FreeImage_GetScanLine(im, j);
 		for (int i = 0; i < tw; ++i)
 		{
 #ifdef _WINDOWS
@@ -528,12 +528,12 @@ SoftwareBuffer *PsWinProject::loadThumb(PsTexture *g)
 	return img;
 }
 
-void PsWinProject::relaseThumb(PsTexture *texture)
+void PsWinProject::relaseThumb(PsTexture* texture)
 {
 	if (imageList.find(texture->GetAutoGenId()) != imageList.end())
 	{
-		SoftwareBuffer *img = imageList[texture->GetAutoGenId()];
-		if (img) 
+		SoftwareBuffer* img = imageList[texture->GetAutoGenId()];
+		if (img)
 		{
 			delete img;
 			imageList[texture->GetAutoGenId()] = NULL;
@@ -542,7 +542,7 @@ void PsWinProject::relaseThumb(PsTexture *texture)
 	}
 }
 
-void PsWinProject::DrawMatrixBloc(PsMatrix *matrix)
+void PsWinProject::DrawMatrixBloc(PsMatrix* matrix)
 {
 	if (ypos_precalc + bloc_count_size > 0)
 	{
@@ -550,15 +550,15 @@ void PsWinProject::DrawMatrixBloc(PsMatrix *matrix)
 		SetPenColor(255, 255, 255);
 		bool close = true;
 		if (openCloseMap[matrix] != CLOSE)
-		{	
-			DrawRectangle(0, ypos_precalc, 25, ypos_precalc + bloc_count_size 
+		{
+			DrawRectangle(0, ypos_precalc, 25, ypos_precalc + bloc_count_size
 				+ item_count_size * (int)matrix->images.size() - 1);
 			close = false;
 		}
 		else DrawRectangle(0, ypos_precalc, 25, ypos_precalc + bloc_count_size - 1);
 
 		if (!matrix->hide) viewImage.BitBlt(*this, 4, ypos_precalc + 2);
-		else boxImage.BitBlt(*this, 4, ypos_precalc + 2);	
+		else boxImage.BitBlt(*this, 4, ypos_precalc + 2);
 
 		if (selected != matrix)
 		{
@@ -567,16 +567,16 @@ void PsWinProject::DrawMatrixBloc(PsMatrix *matrix)
 			DrawRectangle(26, ypos_precalc, iWidth, ypos_precalc + bloc_count_size);
 			if (!close) openImage.BitBlt(*this, 27, ypos_precalc + 8);
 			else closeImage.BitBlt(*this, 27, ypos_precalc + 5);
-			directoryImage.BitBlt(*this, 45, ypos_precalc + 4);	
+			directoryImage.BitBlt(*this, 45, ypos_precalc + 4);
 		}
 		else
 		{
 			SetBrushColor(10, 36, 106);
 			SetPenColor(10, 36, 106);
-			DrawRectangle(26, ypos_precalc, iWidth, ypos_precalc + bloc_count_size); 
+			DrawRectangle(26, ypos_precalc, iWidth, ypos_precalc + bloc_count_size);
 			if (!close) openImageB.BitBlt(*this, 27, ypos_precalc + 8);
 			else closeImageB.BitBlt(*this, 27, ypos_precalc + 5);
-			directoryImageB.BitBlt(*this, 45, ypos_precalc + 4);	
+			directoryImageB.BitBlt(*this, 45, ypos_precalc + 4);
 		}
 		//
 		PsRect p;
@@ -594,7 +594,7 @@ void PsWinProject::DrawMatrixBloc(PsMatrix *matrix)
 			SetTextColor(255, 255, 255);
 			MyFont = PSFONT_BOLD;
 		}
-		DrawText(buffer, p, MyFont); 
+		DrawText(buffer, p, MyFont);
 		//
 		SetPenColor(255, 255, 255);
 		MovePenTo(28, ypos_precalc + bloc_count_size);
@@ -605,34 +605,34 @@ void PsWinProject::DrawMatrixBloc(PsMatrix *matrix)
 	ypos_precalc += bloc_count_size;
 }
 
-void PsWinProject::DrawImageBloc(PsImage *image)
+void PsWinProject::DrawImageBloc(PsImage* image)
 {
-	if (ypos_precalc + item_count_size > 0) 
+	if (ypos_precalc + item_count_size > 0)
 	{
 		int left_space_pixels = 5;
 		if (image->parent) left_space_pixels = 15;
 
-		if (!image->hide) viewImage.BitBlt(*this, 4, ypos_precalc + 4);	
-		else boxImage.BitBlt(*this, 4, ypos_precalc + 4);	
+		if (!image->hide) viewImage.BitBlt(*this, 4, ypos_precalc + 4);
+		else boxImage.BitBlt(*this, 4, ypos_precalc + 4);
 
 		SetBrushColor(255, 255, 255);
 		SetPenColor(255, 255, 255);
-		DrawRectangle(26, ypos_precalc, iWidth, ypos_precalc + item_count_size); 
+		DrawRectangle(26, ypos_precalc, iWidth, ypos_precalc + item_count_size);
 		if (selected == image)
 		{
 			SetBrushColor(10, 36, 106);
 			SetPenColor(10, 36, 106);
-			DrawRectangle(26, ypos_precalc, iWidth, ypos_precalc + item_count_size - 1); 
+			DrawRectangle(26, ypos_precalc, iWidth, ypos_precalc + item_count_size - 1);
 		}
 
-		SoftwareBuffer *img = imageList[image->GetAutoGenId()];
+		SoftwareBuffer* img = imageList[image->GetAutoGenId()];
 		if (!img) img = loadThumb(&image->GetTexture());
 		assert(img);
-		int w = img->GetWidth(); 
+		int w = img->GetWidth();
 		int h = img->GetHeight();
-		int p = (32 - w) / 2  + left_space_pixels + 26;
+		int p = (32 - w) / 2 + left_space_pixels + 26;
 		int u = (item_count_size - h) / 2 + ypos_precalc;
-		img->BitBlt(*this, p, u);	 
+		img->BitBlt(*this, p, u);
 		if (selected == image)
 		{
 			SetPenColor(10, 36, 106);
@@ -674,9 +674,9 @@ void PsWinProject::DrawImageBloc(PsImage *image)
 			SetTextColor(255, 255, 255);
 			MyFont = PSFONT_BOLD;
 		}
-		DrawText(buffer, t, MyFont); 
+		DrawText(buffer, t, MyFont);
 		//
-		if (bDragging && image != selected 
+		if (bDragging && image != selected
 			&& dynamic_cast<PsImage*>(selected)
 			&& draggingPoint.y < ypos_precalc + item_count_size
 			&& draggingPoint.y > ypos_precalc)
@@ -690,33 +690,33 @@ void PsWinProject::DrawImageBloc(PsImage *image)
 
 void PsWinProject::DrawBackgroundBloc()
 {
-	PsProject *project = PsController::Instance().project;
+	PsProject* project = PsController::Instance().project;
 
 	if (project)
 	{
 		if (project->pattern)
 		{
-			PsPattern *pattern = project->pattern;
+			PsPattern* pattern = project->pattern;
 			// pattern
-			if (ypos_precalc + item_count_size > 0) 
+			if (ypos_precalc + item_count_size > 0)
 			{
-				if (!pattern->hide) viewImage.BitBlt(*this, 4, ypos_precalc + 4);	
-				else boxImage.BitBlt(*this, 4, ypos_precalc + 4);	
+				if (!pattern->hide) viewImage.BitBlt(*this, 4, ypos_precalc + 4);
+				else boxImage.BitBlt(*this, 4, ypos_precalc + 4);
 				SetBrushColor(212, 208, 200);
 				SetPenColor(255, 255, 255);
-				DrawRectangle(26, ypos_precalc, iWidth, ypos_precalc + item_count_size); 
-				SoftwareBuffer *img = imageList[pattern->GetAutoGenId()];
-				if (!img) 
-					img = loadThumb(&(pattern->texture)); 
+				DrawRectangle(26, ypos_precalc, iWidth, ypos_precalc + item_count_size);
+				SoftwareBuffer* img = imageList[pattern->GetAutoGenId()];
+				if (!img)
+					img = loadThumb(&(pattern->texture));
 				int p = (32 - img->GetWidth()) / 2 + 26;
 				int u = (item_count_size - img->GetHeight()) / 2 + ypos_precalc;
 				/*if (project->bPatternsIsSelected)
 				{
-				SetBrushColor(10, 36, 106); 
+				SetBrushColor(10, 36, 106);
 				SetPenColor(10, 36, 106);
-				DrawRectangle(p - 2, u - 2, p + img->GetWidth() + 2, u + img->GetHeight() + 2); 
+				DrawRectangle(p - 2, u - 2, p + img->GetWidth() + 2, u + img->GetHeight() + 2);
 				}*/
-				img->BitBlt(*this, p, u);	
+				img->BitBlt(*this, p, u);
 				p += img->GetWidth() + 5;
 				//spot.BitBlt(*this, p, ypos_precalc + 5);	
 				//p += 18 + 5;
@@ -724,16 +724,16 @@ void PsWinProject::DrawBackgroundBloc()
 				t.left = p; t.top = ypos_precalc;
 				t.right = iWidth; t.bottom = ypos_precalc + item_count_size;
 				SetTextColor(0, 0, 0);
-				DrawText(GetLabel(LABEL_PATTERN), t, PSFONT_NORMAL); 
+				DrawText(GetLabel(LABEL_PATTERN), t, PSFONT_NORMAL);
 			}
 			ypos_precalc += item_count_size;
 		}
 
 		// uniform color
-		if (ypos_precalc + item_count_size > 0) 
+		if (ypos_precalc + item_count_size > 0)
 		{
-			if (!project->bHideColor) viewImage.BitBlt(*this, 4, ypos_precalc + 4);	
-			else boxImage.BitBlt(*this, 4, ypos_precalc + 4);	
+			if (!project->bHideColor) viewImage.BitBlt(*this, 4, ypos_precalc + 4);
+			else boxImage.BitBlt(*this, 4, ypos_precalc + 4);
 			SetBrushColor(212, 208, 200);
 			SetPenColor(255, 255, 255);
 			DrawRectangle(26, ypos_precalc, iWidth, ypos_precalc + item_count_size);
@@ -748,13 +748,13 @@ void PsWinProject::DrawBackgroundBloc()
 			t.left = 80; t.top = ypos_precalc;
 			t.right = iWidth; t.bottom = ypos_precalc + item_count_size;
 			SetTextColor(0, 0, 0);
-			DrawText(GetLabel(LABEL_BACKGROUND), t, PSFONT_NORMAL); 
+			DrawText(GetLabel(LABEL_BACKGROUND), t, PSFONT_NORMAL);
 		}
 		ypos_precalc += item_count_size;
 	}
 }
 
-void PsWinProject::DrawInsertionCaret() 
+void PsWinProject::DrawInsertionCaret()
 {
 	SetPenColor(0, 0, 0);
 	SetBrushColor(0, 0, 0);
@@ -762,7 +762,7 @@ void PsWinProject::DrawInsertionCaret()
 	DrawLineTo(iWidth, ypos_precalc);
 	MovePenTo(0, ypos_precalc - 2);
 	DrawLineTo(iWidth, ypos_precalc - 2);
-	PsPoint ptsr[3], *pts = ptsr;	
+	PsPoint ptsr[3], * pts = ptsr;
 	pts[0].x = 0; pts[0].y = ypos_precalc - 2;
 	pts[1].x = 0; pts[1].y = ypos_precalc - 5;
 	pts[2].x = 3; pts[2].y = ypos_precalc - 2;
@@ -778,12 +778,12 @@ void PsWinProject::DrawInsertionCaret()
 	pts[0].x = iWidth - s.right - 1; pts[0].y = ypos_precalc;
 	pts[1].x = iWidth - s.right - 1; pts[1].y = ypos_precalc + 3;
 	pts[2].x = iWidth - s.right - 4; pts[2].y = ypos_precalc;
-	DrawPolygon(pts, 3);	
+	DrawPolygon(pts, 3);
 }
 
 void PsWinProject::GenericUpdate()
 {
-	PsProject *project = PsController::Instance().project;
+	PsProject* project = PsController::Instance().project;
 
 	if (!project) scrollbar->Disable();
 
@@ -811,7 +811,7 @@ void PsWinProject::GenericUpdate()
 		{
 			DrawImageBloc(*image);
 			imageNameCount++;
-			item_count++; 
+			item_count++;
 		}
 		matNameCount = 1; // FIXME
 		MatrixList::reverse_iterator matrix = project->matrices.rbegin();
@@ -832,7 +832,7 @@ void PsWinProject::GenericUpdate()
 						MovePenTo(26 + 15, ypos_precalc - 1);
 						DrawLineTo(iWidth, ypos_precalc - 1);
 					}
-					item_count++; 
+					item_count++;
 					motifNameCount++;
 				}
 			}
@@ -870,7 +870,7 @@ void PsWinProject::GenericUpdate()
 		if (totalHSize - (int)iHeight > 0)
 		{
 			scrollbar->Enable();
-			scrollbar->SetSize(totalHSize - iHeight); 
+			scrollbar->SetSize(totalHSize - iHeight);
 		}
 		else scrollbar->Disable();
 

@@ -193,24 +193,24 @@ PsVector& PsVector::operator/=(const float k)
 */
 float PsVector::Size()
 {
-	return sqrt(pow(X, 2.f) + pow(Y, 2.f) + pow(Z, 2.f));
+	return sqrt(pow(X, 2.0) + pow(Y, 2.0) + pow(Z, 2.0));
 }
 
 PsRotator::PsRotator()
 {
-	Yaw = 0.f;
-	Pitch = 0.f;
-	Roll = 0.f;
+	Yaw = 0.0;
+	Pitch = 0.0;
+	Roll = 0.0;
 }
 
 float PsRotator::ToDegree(float r)
 {
-	return (r * 180.0f / PS_MATH_PI);
+	return (r * 180.0 / PS_MATH_PI);
 }
 
 float PsRotator::FromDegree(float r)
 {
-	return (r * PS_MATH_PI / 180.0f);
+	return (r * PS_MATH_PI / 180.0);
 }
 
 #ifdef _WINDOWS

@@ -1,16 +1,16 @@
 /**
  * This file is part of Patternshop Project.
- * 
+ *
  * Patternshop is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * Patternshop is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with Patternshop.  If not, see <http://www.gnu.org/licenses/>
 */
@@ -41,13 +41,13 @@ PsLayer::~PsLayer()
 {
 	if (iFinalTextureId)
 	{
-		glDeleteTextures (1, &iFinalTextureId);
+		glDeleteTextures(1, &iFinalTextureId);
 		iFinalTextureId = 0;
 	}
 
 	if (iMaskTextureId)
 	{
-		glDeleteTextures (1, &iMaskTextureId);
+		glDeleteTextures(1, &iMaskTextureId);
 		iMaskTextureId = 0;
 	}
 
@@ -61,26 +61,26 @@ PsLayer::~PsLayer()
 /*
 ** Charge les données d'une calque (ceci comprend toutes les images qu'elle contient) depuis un fichier.
 */
-ErrID PsLayer::FileLoad (FILE* file)
+ErrID PsLayer::FileLoad(FILE* file)
 {
 
-	if (fread (&iWidth, sizeof (int), 1, file) != 1)
+	if (fread(&iWidth, sizeof(int), 1, file) != 1)
 		return ERROR_FILE_READ;
 
-	if (fread (&iHeight, sizeof (int), 1, file) != 1)
+	if (fread(&iHeight, sizeof(int), 1, file) != 1)
 		return ERROR_FILE_READ;
 
 	ucData = new uint8[iWidth * iHeight];
-	if (fread (ucData, sizeof (*ucData), iWidth * iHeight, file) != iWidth * iHeight)
+	if (fread(ucData, sizeof(*ucData), iWidth * iHeight, file) != iWidth * iHeight)
 		return ERROR_FILE_READ;
 
 	if (Register(iWidth, iHeight, ucData) != ERROR_NONE)
 		return ERROR_FILE_READ;
 
-	if (fread (&vTranslation, sizeof (PsVector), 1, file) != 1)
+	if (fread(&vTranslation, sizeof(PsVector), 1, file) != 1)
 		return ERROR_FILE_READ;
 
-	if (fread (&rRotation, sizeof (PsRotator), 1, file) != 1)
+	if (fread(&rRotation, sizeof(PsRotator), 1, file) != 1)
 		return ERROR_FILE_READ;
 
 	/*
@@ -91,7 +91,7 @@ ErrID PsLayer::FileLoad (FILE* file)
 	return ERROR_FILE_READ;
 	*/
 
-	if (fread (&fScale, sizeof (float), 1, file) != 1)
+	if (fread(&fScale, sizeof(float), 1, file) != 1)
 		return ERROR_FILE_READ;
 
 	return ERROR_NONE;
@@ -100,22 +100,22 @@ ErrID PsLayer::FileLoad (FILE* file)
 /*
 ** Sauvegarde toutes les données d'une calque dans un fichier.
 */
-ErrID PsLayer::FileSave (FILE* file) const
+ErrID PsLayer::FileSave(FILE* file) const
 {
 
-	if (fwrite (&iWidth, sizeof (int), 1, file) != 1)
+	if (fwrite(&iWidth, sizeof(int), 1, file) != 1)
 		return ERROR_FILE_WRITE;
 
-	if (fwrite (&iHeight, sizeof (int), 1, file) != 1)
+	if (fwrite(&iHeight, sizeof(int), 1, file) != 1)
 		return ERROR_FILE_WRITE;
 
-	if (fwrite (ucData, sizeof (*ucData), iWidth * iHeight, file) != iWidth * iHeight)
+	if (fwrite(ucData, sizeof(*ucData), iWidth * iHeight, file) != iWidth * iHeight)
 		return ERROR_FILE_WRITE;
 
-	if (fwrite (&vTranslation, sizeof (PsVector), 1, file) != 1)
+	if (fwrite(&vTranslation, sizeof(PsVector), 1, file) != 1)
 		return ERROR_FILE_WRITE;
 
-	if (fwrite (&rRotation, sizeof (PsRotator), 1, file) != 1)
+	if (fwrite(&rRotation, sizeof(PsRotator), 1, file) != 1)
 		return ERROR_FILE_WRITE;
 
 	/*
@@ -126,7 +126,7 @@ ErrID PsLayer::FileSave (FILE* file) const
 	return ERROR_FILE_WRITE;
 	*/
 
-	if (fwrite (&fScale, sizeof (float), 1, file) != 1)
+	if (fwrite(&fScale, sizeof(float), 1, file) != 1)
 		return ERROR_FILE_WRITE;
 
 	return ERROR_NONE;
@@ -162,7 +162,7 @@ ErrID PsLayer::CreateTexture()
 	//--
 
 	//-- préparation des données
-	uint8 *texture_buffer = new uint8 [w * h];
+	uint8* texture_buffer = new uint8[w * h];
 	for (int x = w; x--; )
 	{
 		for (int y = h; y--; )
@@ -176,23 +176,21 @@ ErrID PsLayer::CreateTexture()
 				{
 					v += ucData[i + j * iWidth];
 					++n;
-				}
-				while (++j < (y + 1) * iHeight / h);
-			}
-			while (++i < (x + 1) * iWidth / w);
-			texture_buffer[(x + y * w)] = ( v / n > 127 ? 255 : 0);
+				} while (++j < (y + 1) * iHeight / h);
+			} while (++i < (x + 1) * iWidth / w);
+			texture_buffer[(x + y * w)] = (v / n > 127 ? 255 : 0);
 		}
 	}
 	//--
 
 	//-- creation de la texture
-	glEnable (GL_TEXTURE_2D);
-	glGenTextures (1, &iMaskTextureId);
-	glBindTexture (GL_TEXTURE_2D, iMaskTextureId);
-	glTexImage2D (GL_TEXTURE_2D, 0, GL_ALPHA, w, h, 0, GL_ALPHA, GL_UNSIGNED_BYTE, texture_buffer);
-	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glDisable (GL_TEXTURE_2D);
+	glEnable(GL_TEXTURE_2D);
+	glGenTextures(1, &iMaskTextureId);
+	glBindTexture(GL_TEXTURE_2D, iMaskTextureId);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, w, h, 0, GL_ALPHA, GL_UNSIGNED_BYTE, texture_buffer);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glDisable(GL_TEXTURE_2D);
 	delete[] texture_buffer;
 	//--
 
@@ -201,16 +199,16 @@ ErrID PsLayer::CreateTexture()
 
 /* Perform one transform operation */
 static void
-Transform(GLfloat *matrix, GLfloat *in, GLfloat *out)
+Transform(GLfloat* matrix, GLfloat* in, GLfloat* out)
 {
 	int ii;
 
-	for (ii=0; ii<4; ++ii) {
-		out[ii] = 
-			in[0] * matrix[0*4+ii] +
-			in[1] * matrix[1*4+ii] +
-			in[2] * matrix[2*4+ii] +
-			in[3] * matrix[3*4+ii];
+	for (ii = 0; ii < 4; ++ii) {
+		out[ii] =
+			in[0] * matrix[0 * 4 + ii] +
+			in[1] * matrix[1 * 4 + ii] +
+			in[2] * matrix[2 * 4 + ii] +
+			in[3] * matrix[3 * 4 + ii];
 	}
 }
 
@@ -219,7 +217,7 @@ Transform(GLfloat *matrix, GLfloat *in, GLfloat *out)
 */
 
 static void
-DoTransform(GLfloat *in, GLfloat *out)
+DoTransform(GLfloat* in, GLfloat* out)
 {
 	GLfloat tmp[4];
 	GLfloat invW;       /* 1/w */
@@ -240,7 +238,7 @@ DoTransform(GLfloat *in, GLfloat *out)
 	// Perspective divide
 	out[0] *= invW;
 	out[1] *= invW;
-	out[2] *= invW; 
+	out[2] *= invW;
 	// Map to 0..1 range 
 	/*
 	out[0] = out[0] * 0.5f + 0.5f;
@@ -256,27 +254,27 @@ DoTransform(GLfloat *in, GLfloat *out)
 	out[3] = invW;
 }
 
-void PsLayer::InitProjection(PsRender &renderer)
+void PsLayer::InitProjection(PsRender& renderer)
 {
 	/* Retrieve the view port */
-	Viewport[0] = (GLfloat) 0;
-	Viewport[1] = (GLfloat) 0;
-	Viewport[2] = (GLfloat) renderer.doc_x;
-	Viewport[3] = (GLfloat) renderer.doc_y;
+	Viewport[0] = (GLfloat)0;
+	Viewport[1] = (GLfloat)0;
+	Viewport[2] = (GLfloat)renderer.doc_x;
+	Viewport[3] = (GLfloat)renderer.doc_y;
 
-	/* Retrieve the projection matrix */ 
+	/* Retrieve the projection matrix */
 	glMatrixMode(GL_PROJECTION);
-	glPushMatrix();  
-	glLoadIdentity();   
+	glPushMatrix();
+	glLoadIdentity();
 	//glFrustum(-10, 10, -10, 10, 1.f, 20001.f); 
 	gluPerspective(45.0f, Viewport[2] / Viewport[3], 10000.f, 20000.f);
 	glGetFloatv(GL_PROJECTION_MATRIX, Projection);
-	glPopMatrix(); 
+	glPopMatrix();
 
-	/* Retrieve the model view matrix */  
+	/* Retrieve the model view matrix */
 	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();   
-	glLoadIdentity(); 
+	glPushMatrix();
+	glLoadIdentity();
 	//glTranslatef(renderer.size_x / 2.f, 0.f, -10001.f);
 	PsVector vEye = renderer.GetEyeLocation();
 	gluLookAt(vEye.X, vEye.Y, vEye.Z, // oeuil   
@@ -287,7 +285,7 @@ void PsLayer::InitProjection(PsRender &renderer)
 	glPopMatrix();
 }
 
-void PsLayer::UpdateProjection(PsRender &renderer)
+void PsLayer::UpdateProjection(PsRender& renderer)
 {
 
 	float fLayerWidth = renderer.doc_x;
@@ -309,10 +307,10 @@ void PsLayer::UpdateProjection(PsRender &renderer)
 		vProjected[i].Z = 0.f;
 
 		// scale
-		vProjected[i] = vProjected[i] * fScale; 
+		vProjected[i] = vProjected[i] * fScale;
 
 		// rotation
-		vProjected[i] = RotateVertex(vProjected[i], PsRotator::FromDegree(rRotation.Roll), 
+		vProjected[i] = RotateVertex(vProjected[i], PsRotator::FromDegree(rRotation.Roll),
 			PsRotator::FromDegree(rRotation.Pitch), PsRotator::FromDegree(rRotation.Yaw));
 
 		// translation
@@ -347,7 +345,7 @@ void PsLayer::UpdateProjection(PsRender &renderer)
 	}
 }
 
-void PsLayer::UpdateGizmoProjection(PsRender &renderer)
+void PsLayer::UpdateGizmoProjection(PsRender& renderer)
 {
 
 	float fLayerWidth = fGizmoSize;
@@ -370,10 +368,10 @@ void PsLayer::UpdateGizmoProjection(PsRender &renderer)
 		vProjectedGizmo[i].Z = 0.f;
 
 		// scale
-		vProjectedGizmo[i] = vProjectedGizmo[i] * fScale; 
+		vProjectedGizmo[i] = vProjectedGizmo[i] * fScale;
 
 		// rotation
-		vProjectedGizmo[i] = RotateVertex(vProjectedGizmo[i], PsRotator::FromDegree(rRotation.Roll), 
+		vProjectedGizmo[i] = RotateVertex(vProjectedGizmo[i], PsRotator::FromDegree(rRotation.Roll),
 			PsRotator::FromDegree(rRotation.Pitch), PsRotator::FromDegree(rRotation.Yaw));
 
 		// translation
@@ -414,13 +412,13 @@ bool PsLayer::MouseIsInside(int x, int y) const
 
 	for (int i = 0; i < 4; ++i)
 	{
-		PsVector vN = vProjectedGizmo[(i + 1) % 4] - vProjectedGizmo[i]; 
+		PsVector vN = vProjectedGizmo[(i + 1) % 4] - vProjectedGizmo[i];
 		vN = RotateVertex(vN, 0, 0, 3.14f / 2.f);
 
 		PsVector vAP = vPoint - vProjectedGizmo[i];
 		PsVector vAC = vProjectedGizmo[(i + 2) % 4] - vProjectedGizmo[i];
 
-		if (!SameSign(DotProduct2x2(vAP, vN),DotProduct2x2(vAC, vN)))
+		if (!SameSign(DotProduct2x2(vAP, vN), DotProduct2x2(vAC, vN)))
 			return false;
 
 	}
@@ -432,19 +430,19 @@ bool PsLayer::MouseIsInside(int x, int y) const
 ** Teste si un point est à l'un des emplacements de rotation; même remarques que pour
 ** le redimentionnement.
 */
-bool PsLayer::InRotate (float px, float py, float zoom, int& i) const
+bool PsLayer::InRotate(float px, float py, float zoom, int& i) const
 {
 	float	size = SHAPE_SIZE_ROTATE * zoom;
 
 	for (i = 0; i < 4; ++i)
 	{
 		float angle = ToAngle(vProjectedGizmo[i].X, vProjectedGizmo[i].Y);
-		float ax = size * cos (angle) - size * sin (angle);
-		float ay = size * sin (angle) + size * cos (angle);
+		float ax = size * cos(angle) - size * sin(angle);
+		float ay = size * sin(angle) + size * cos(angle);
 
-		if (px >= vProjectedGizmo[i].X + ax - size 
-			&& px <= vProjectedGizmo[i].X + ax + size 
-			&& py >= vProjectedGizmo[i].Y + ay - size 
+		if (px >= vProjectedGizmo[i].X + ax - size
+			&& px <= vProjectedGizmo[i].X + ax + size
+			&& py >= vProjectedGizmo[i].Y + ay - size
 			&& py <= vProjectedGizmo[i].Y + ay + size)
 			return true;
 	}
@@ -455,15 +453,15 @@ bool PsLayer::InRotate (float px, float py, float zoom, int& i) const
 /*
 ** Retourne l'angle entre le centre de l'PsShape et le point "ax, ay", en radians.
 */
-float	PsLayer::ToAngle (float ax, float ay) const
+float	PsLayer::ToAngle(float ax, float ay) const
 {
 	float tx = vTranslation.X;
 	float ty = vTranslation.Y;
 
 	if (ax < tx)
-		return (float)atan ((ay - ty) / (ax - tx)) + PS_MATH_PI;
+		return (float)atan((ay - ty) / (ax - tx)) + PS_MATH_PI;
 	else if (ax > tx)
-		return (float)atan ((ay - ty) / (ax - tx));
+		return (float)atan((ay - ty) / (ax - tx));
 	else
 		return (ay < ty ? -PS_MATH_PI : PS_MATH_PI) / 2.0f;
 }
@@ -474,14 +472,14 @@ float	PsLayer::ToAngle (float ax, float ay) const
 ** prendre le zoom en paramètre, pour que la taille des poignées ne soient pas affectées par lui
 ** (on doit donc pouvoir annuler ses effets).
 */
-bool PsLayer::InResize (float px, float py, float zoom, int& i) const
+bool PsLayer::InResize(float px, float py, float zoom, int& i) const
 {
 	float	size = SHAPE_SIZE_RESIZE * zoom;
 
 	for (i = 0; i < 4; ++i)
-		if (px >= vProjectedGizmo[i].X - size 
-			&& px <= vProjectedGizmo[i].X + size 
-			&& py >= vProjectedGizmo[i].Y - size 
+		if (px >= vProjectedGizmo[i].X - size
+			&& px <= vProjectedGizmo[i].X + size
+			&& py >= vProjectedGizmo[i].Y - size
 			&& py <= vProjectedGizmo[i].Y + size)
 			return true;
 

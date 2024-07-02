@@ -1,16 +1,16 @@
 /**
  * This file is part of Patternshop Project.
- * 
+ *
  * Patternshop is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * Patternshop is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with Patternshop.  If not, see <http://www.gnu.org/licenses/>
 */
@@ -40,7 +40,7 @@ PsMatrix::~PsMatrix()
 	ImageList::iterator	i;
 
 	for (i = images.begin(); i != images.end(); ++i)
-		delete *i;
+		delete* i;
 }
 
 /*
@@ -71,75 +71,75 @@ void		PsMatrix::DoResetAll()
 /*
 ** Charge les données d'une matrice (ceci comprend toutes les images qu'elle contient) depuis un fichier.
 */
-ErrID		PsMatrix::FileLoad (FILE* file)
+ErrID		PsMatrix::FileLoad(FILE* file)
 {
-	PsImage*	image;
+	PsImage* image;
 	ErrID	err;
 	size_t	n;
 
-	if (fread (&color, sizeof (color), 1, file) != 1)
+	if (fread(&color, sizeof(color), 1, file) != 1)
 		return ERROR_FILE_READ;
 
-	if (fread (&n, sizeof (n), 1, file) != 1)
+	if (fread(&n, sizeof(n), 1, file) != 1)
 		return ERROR_FILE_READ;
 
 	while (n--)
 	{
-		images.push_back ((image = new PsImage (this)));
+		images.push_back((image = new PsImage(this)));
 
-		if ((err = image->FileLoad (file)) != ERROR_NONE)
+		if ((err = image->FileLoad(file)) != ERROR_NONE)
 			return err;
 	}
 
-	if (fread (&div_is_active, sizeof (div_is_active), 1, file) != 1)
+	if (fread(&div_is_active, sizeof(div_is_active), 1, file) != 1)
 		return ERROR_FILE_READ;
 
-	if (fread (&div_x, sizeof (div_x), 1, file) != 1)
+	if (fread(&div_x, sizeof(div_x), 1, file) != 1)
 		return ERROR_FILE_READ;
 
-	if (fread (&div_y, sizeof (div_y), 1, file) != 1)
+	if (fread(&div_y, sizeof(div_y), 1, file) != 1)
 		return ERROR_FILE_READ;
 
-	return PsShape::FileLoad (file);
+	return PsShape::FileLoad(file);
 }
 
 /*
 ** Sauvegarde toutes les données d'une matrice dans un fichier.
 */
-ErrID									PsMatrix::FileSave (FILE* file) const
+ErrID									PsMatrix::FileSave(FILE* file) const
 {
 	ImageList::const_iterator	i;
 	ErrID								err;
 	size_t								n;
 
-	if (fwrite (&color, sizeof (color), 1, file) != 1)
+	if (fwrite(&color, sizeof(color), 1, file) != 1)
 		return ERROR_FILE_WRITE;
 
 	n = images.size();
 
-	if (fwrite (&n, sizeof (n), 1, file) != 1)
+	if (fwrite(&n, sizeof(n), 1, file) != 1)
 		return ERROR_FILE_WRITE;
 
 	for (i = images.begin(); i != images.end(); ++i)
-		if ((err = (*i)->FileSave (file)) != ERROR_NONE)
+		if ((err = (*i)->FileSave(file)) != ERROR_NONE)
 			return err;
 
-	if (fwrite (&div_is_active, sizeof (div_is_active), 1, file) != 1)
+	if (fwrite(&div_is_active, sizeof(div_is_active), 1, file) != 1)
 		return ERROR_FILE_WRITE;
 
-	if (fwrite (&div_x, sizeof (div_x), 1, file) != 1)
+	if (fwrite(&div_x, sizeof(div_x), 1, file) != 1)
 		return ERROR_FILE_WRITE;
 
-	if (fwrite (&div_y, sizeof (div_y), 1, file) != 1)
+	if (fwrite(&div_y, sizeof(div_y), 1, file) != 1)
 		return ERROR_FILE_WRITE;
 
-	return PsShape::FileSave (file);
+	return PsShape::FileSave(file);
 }
 
 /*
 ** Récuere la couleur de la matrice (pour le mode "highlight").
 */
-void				PsMatrix::GetColor (float& r, float& g, float& b) const
+void				PsMatrix::GetColor(float& r, float& g, float& b) const
 {
 	static float	rgb[][3] =
 	{
@@ -160,7 +160,7 @@ void				PsMatrix::GetColor (float& r, float& g, float& b) const
 ** Récupere la position d'une matrice. Il serait peut-être utile d'enregistrer ces coordonnées
 ** en relatif plutot qu'en absolu, pour tester quand une matrice sort du document facilement ?
 */
-void	PsMatrix::GetPosition (float& x, float& y) const
+void	PsMatrix::GetPosition(float& x, float& y) const
 {
 	x = this->x;
 	y = this->y;
@@ -171,7 +171,7 @@ void	PsMatrix::GetPosition (float& x, float& y) const
 ** "reflect" est actif, cette rotation est répercutée sur toutes les images contenues dans
 ** la matrice.
 */
-void  PsMatrix::SetAngle (float r, bool constrain, bool reflect)
+void  PsMatrix::SetAngle(float r, bool constrain, bool reflect)
 {
 	ImageList::iterator	image;
 	float				angle;
@@ -184,7 +184,7 @@ void  PsMatrix::SetAngle (float r, bool constrain, bool reflect)
 		angle = r - this->r;
 
 		for (image = images.begin(); image != images.end(); ++image)
-			(*image)->SetAngle ((*image)->GetAngle() + angle, false, reflect);
+			(*image)->SetAngle((*image)->GetAngle() + angle, false, reflect);
 	}
 
 	this->r = r;
@@ -198,9 +198,9 @@ void  PsMatrix::SetAngle (float r, bool constrain, bool reflect)
 ** relatives pour la position (voir fonction "GetPosition"), et ainsi de tester simplement si
 ** x < -SHAPE_SIZE, x > SHAPE_SIZE, y < -SHAPE_SIZE, y > SHAPE_SIZE.
 */
-void	PsMatrix::SetPosition (float x, float y, bool)
+void	PsMatrix::SetPosition(float x, float y, bool)
 {
-	PsShape::FinalizePosition (x, y);
+	PsShape::FinalizePosition(x, y);
 }
 
 /*
@@ -208,7 +208,7 @@ void	PsMatrix::SetPosition (float x, float y, bool)
 ** old_w et old_h servent justement à connaitre le ratio des dimentions de la matrice avant
 ** cette transformation). Voir la fonction "PsShape::FinalizeSize" à propos des paramètres inv_x et inv_y.
 */
-void					PsMatrix::SetSize (float w, float h, float inv_x, float inv_y, float old_w, float old_h, bool constrain, bool reflect)
+void					PsMatrix::SetSize(float w, float h, float inv_x, float inv_y, float old_w, float old_h, bool constrain, bool reflect)
 {
 	ImageList::iterator	image;
 	float				ratio_h;
@@ -240,20 +240,20 @@ void					PsMatrix::SetSize (float w, float h, float inv_x, float inv_y, float ol
 			float	sin_a;
 
 			angle = r - (*image)->r;
-			cos_a = abs (cos (angle));
-			sin_a = abs (sin (angle));
+			cos_a = abs(cos(angle));
+			sin_a = abs(sin(angle));
 
-			(*image)->SetSize ((*image)->w * (ratio_w * cos_a + ratio_h * (1 - cos_a)), (*image)->h * (ratio_w * sin_a + ratio_h * (1 - sin_a)), constrain, reflect);
+			(*image)->SetSize((*image)->w * (ratio_w * cos_a + ratio_h * (1 - cos_a)), (*image)->h * (ratio_w * sin_a + ratio_h * (1 - sin_a)), constrain, reflect);
 		}
 	}
 
-	PsShape::FinalizeSize (w, h, inv_x, inv_y);
+	PsShape::FinalizeSize(w, h, inv_x, inv_y);
 }
 
 /*
 ** Change la torsion de la matrice, avec éventuelle contrainte sur le pas.
 */
-void	PsMatrix::SetTorsion (float i, float j, bool constrain)
+void	PsMatrix::SetTorsion(float i, float j, bool constrain)
 {
 	if (constrain)
 	{
@@ -268,7 +268,7 @@ void	PsMatrix::SetTorsion (float i, float j, bool constrain)
 /*
 ** Récuper la torsion de la matrice.
 */
-void	PsMatrix::GetTorsion (float& a, float& b) const
+void	PsMatrix::GetTorsion(float& a, float& b) const
 {
 	a = i;
 	b = j;

@@ -20,8 +20,8 @@
 
 #include "PsTypes.h"
 
-#define PS_MATH_PI 3.14159265358979323846f
-#define PS_MATH_NEAR_ZERO 0.000001f
+#define PS_MATH_PI 3.14159265358979323846
+#define PS_MATH_NEAR_ZERO 0.000001
 
 /*
 ** Un vecteur en pixel.

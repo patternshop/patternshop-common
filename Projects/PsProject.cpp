@@ -1,16 +1,16 @@
 /**
  * This file is part of Patternshop Project.
- * 
+ *
  * Patternshop is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * Patternshop is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with Patternshop.  If not, see <http://www.gnu.org/licenses/>
 */
@@ -51,12 +51,12 @@
 ** Initialement, aucun patron n'est selectionné, ni aucune matrice, ni aucune image, etc.
 */
 PsProject::PsProject() :
-pattern(0),
-matrix(0),
-image(0),
-shape(0),
-center(true),
-log_insert(false)
+	pattern(0),
+	matrix(0),
+	image(0),
+	shape(0),
+	center(true),
+	log_insert(false)
 {
 	iColor[0] = 255;
 	iColor[1] = 255;
@@ -78,27 +78,27 @@ PsProject::~PsProject()
 */
 ErrID				PsProject::CloneImage()
 {
-	uint8*	buffer1;
-	uint8*	buffer2;
-	PsImage*	image;
+	uint8* buffer1;
+	uint8* buffer2;
+	PsImage* image;
 	size_t		size;
-	
+
 	if (!this->image)
 		return ERROR_IMAGE_SELECT;
 
 	image = new PsImage(this->matrix);
-	
+
 	buffer1 = this->image->GetTexture().GetBuffer(size);
-	buffer2 = new uint8 [size];
+	buffer2 = new uint8[size];
 	memcpy(buffer2, buffer1, size * sizeof(*buffer2));
-	
+
 	if (!image->TextureFromBuffer(buffer2))
 		return ERROR_IMAGE_LOAD;
-	
+
 	image->SetAngle(this->image->GetAngle());
 	image->SetSize(this->image->w, this->image->h);
 	image->SetTorsion(this->image->i, this->image->j);
-	
+
 	if (this->matrix)
 	{
 		this->matrix->images.push_back(image);
@@ -110,10 +110,10 @@ ErrID				PsProject::CloneImage()
 		this->images.push_back(image);
 		image->SetPosition(PROJECT_VERSION / 2.0f, GetHeight() / 2.0f);
 	}
-	
+
 	this->LogAdd(new LogNewImage(*this, image, true));
 	this->SelectImage(image);
-	
+
 	return ERROR_NONE;
 }
 
@@ -122,50 +122,50 @@ ErrID				PsProject::CloneImage()
 */
 ErrID					PsProject::CloneMatrix()
 {
-	uint8*		buffer1;
-	uint8*		buffer2;
-	PsMatrix*				matrix;
+	uint8* buffer1;
+	uint8* buffer2;
+	PsMatrix* matrix;
 	ImageList::iterator		ti;
-	PsImage*				image;
+	PsImage* image;
 	size_t				size;
-	
+
 	if (!this->matrix)
 		return ERROR_MATRIX_SELECT;
-	
+
 	matrix = new PsMatrix();
-	
+
 	this->matrices.push_back(matrix);
-	
+
 	matrix->SetAngle(this->matrix->GetAngle());
 	matrix->SetSize(this->matrix->w, this->matrix->h);
 	matrix->SetTorsion(this->matrix->i, this->matrix->j);
 	matrix->SetPosition(GetWidth() / 2.0f, GetHeight() / 2.0f);
-	
+
 	this->LogAdd(new LogNewMatrix(*this, matrix, true));
-	
-	for(ti = this->matrix->images.begin(); ti != this->matrix->images.end(); ++ti)
+
+	for (ti = this->matrix->images.begin(); ti != this->matrix->images.end(); ++ti)
 	{
 		image = new PsImage(matrix);
-		
-		buffer1 =(*ti)->GetTexture().GetBuffer(size);
-		buffer2 = new uint8 [size];
+
+		buffer1 = (*ti)->GetTexture().GetBuffer(size);
+		buffer2 = new uint8[size];
 		memcpy(buffer2, buffer1, size * sizeof(*buffer2));
-		
+
 		if (!image->TextureFromBuffer(buffer2))
 			return ERROR_IMAGE_LOAD;
-		
+
 		matrix->images.push_back(image);
 		image->SetAngle((*ti)->GetAngle());
-		image->SetSize((*ti)->w,(*ti)->h);
-		image->SetTorsion((*ti)->i,(*ti)->j);
-		image->x =(*ti)->x;
-		image->y =(*ti)->y;
-		
+		image->SetSize((*ti)->w, (*ti)->h);
+		image->SetTorsion((*ti)->i, (*ti)->j);
+		image->x = (*ti)->x;
+		image->y = (*ti)->y;
+
 		this->LogAdd(new LogNewImage(*this, image, true));
 	}
-	
+
 	this->SelectMatrix(matrix);
-	
+
 	return ERROR_NONE;
 }
 
@@ -176,12 +176,12 @@ ErrID	PsProject::ReplaceImage(const char* file)
 {
 	if (!this->image)
 		return ERROR_IMAGE_SELECT;
-	
+
 	this->LogAdd(new LogReplace(*this, this->image));
-	
+
 	if (!this->image->TextureFromFile(file, false))
 		return ERROR_IMAGE_LOAD;
-	
+
 	return ERROR_NONE;
 }
 
@@ -192,23 +192,23 @@ ErrID	PsProject::DelImage()
 {
 	ImageList::iterator		ti;
 	MatrixList::iterator	tm;
-	
+
 	if (!image)
 		return ERROR_IMAGE_SELECT;
-	
+
 	this->LogAdd(new LogDelImage(*this, image, false));
-	
+
 	if (!image->parent)
 		this->images.remove(image);
 	else
 		this->matrix->images.remove(image);
-	
+
 	delete this->image;
-	
+
 	PsMatrix* b = matrix;
 	SelectImage(0);
 	matrix = b;
-	
+
 	return ERROR_NONE;
 }
 
@@ -218,20 +218,20 @@ ErrID	PsProject::DelImage()
 ErrID					PsProject::DelMatrix()
 {
 	ImageList::iterator	t;
-	
+
 	if (!this->matrix)
 		return ERROR_MATRIX_SELECT;
-	
-	for(t = this->matrix->images.begin(); t != this->matrix->images.end(); ++t)
+
+	for (t = this->matrix->images.begin(); t != this->matrix->images.end(); ++t)
 		this->LogAdd(new LogDelImage(*this, *t, false));
-	
+
 	this->LogAdd(new LogDelMatrix(*this, this->matrix, false));
-	
+
 	this->matrices.remove(this->matrix);
 	delete this->matrix;
-	
+
 	SelectMatrix(0);
-	
+
 	return ERROR_NONE;
 }
 
@@ -242,10 +242,10 @@ ErrID	PsProject::DelPattern()
 {
 	if (!pattern)
 		return ERROR_PATTERN_SELECT;
-	
+
 	delete pattern;
 	pattern = 0;
-	
+
 	return ERROR_NONE;
 }
 
@@ -254,53 +254,53 @@ ErrID	PsProject::DelPattern()
 */
 ErrID		PsProject::NewImage(const char* file)
 {
-	PsImage*				image;
+	PsImage* image;
 
 	image = new PsImage(NULL);
-	
+
 	if (!image->TextureFromFile(file))
 		return ERROR_IMAGE_LOAD;
-	
+
 	image->SetPosition(GetWidth() / 2.0f, GetHeight() / 2.0f);
 	images.push_back(image);
-	
+
 	SelectImage(image);
-	
+
 	this->LogAdd(new LogNewImage(*this, image, true));
-	
+
 	return ERROR_NONE;
 }
 
 /*
 ** Importe une nouvelle image dans la matrice courante, si il y en a une.
 */
-ErrID		PsProject::NewMotif (const char* file)
+ErrID		PsProject::NewMotif(const char* file)
 {
-	PsImage*				image;
+	PsImage* image;
 	float	x;
 	float	y;
-	
+
 	if (!matrix)
 	{
 		if (this->matrices.size() == 0)
 			this->NewMatrix();
-		
+
 		matrix = *this->matrices.begin();
 	}
-	
+
 	image = new PsImage(matrix);
-	
+
 	if (!image->TextureFromFile(file))
 		return ERROR_IMAGE_LOAD;
-	
+
 	matrix->images.push_back(image);
 	matrix->GetPosition(x, y);
 	image->SetPosition(x, y);
-	
+
 	SelectImage(image);
-	
+
 	this->LogAdd(new LogNewImage(*this, image, true));
-	
+
 	return ERROR_NONE;
 }
 
@@ -313,15 +313,15 @@ ErrID	PsProject::NewMatrix()
 {
 	matrix = new PsMatrix();
 	image = 0;
-	
+
 	matrices.push_back(matrix);
 	matrix->SetPosition(GetWidth() / 2.0f, GetHeight() / 2.0f);
-	matrix->SetSize((float)PsMatrix::default_w,(float)PsMatrix::default_h);
-	
-	SelectMatrix(matrix); 
-	
+	matrix->SetSize((float)PsMatrix::default_w, (float)PsMatrix::default_h);
+
+	SelectMatrix(matrix);
+
 	this->LogAdd(new LogNewMatrix(*this, matrix, true));
-	
+
 	return ERROR_NONE;
 }
 
@@ -332,30 +332,30 @@ ErrID	PsProject::NewPattern(const char* file)
 {
 	if (pattern)
 		delete pattern;
-	
+
 	pattern = new PsPattern();
-	
+
 	if (!pattern->TextureFromFile(file))
 	{
 		delete pattern;
 		pattern = 0;
 		return ERROR_PATTERN_LOAD;
 	}
-	
+
 	//-- paramétrage initial
-	for(int i = 0; i <  pattern->GetChannelsCount(); ++i)
+	for (int i = 0; i < pattern->GetChannelsCount(); ++i)
 	{
-		PsLayer *layer = pattern->aLayers[i];
+		PsLayer* layer = pattern->aLayers[i];
 		layer->vTranslation.X = GetWidth() / 2.f;
 		layer->vTranslation.Y = GetHeight() / 2.f;
 	}
 	//--
-	
+
 	pattern->UpdateScale(GetWidth(), GetHeight());
-	
+
 	this->pattern = pattern;
-	iLayerId = 0; 
-	
+	iLayerId = 0;
+
 	return ERROR_NONE;
 }
 
@@ -369,42 +369,42 @@ ErrID	PsProject::NewPattern(const char* file)
 
 ErrID			PsProject::FileLoad(const char* path)
 {
-	PsMatrix*		matrix;
-	FILE*		file;
+	PsMatrix* matrix;
+	FILE* file;
 	ErrID		err;
 	size_t		n;
 	int			x;
 	int			y;
-	
+
 	if (!(file = fopen(path, "rb")))
 		return ERROR_FILE_ACCESS;
-	
+
 	PsController::Instance().SetProgress(-1);
-	
+
 	LogFlush();
-	
+
 	fread(&n, sizeof(size_t), 1, file);
-	
+
 	if (n != ACCEPTED_ENDIAN_FILE)
 	{
 		PsController::Instance().SetProgress(-2);
 		return ERROR_FILE_VERSION;
 	}
-	
+
 	fread(&n, sizeof(size_t), 1, file);
-	
+
 	if (n != PROJECT_VERSION && n != PROJECT_VERSION_OLD_BETA) // FIXME
 	{
 		PsController::Instance().SetProgress(-2);
 		return ERROR_FILE_VERSION;
 	}
-	
+
 	fread(&x, sizeof(x), 1, file);
 	fread(&y, sizeof(y), 1, file);
 	renderer.SetDocSize(x, y);
-	
+
 	PsController::Instance().SetProgress(10);
-	
+
 	if (n != PROJECT_VERSION_OLD_BETA) // FIXME
 	{
 		if (fread(&n, sizeof(n), 1, file) != 1)
@@ -412,10 +412,10 @@ ErrID			PsProject::FileLoad(const char* path)
 			PsController::Instance().SetProgress(-2);
 			return ERROR_FILE_READ;
 		}
-		while(n--)
+		while (n--)
 		{
 			images.push_back((image = new PsImage(NULL)));
-			
+
 			if ((err = image->FileLoad(file)) != ERROR_NONE)
 			{
 				PsController::Instance().SetProgress(-2);
@@ -423,22 +423,22 @@ ErrID			PsProject::FileLoad(const char* path)
 			}
 		}
 	}
-	
+
 	fread(&n, sizeof(n), 1, file);
-	
-	for(uint32 i = 0; i < n; ++i)
+
+	for (uint32 i = 0; i < n; ++i)
 	{
 		PsController::Instance().SetProgress(10 + 90 * i / n);
-		
+
 		matrices.push_back((matrix = new PsMatrix()));
-		
+
 		if ((err = matrix->FileLoad(file)) != ERROR_NONE)
 		{
 			PsController::Instance().SetProgress(-2);
 			return err;
 		}
 	}
-	
+
 	bool pattern_exist = false;
 	fread(&pattern_exist, sizeof(pattern_exist), 1, file);
 	if (pattern_exist)
@@ -451,16 +451,16 @@ ErrID			PsProject::FileLoad(const char* path)
 		}
 		pattern->UpdateScale(GetWidth(), GetHeight());
 	}
-	
+
 	fread(&bHideColor, sizeof(bHideColor), 1, file);
 	fread(&iColor, sizeof(iColor), 1, file);
-	
+
 	fclose(file);
-	
+
 	center = true;
-	
+
 	PsController::Instance().SetProgress(-2);
-	
+
 	return ERROR_NONE;
 }
 
@@ -469,45 +469,45 @@ ErrID			PsProject::FileLoad(const char* path)
 */
 ErrID			PsProject::FileSave(const char* path)
 {
-	FILE*		file;
+	FILE* file;
 	ErrID		err;
 	size_t	n;
 	int		x;
 	int		y;
-	
+
 	if (!(file = fopen(path, "wb")))
 		return ERROR_FILE_ACCESS;
-	
+
 	n = ACCEPTED_ENDIAN_FILE;
 	fwrite(&n, sizeof(size_t), 1, file);
-	
+
 	n = PROJECT_VERSION;
 	fwrite(&n, sizeof(size_t), 1, file);
-	
+
 	renderer.GetDocSize(x, y);
 	fwrite(&x, sizeof(int), 1, file);
 	fwrite(&y, sizeof(int), 1, file);
-	
+
 	n = images.size();
-	
+
 	if (fwrite(&n, sizeof(size_t), 1, file) != 1)
 		return ERROR_FILE_WRITE;
-	
-	for(ImageList::const_iterator i = images.begin(); i != images.end(); ++i)
-		if ((err =(*i)->FileSave(file)) != ERROR_NONE)
+
+	for (ImageList::const_iterator i = images.begin(); i != images.end(); ++i)
+		if ((err = (*i)->FileSave(file)) != ERROR_NONE)
 			return err;
-	
+
 	n = matrices.size();
 	fwrite(&n, sizeof(size_t), 1, file);
-	
-	for(MatrixList::const_iterator i = matrices.begin(); i != matrices.end(); ++i)
-		if ((err =(*i)->FileSave(file)) != ERROR_NONE)
+
+	for (MatrixList::const_iterator i = matrices.begin(); i != matrices.end(); ++i)
+		if ((err = (*i)->FileSave(file)) != ERROR_NONE)
 		{
 			fclose(file);
-			
+
 			return err;
 		}
-			
+
 	bool pattern_exist = false;
 	if (pattern) pattern_exist = true;
 	fwrite(&pattern_exist, sizeof(pattern_exist), 1, file);
@@ -519,14 +519,14 @@ ErrID			PsProject::FileSave(const char* path)
 			return err;
 		}
 	}
-	
+
 	fwrite(&bHideColor, sizeof(bHideColor), 1, file);
 	fwrite(&iColor, sizeof(iColor), 1, file);
-	
+
 	fclose(file);
-	
+
 	this->bNeedSave = false;
-	
+
 	return ERROR_NONE;
 }
 
@@ -538,24 +538,24 @@ void						PsProject::LogFlush()
 {
 	LogList::iterator		t;
 	MatrixList::iterator	i;
-	
-	for(t = this->log_redo.begin(); t != this->log_redo.end(); ++t)
-		delete *t;
-	
-	for(t = this->log_undo.begin(); t != this->log_undo.end(); ++t)
-		delete *t;
-	
-	for(i = matrices.begin(); i != matrices.end(); ++i)
-		delete *i;
-	
+
+	for (t = this->log_redo.begin(); t != this->log_redo.end(); ++t)
+		delete* t;
+
+	for (t = this->log_undo.begin(); t != this->log_undo.end(); ++t)
+		delete* t;
+
+	for (i = matrices.begin(); i != matrices.end(); ++i)
+		delete* i;
+
 	matrices.clear();
-	
+
 	if (pattern)
 	{
 		delete pattern;
 		pattern = 0;
 	}
-	
+
 	matrix = 0;
 	image = 0;
 	shape = 0;
@@ -567,21 +567,21 @@ void						PsProject::LogFlush()
 void					PsProject::LogAdd(PsAction* log)
 {
 	LogList::iterator	t;
-	
-	for(t = this->log_redo.begin(); t != this->log_redo.end(); ++t)
-		delete *t;
-	
+
+	for (t = this->log_redo.begin(); t != this->log_redo.end(); ++t)
+		delete* t;
+
 	this->log_redo.clear();
-	
+
 	if (log)
 		this->log_undo.push_back(log);
-	
-	while(this->log_undo.size() > LOG_SIZE)
+
+	while (this->log_undo.size() > LOG_SIZE)
 	{
 		delete this->log_undo.front();
 		this->log_undo.pop_front();
 	}
-	
+
 	this->log_insert = false;
 	this->bNeedSave = true;
 }
@@ -621,7 +621,7 @@ int	PsProject::LogUndoCount()
 /*
 ** Retourne le nom de la dernière action "refaisable" enregistrée
 */
-const char*	PsProject::LogRedoLastName() const
+const char* PsProject::LogRedoLastName() const
 {
 	return(*this->log_redo.rbegin())->Name();
 }
@@ -629,7 +629,7 @@ const char*	PsProject::LogRedoLastName() const
 /*
 ** Retourne le nom de la dernière action "annulable" enregistrée
 */
-const char*	PsProject::LogUndoLastName() const
+const char* PsProject::LogUndoLastName() const
 {
 	return(*this->log_undo.rbegin())->Name();
 }
@@ -647,27 +647,27 @@ bool	PsProject::LogMustAdd() const
 */
 void	PsProject::LogRedo()
 {
-	PsAction*	redo;
-	PsAction*	undo;
-	
+	PsAction* redo;
+	PsAction* undo;
+
 	if (!this->log_redo.empty())
 	{
 		redo = *this->log_redo.rbegin();
 		this->log_redo.pop_back();
 		undo = redo->Execute();
-		
+
 		if (undo)
 		{
 			this->log_undo.push_back(undo);
 			this->bNeedSave = true;
 		}
-		
-		while(this->log_undo.size() > LOG_SIZE)
+
+		while (this->log_undo.size() > LOG_SIZE)
 		{
 			delete this->log_undo.front();
 			this->log_undo.pop_front();
 		}
-		
+
 		delete redo;
 	}
 }
@@ -677,26 +677,26 @@ void	PsProject::LogRedo()
 */
 void		PsProject::LogUndo()
 {
-	PsAction*	redo;
-	PsAction*	undo;
-	
+	PsAction* redo;
+	PsAction* undo;
+
 	if (!this->log_undo.empty())
 	{
 		undo = *this->log_undo.rbegin();
 		this->log_undo.pop_back();
 		redo = undo->Execute();
-		
+
 		this->bNeedSave = true;
-		
+
 		if (redo)
 			this->log_redo.push_back(redo);
-		
-		while(this->log_redo.size() > LOG_SIZE)
+
+		while (this->log_redo.size() > LOG_SIZE)
 		{
 			delete this->log_redo.front();
 			this->log_redo.pop_front();
 		}
-		
+
 		delete undo;
 	}
 }
@@ -708,9 +708,9 @@ ErrID	PsProject::MatrixColor()
 {
 	if (!matrix)
 		return ERROR_MATRIX_SELECT;
-	
+
 	matrix->DoChangeColor();
-	
+
 	return ERROR_NONE;
 }
 
@@ -721,13 +721,13 @@ ErrID	PsProject::MatrixReset()
 {
 	if (!matrix)
 		return ERROR_MATRIX_SELECT;
-	
+
 	this->LogAdd(new LogResize(*this, this->matrix, this->matrix->x, this->matrix->y, this->matrix->w, this->matrix->h, false));
 	this->LogAdd(new LogRotate(*this, this->matrix, this->matrix->r, false));
 	this->LogAdd(new LogTorsio(*this, this->matrix, this->matrix->i, this->matrix->j));
-	
+
 	matrix->DoResetAll();
-	
+
 	return ERROR_NONE;
 }
 
@@ -739,26 +739,26 @@ void	PsProject::RenderToScreen()
 {
 	int	x;
 	int	y;
-	
+
 	if (center)
 	{
 		renderer.CenterView();
 		center = false;
 	}
-	
+
 	renderer.GetSize(x, y);
 	renderer.SetEngine(PsRender::ENGINE_HARDWARE);
 	renderer.Render(*this, x, y);
-	
+
 #ifdef _WINDOWS
 	int m_glErrorCode = glGetError();
 	if (m_glErrorCode != GL_NO_ERROR)
 	{
-		const GLubyte *estring;
+		const GLubyte* estring;
 		CString mexstr;
 		estring = gluErrorString(m_glErrorCode);
 		mexstr.Format("RenderToScreen:\n\tAn OpenGL error occurred: %s\n", estring);
-		AfxMessageBox(mexstr,MB_OK | MB_ICONEXCLAMATION);
+		AfxMessageBox(mexstr, MB_OK | MB_ICONEXCLAMATION);
 		TRACE0(mexstr);
 	}
 #endif /* _WINDOWS */
@@ -766,27 +766,27 @@ void	PsProject::RenderToScreen()
 
 /*
 ** Déclanche le rendu dans un fichier
-*/ 
-bool	PsProject::RenderToFile(const char * filename, int x, int y)
+*/
+bool	PsProject::RenderToFile(const char* filename, int x, int y)
 {
 	PsController::Instance().SetProgress(-1);
-	
-	renderer.SetZone((float)GetWidth(),(float)GetHeight());
-	
+
+	renderer.SetZone((float)GetWidth(), (float)GetHeight());
+
 	InitSoftwareFile(x, y);
-	
+
 	PsController::Instance().SetProgress(5);
-	
+
 	renderer.SetEngine(PsRender::ENGINE_SOFTWARE);
 	renderer.Render(*this, x, y);
 	renderer.Recalc();
-	
+
 	PsController::Instance().SetProgress(90);
-	
+
 	flushSoftwareFile(filename, bHideColor);
-	
+
 	PsController::Instance().SetProgress(-2);
-	
+
 	return true;
 }
 
@@ -798,14 +798,14 @@ void	PsProject::SelectImage(PsImage* image)
 	this->matrix = image ? image->GetParent() : 0;
 	this->image = image;
 	this->shape = image;
-	
+
 	PsController::Instance().UpdateWindow();
 	PsController::Instance().UpdateDialogProject();
-	
+
 	if (dlgPropreties)
 	{
 		//dlgPropreties->FocusImageInformation();
-		dlgPropreties->UpdateInformation(this);	
+		dlgPropreties->UpdateInformation(this);
 	}
 }
 
@@ -817,10 +817,10 @@ void	PsProject::SelectMatrix(PsMatrix* matrix)
 	this->matrix = matrix;
 	this->image = 0;
 	this->shape = matrix;
-	
+
 	PsController::Instance().UpdateWindow();
 	PsController::Instance().UpdateDialogProject();
-	
+
 	if (dlgPropreties)
 	{
 		//dlgPropreties->FocusMatrixInformation();
@@ -843,23 +843,23 @@ void	PsProject::SelectMatrix(PsMatrix* matrix)
 */
 void		PsProject::ToolMagnifyDrag(int y, int old_x, int old_y)
 {
-	float	zoom = prev_zoom +(y - old_y) * ZOOM_COEF;
-	
+	float	zoom = prev_zoom + (y - old_y) * ZOOM_COEF;
+
 	if (y > old_y)
 		PsController::Instance().SetCursor(CURSOR_MAGNIFY2);
 	else
 		PsController::Instance().SetCursor(CURSOR_MAGNIFY3);
-	
+
 	/* static float fx, fy, ox, oy;
 	if (prev_zoom == renderer.zoom)
 	{
 		renderer.Convert(old_x, old_y, fx, fy);
 		ox = renderer.scroll_x;
-		oy = renderer.scroll_y; 
+		oy = renderer.scroll_y;
 	} */
-	
+
 	renderer.SetZoom(zoom);
-	
+
 	PsController::Instance().UpdateWindow();
 	PsController::Instance().UpdateDialogOverview();
 }
@@ -870,7 +870,7 @@ void		PsProject::ToolMagnifyDrag(int y, int old_x, int old_y)
 PsController::Tool	PsProject::ToolMagnifyStart()
 {
 	prev_zoom = renderer.zoom;
-	
+
 	return PsController::TOOL_MAGNIFY_ZOOM;
 }
 
@@ -883,146 +883,146 @@ void		PsProject::ToolModifyMove(int x, int y, int old_x, int old_y, PsController
 	float	fx;
 	float	fy;
 	float	sx;
-	float	sy; 
+	float	sy;
 	float	tx;
 	float	ty;
 	bool	constrain = PsController::Instance().GetOption(PsController::OPTION_CONSTRAIN);
 	bool	reflect = PsController::Instance().GetOption(PsController::OPTION_REFLECT);
-	
-	
+
+
 	renderer.Convert(x, y, fx, fy);
 	renderer.Convert(old_x, old_y, sx, sy);
-	
+
 	if (bPatternsIsSelected && !pattern->hide)
 	{
-		PsLayer *layer = pattern->aLayers[iLayerId];
-		
-		switch(tool)
+		PsLayer* layer = pattern->aLayers[iLayerId];
+
+		switch (tool)
 		{
-			case PsController::TOOL_MODIFY_ROTATE:
-			{
-				if (this->LogMustAdd())
-					this->LogAdd(new LogPatternRotate(*this));
-				
-				PsController::Instance().SetCursor((PsCursor)(CURSOR_ROTATE1 +(int)((layer->ToAngle(fx, fy) + PS_MATH_PI / 2) * 2 / PS_MATH_PI) % 4));
-				layer->rRotation.Yaw = prev_r + PsRotator::ToDegree(-(layer->ToAngle(fx, fy) - layer->ToAngle(sx, sy)));
-				break;
-			}
-				
-			case PsController::TOOL_MODIFY_MOVE:
-			{
-				if (this->LogMustAdd())
-					this->LogAdd(new LogPatternTranslate(*this));
-				
-				PsVector vTranslation(fx - sx, fy - sy, 0.f);
-				
-				PsLayer *layer = pattern->aLayers[iLayerId];
-				
-				PsVector vEye = renderer.GetEyeLocation();
-				
-				float fDistance = (prev_origin - vEye).Size();
-				float fDistanceZ0 = (prev_origin_z0 - vEye).Size();
-				
-				vTranslation = vTranslation * (fDistance / fDistanceZ0);
-				
-				layer->vTranslation.X = prev_x + vTranslation.X;
-				layer->vTranslation.Y = prev_y + vTranslation.Y;
-				
-				break;
-			}
-				
-			case PsController::TOOL_MODIFY_SIZE:
-			{
-				// FIXME : LOG !!
-				
-				tx =(fx - sx) * cos(-shape->GetAngle()) -(fy - sy) * sin(-shape->GetAngle());
-				ty =(fx - sx) * sin(-shape->GetAngle()) +(fy - sy) * cos(-shape->GetAngle());
-				
-				/* 
-					if (init_corner == 0)
-					layer->SetSize(prev_w - tx, prev_h - ty, -SHAPE_SIZE, -SHAPE_SIZE, prev_w, prev_h, constrain, reflect);
-				else if (init_corner == 1)
-					layer->SetSize(prev_w + tx, prev_h - ty, SHAPE_SIZE, -SHAPE_SIZE, prev_w, prev_h, constrain, reflect);
-				else if (init_corner == 2)
-					layer->SetSize(prev_w - tx, prev_h + ty, -SHAPE_SIZE, SHAPE_SIZE, prev_w, prev_h, constrain, reflect);
-				else
-					layer->SetSize(prev_w + tx, prev_h + ty, SHAPE_SIZE, SHAPE_SIZE, prev_w, prev_h, constrain, reflect);
-				*/
-				break;
-			}
-				
+		case PsController::TOOL_MODIFY_ROTATE:
+		{
+			if (this->LogMustAdd())
+				this->LogAdd(new LogPatternRotate(*this));
+
+			PsController::Instance().SetCursor((PsCursor)(CURSOR_ROTATE1 + (int)((layer->ToAngle(fx, fy) + PS_MATH_PI / 2) * 2 / PS_MATH_PI) % 4));
+			layer->rRotation.Yaw = prev_r + PsRotator::ToDegree(-(layer->ToAngle(fx, fy) - layer->ToAngle(sx, sy)));
+			break;
+		}
+
+		case PsController::TOOL_MODIFY_MOVE:
+		{
+			if (this->LogMustAdd())
+				this->LogAdd(new LogPatternTranslate(*this));
+
+			PsVector vTranslation(fx - sx, fy - sy, 0.f);
+
+			PsLayer* layer = pattern->aLayers[iLayerId];
+
+			PsVector vEye = renderer.GetEyeLocation();
+
+			float fDistance = (prev_origin - vEye).Size();
+			float fDistanceZ0 = (prev_origin_z0 - vEye).Size();
+
+			vTranslation = vTranslation * (fDistance / fDistanceZ0);
+
+			layer->vTranslation.X = prev_x + vTranslation.X;
+			layer->vTranslation.Y = prev_y + vTranslation.Y;
+
+			break;
+		}
+
+		case PsController::TOOL_MODIFY_SIZE:
+		{
+			// FIXME : LOG !!
+
+			tx = (fx - sx) * cos(-shape->GetAngle()) - (fy - sy) * sin(-shape->GetAngle());
+			ty = (fx - sx) * sin(-shape->GetAngle()) + (fy - sy) * cos(-shape->GetAngle());
+
+			/*
+				if (init_corner == 0)
+				layer->SetSize(prev_w - tx, prev_h - ty, -SHAPE_SIZE, -SHAPE_SIZE, prev_w, prev_h, constrain, reflect);
+			else if (init_corner == 1)
+				layer->SetSize(prev_w + tx, prev_h - ty, SHAPE_SIZE, -SHAPE_SIZE, prev_w, prev_h, constrain, reflect);
+			else if (init_corner == 2)
+				layer->SetSize(prev_w - tx, prev_h + ty, -SHAPE_SIZE, SHAPE_SIZE, prev_w, prev_h, constrain, reflect);
+			else
+				layer->SetSize(prev_w + tx, prev_h + ty, SHAPE_SIZE, SHAPE_SIZE, prev_w, prev_h, constrain, reflect);
+			*/
+			break;
+		}
+
 		}
 	}
 	else
 	{
-		
+
 		if (!shape || shape->hide)
 			return;
-		
-		switch(tool)
+
+		switch (tool)
 		{
-			case PsController::TOOL_MODIFY_MOVE:
-			{
-				if (this->LogMustAdd())
-					this->LogAdd(new LogMove(*this, shape, prev_x, prev_y));
-				
-				shape->SetPosition(prev_x + fx - sx, prev_y + fy - sy, constrain);
-				break;
-			}
-				
-			case PsController::TOOL_MODIFY_ROTATE:
-			{
-				if (this->LogMustAdd())
-					this->LogAdd(new LogRotate(*this, shape, prev_r, reflect));
-				
-				PsController::Instance().SetCursor((PsCursor)(CURSOR_ROTATE1 +(int)((shape->ToAngle(fx, fy) + PS_MATH_PI / 2) * 2 / PS_MATH_PI) % 4));
-				
-				shape->SetAngle(prev_r + shape->ToAngle(fx, fy) - shape->ToAngle(sx, sy), constrain, reflect);
-				break;
-			}
-				
-			case PsController::TOOL_MODIFY_SIZE:
-			{
-				if (this->LogMustAdd())
-					this->LogAdd(new LogResize(*this, shape, prev_x, prev_y, prev_w, prev_h, reflect));
-				
-				tx =(fx - sx) * cos(-shape->GetAngle()) -(fy - sy) * sin(-shape->GetAngle());
-				ty =(fx - sx) * sin(-shape->GetAngle()) +(fy - sy) * cos(-shape->GetAngle());
-				
-				if (init_corner == 0)
-					shape->SetSize(prev_w - tx, prev_h - ty, -SHAPE_SIZE, -SHAPE_SIZE, prev_w, prev_h, constrain, reflect);
-				else if (init_corner == 1)
-					shape->SetSize(prev_w + tx, prev_h - ty, SHAPE_SIZE, -SHAPE_SIZE, prev_w, prev_h, constrain, reflect);
-				else if (init_corner == 2)
-					shape->SetSize(prev_w - tx, prev_h + ty, -SHAPE_SIZE, SHAPE_SIZE, prev_w, prev_h, constrain, reflect);
-				else
-					shape->SetSize(prev_w + tx, prev_h + ty, SHAPE_SIZE, SHAPE_SIZE, prev_w, prev_h, constrain, reflect);
-				break;
-			}
-				
-			case PsController::TOOL_MODIFY_TORSIO:
-			{
-				if (this->LogMustAdd())
-					this->LogAdd(new LogTorsio(*this, shape, prev_i, prev_j));
-				
-				tx = fx - sx;
-				ty = fy - sy;
-				
-				if (init_corner == 0)
-					shape->SetTorsion(prev_i - tx * cos(shape->GetAngle()) - ty * sin(shape->GetAngle()), prev_j, constrain);
-				else if (init_corner == 1)
-					shape->SetTorsion(prev_i, prev_j - tx * sin(shape->GetAngle()) + ty * cos(shape->GetAngle()), constrain);
-				else if (init_corner == 2)
-					shape->SetTorsion(prev_i + tx * cos(shape->GetAngle()) + ty * sin(shape->GetAngle()), prev_j, constrain);
-				else
-					shape->SetTorsion(prev_i, prev_j + tx * sin(shape->GetAngle()) - ty * cos(shape->GetAngle()), constrain);
-				break;
-			}
+		case PsController::TOOL_MODIFY_MOVE:
+		{
+			if (this->LogMustAdd())
+				this->LogAdd(new LogMove(*this, shape, prev_x, prev_y));
+
+			shape->SetPosition(prev_x + fx - sx, prev_y + fy - sy, constrain);
+			break;
+		}
+
+		case PsController::TOOL_MODIFY_ROTATE:
+		{
+			if (this->LogMustAdd())
+				this->LogAdd(new LogRotate(*this, shape, prev_r, reflect));
+
+			PsController::Instance().SetCursor((PsCursor)(CURSOR_ROTATE1 + (int)((shape->ToAngle(fx, fy) + PS_MATH_PI / 2) * 2 / PS_MATH_PI) % 4));
+
+			shape->SetAngle(prev_r + shape->ToAngle(fx, fy) - shape->ToAngle(sx, sy), constrain, reflect);
+			break;
+		}
+
+		case PsController::TOOL_MODIFY_SIZE:
+		{
+			if (this->LogMustAdd())
+				this->LogAdd(new LogResize(*this, shape, prev_x, prev_y, prev_w, prev_h, reflect));
+
+			tx = (fx - sx) * cos(-shape->GetAngle()) - (fy - sy) * sin(-shape->GetAngle());
+			ty = (fx - sx) * sin(-shape->GetAngle()) + (fy - sy) * cos(-shape->GetAngle());
+
+			if (init_corner == 0)
+				shape->SetSize(prev_w - tx, prev_h - ty, -SHAPE_SIZE, -SHAPE_SIZE, prev_w, prev_h, constrain, reflect);
+			else if (init_corner == 1)
+				shape->SetSize(prev_w + tx, prev_h - ty, SHAPE_SIZE, -SHAPE_SIZE, prev_w, prev_h, constrain, reflect);
+			else if (init_corner == 2)
+				shape->SetSize(prev_w - tx, prev_h + ty, -SHAPE_SIZE, SHAPE_SIZE, prev_w, prev_h, constrain, reflect);
+			else
+				shape->SetSize(prev_w + tx, prev_h + ty, SHAPE_SIZE, SHAPE_SIZE, prev_w, prev_h, constrain, reflect);
+			break;
+		}
+
+		case PsController::TOOL_MODIFY_TORSIO:
+		{
+			if (this->LogMustAdd())
+				this->LogAdd(new LogTorsio(*this, shape, prev_i, prev_j));
+
+			tx = fx - sx;
+			ty = fy - sy;
+
+			if (init_corner == 0)
+				shape->SetTorsion(prev_i - tx * cos(shape->GetAngle()) - ty * sin(shape->GetAngle()), prev_j, constrain);
+			else if (init_corner == 1)
+				shape->SetTorsion(prev_i, prev_j - tx * sin(shape->GetAngle()) + ty * cos(shape->GetAngle()), constrain);
+			else if (init_corner == 2)
+				shape->SetTorsion(prev_i + tx * cos(shape->GetAngle()) + ty * sin(shape->GetAngle()), prev_j, constrain);
+			else
+				shape->SetTorsion(prev_i, prev_j + tx * sin(shape->GetAngle()) - ty * cos(shape->GetAngle()), constrain);
+			break;
+		}
 		}
 	}
-	
+
 	PsController::Instance().UpdateWindow();
-	if (dlgPropreties) 
+	if (dlgPropreties)
 		dlgPropreties->UpdateInformation(this);
 }
 
@@ -1035,49 +1035,49 @@ PsController::Tool PsProject::ToolModifyScan(int x, int y, bool set)
 {
 	float									fx;
 	float									fy;
-	
+
 	renderer.Convert(x, y, fx, fy);
-	
+
 	if (bPatternsIsSelected && !pattern->hide)
 	{
-		PsLayer *layer = pattern->aLayers[iLayerId];
-		
+		PsLayer* layer = pattern->aLayers[iLayerId];
+
 		/*
 		if (layer->InResize(fx, fy, renderer.zoom, init_corner))
 		 {
 			PsController::Instance().SetCursor((PsCursor)(CURSOR_SIZE1 +(int)((layer->ToAngle(fx, fy) + PS_MATH_PI / 2) * 2 / PS_MATH_PI) % 2));
-			 
+
 			if (set)
 			{
 				prev_x = layer->vTranslation.X;
-				prev_y = layer->vTranslation.Y; 
+				prev_y = layer->vTranslation.Y;
 				prev_h = layer->fScale * layer->fGizmoSize;
 				prev_w = layer->fScale * layer->fGizmoSize;
 			}
-			
+
 			return PsController::TOOL_MODIFY_SIZE;
 		 }
 		 */
-		
+
 		if (layer->InRotate(fx, fy, renderer.zoom, init_corner))
 		{
-			PsController::Instance().SetCursor((PsCursor)(CURSOR_ROTATE1 +(int)((layer->ToAngle(fx, fy) + PS_MATH_PI / 2) * 2 / PS_MATH_PI) % 4));
-			
+			PsController::Instance().SetCursor((PsCursor)(CURSOR_ROTATE1 + (int)((layer->ToAngle(fx, fy) + PS_MATH_PI / 2) * 2 / PS_MATH_PI) % 4));
+
 			if (set)
 			{
 				prev_r = layer->rRotation.Yaw;
 			}
-			
+
 			return PsController::TOOL_MODIFY_ROTATE;
 		}
-		
+
 		if (layer->MouseIsInside(fx, fy))
 		{
 			if (set)
 			{
 				prev_x = layer->vTranslation.X;
-				prev_y = layer->vTranslation.Y; 
-				
+				prev_y = layer->vTranslation.Y;
+
 				/*
 				** Préparation des paramètres de projection
 				 */
@@ -1085,48 +1085,48 @@ PsController::Tool PsProject::ToolModifyScan(int x, int y, bool set)
 				PsVector direction(fx, fy, 0);
 				direction -= oeil;
 				PsVector normal(0.f, 0.f, 1.f);
-				
+
 				/*
 				** Point d'intersection click souris & plan en z = 0
 				 */
 				PsVector vZ0 = layer->vTranslation;
 				vZ0.Z = 0.f;
-				PsVector *p = LinePlaneIntersection(oeil, direction, vZ0, normal);
+				PsVector* p = LinePlaneIntersection(oeil, direction, vZ0, normal);
 				if (p)
 				{
 					prev_origin_z0 = *p;
 					delete p;
 				}
-				
+
 				/*
 				** Point d'intersection click souris & PsLayer
 				*/
-				normal = RotateVertex(normal, PsRotator::FromDegree(layer->rRotation.Roll), 
-									  PsRotator::FromDegree(layer->rRotation.Pitch), PsRotator::FromDegree(layer->rRotation.Yaw));
+				normal = RotateVertex(normal, PsRotator::FromDegree(layer->rRotation.Roll),
+					PsRotator::FromDegree(layer->rRotation.Pitch), PsRotator::FromDegree(layer->rRotation.Yaw));
 				p = LinePlaneIntersection(oeil, direction, layer->vTranslation, normal);
 				if (p)
 				{
 					prev_origin = *p;
 					delete p;
 				}
-				
-				
+
+
 			}
-			
+
 			PsController::Instance().SetCursor(CURSOR_MOVE);
 			return PsController::TOOL_MODIFY_MOVE;
 		}
-		
+
 		PsController::Instance().SetCursor(CURSOR_DEFAULT);
 		return PsController::TOOL_MODIFY;
 	}
-	
-	if (image && !image->hide &&(!matrix || !matrix->hide))
+
+	if (image && !image->hide && (!matrix || !matrix->hide))
 	{
 		if (image->InResize(fx, fy, renderer.zoom, init_corner))
 		{
-			PsController::Instance().SetCursor((PsCursor)(CURSOR_SIZE1 +(int)((image->ToAngle(fx, fy) + PS_MATH_PI / 2) * 2 / PS_MATH_PI) % 2));
-			
+			PsController::Instance().SetCursor((PsCursor)(CURSOR_SIZE1 + (int)((image->ToAngle(fx, fy) + PS_MATH_PI / 2) * 2 / PS_MATH_PI) % 2));
+
 			if (set)
 			{
 				SelectImage(image);
@@ -1134,29 +1134,29 @@ PsController::Tool PsProject::ToolModifyScan(int x, int y, bool set)
 				prev_h = image->h;
 				prev_w = image->w;
 			}
-			
+
 			return PsController::TOOL_MODIFY_SIZE;
 		}
 		else if (image->InRotate(fx, fy, renderer.zoom, init_corner))
 		{
-			PsController::Instance().SetCursor((PsCursor)(CURSOR_ROTATE1 +(int)((image->ToAngle(fx, fy) + PS_MATH_PI / 2) * 2 / PS_MATH_PI) % 4));
-			
+			PsController::Instance().SetCursor((PsCursor)(CURSOR_ROTATE1 + (int)((image->ToAngle(fx, fy) + PS_MATH_PI / 2) * 2 / PS_MATH_PI) % 4));
+
 			if (set)
 			{
 				SelectImage(image);
 				prev_r = image->GetAngle();
 			}
-			
+
 			return PsController::TOOL_MODIFY_ROTATE;
 		}
 	}
-	
+
 	if (matrix && !matrix->hide)
 	{
 		if (matrix->InResize(fx, fy, renderer.zoom, init_corner))
 		{
-			PsController::Instance().SetCursor((PsCursor)(CURSOR_SIZE1 +(int)((matrix->ToAngle(fx, fy) + PS_MATH_PI / 2) * 2 / PS_MATH_PI) % 2));
-			
+			PsController::Instance().SetCursor((PsCursor)(CURSOR_SIZE1 + (int)((matrix->ToAngle(fx, fy) + PS_MATH_PI / 2) * 2 / PS_MATH_PI) % 2));
+
 			if (set)
 			{
 				SelectMatrix(matrix);
@@ -1164,42 +1164,42 @@ PsController::Tool PsProject::ToolModifyScan(int x, int y, bool set)
 				prev_h = matrix->h;
 				prev_w = matrix->w;
 			}
-			
+
 			return PsController::TOOL_MODIFY_SIZE;
 		}
 		else if (matrix->InTorsion(fx, fy, renderer.zoom, init_corner))
 		{
 			if (set) PsController::Instance().SetCursor(CURSOR_TORSIO2);
 			else PsController::Instance().SetCursor(CURSOR_TORSIO1);
-			
+
 			if (set)
 			{
 				SelectMatrix(matrix);
 				prev_i = matrix->i;
 				prev_j = matrix->j;
 			}
-			
+
 			return PsController::TOOL_MODIFY_TORSIO;
 		}
 		else if (matrix->InRotate(fx, fy, renderer.zoom, init_corner))
 		{
-			PsController::Instance().SetCursor((PsCursor)(CURSOR_ROTATE1 +(int)((matrix->ToAngle(fx, fy) + PS_MATH_PI / 2) * 2 / PS_MATH_PI) % 4));
-			
+			PsController::Instance().SetCursor((PsCursor)(CURSOR_ROTATE1 + (int)((matrix->ToAngle(fx, fy) + PS_MATH_PI / 2) * 2 / PS_MATH_PI) % 4));
+
 			if (set)
 			{
 				SelectMatrix(matrix);
 				prev_r = matrix->r;
 			}
-			
+
 			return PsController::TOOL_MODIFY_ROTATE;
 		}
 	}
-	
-	if (PsController::Instance().GetOption(PsController::OPTION_AUTOMATIC) ||(!image && !matrix))
+
+	if (PsController::Instance().GetOption(PsController::OPTION_AUTOMATIC) || (!image && !matrix))
 	{
 		ImageList::reverse_iterator j;
-		for(j = images.rbegin(); j != images.rend(); ++j)
-			if (!(*j)->hide &&(*j)->InContent(fx, fy))
+		for (j = images.rbegin(); j != images.rend(); ++j)
+			if (!(*j)->hide && (*j)->InContent(fx, fy))
 			{
 				PsController::Instance().SetCursor(CURSOR_MOVE);
 				if (set)
@@ -1209,11 +1209,11 @@ PsController::Tool PsProject::ToolModifyScan(int x, int y, bool set)
 				}
 				return PsController::TOOL_MODIFY_MOVE;
 			}
-				MatrixList::reverse_iterator i;
-		for(i = matrices.rbegin(); i != matrices.rend(); ++i)
+		MatrixList::reverse_iterator i;
+		for (i = matrices.rbegin(); i != matrices.rend(); ++i)
 		{
-			for(j =(*i)->images.rbegin(); !(*i)->hide && j !=(*i)->images.rend(); ++j)
-				if (!(*j)->hide &&(*j)->InContent(fx, fy))
+			for (j = (*i)->images.rbegin(); !(*i)->hide && j != (*i)->images.rend(); ++j)
+				if (!(*j)->hide && (*j)->InContent(fx, fy))
 				{
 					PsController::Instance().SetCursor(CURSOR_MOVE);
 					if (set)
@@ -1224,45 +1224,45 @@ PsController::Tool PsProject::ToolModifyScan(int x, int y, bool set)
 					return PsController::TOOL_MODIFY_MOVE;
 				}
 		}
-			for(i = matrices.rbegin(); i != matrices.rend(); ++i)
-				if (!(*i)->hide &&(*i)->InContent(fx, fy))
+		for (i = matrices.rbegin(); i != matrices.rend(); ++i)
+			if (!(*i)->hide && (*i)->InContent(fx, fy))
+			{
+				PsController::Instance().SetCursor(CURSOR_MOVE);
+				if (set)
 				{
-					PsController::Instance().SetCursor(CURSOR_MOVE);
-					if (set)
-					{
-						SelectMatrix(*i);
-						(*i)->GetPosition(prev_x, prev_y);
-					}
-					return PsController::TOOL_MODIFY_MOVE;
+					SelectMatrix(*i);
+					(*i)->GetPosition(prev_x, prev_y);
 				}
+				return PsController::TOOL_MODIFY_MOVE;
+			}
 	}
 	else if (image && !image->hide && !matrix->hide)
 	{
 		PsController::Instance().SetCursor(CURSOR_MOVE);
-		
+
 		if (set)
 		{
 			SelectImage(image);
 			image->GetPosition(prev_x, prev_y);
 		}
-	
+
 		return PsController::TOOL_MODIFY_MOVE;
 	}
 	else if (matrix && !matrix->hide)
-	{ 
+	{
 		PsController::Instance().SetCursor(CURSOR_MOVE);
-		
+
 		if (set)
 		{
 			SelectMatrix(matrix);
 			matrix->GetPosition(prev_x, prev_y);
 		}
-	
+
 		return PsController::TOOL_MODIFY_MOVE;
 	}
-			
+
 	PsController::Instance().SetCursor(CURSOR_DEFAULT);
-	
+
 	return PsController::TOOL_MODIFY;
 }
 
@@ -1271,7 +1271,7 @@ PsController::Tool PsProject::ToolModifyScan(int x, int y, bool set)
 */
 void PsProject::ToolScrollDrag(int x, int y, int prev_x, int prev_y)
 {
-	renderer.SetScroll(prev_scrollx +(prev_x - x) * renderer.zoom, prev_scrolly +(prev_y - y) * renderer.zoom);
+	renderer.SetScroll(prev_scrollx + (prev_x - x) * renderer.zoom, prev_scrolly + (prev_y - y) * renderer.zoom);
 	PsController::Instance().UpdateWindow();
 	PsController::Instance().UpdateDialogOverview();
 }

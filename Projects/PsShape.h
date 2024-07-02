@@ -1,16 +1,16 @@
 /**
  * This file is part of Patternshop Project.
- * 
+ *
  * Patternshop is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * Patternshop is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with Patternshop.  If not, see <http://www.gnu.org/licenses/>
 */
@@ -37,34 +37,34 @@ class	PsRender;
 */
 class	PsShape
 {
-friend class	PsRender;
+	friend class	PsRender;
 
 public:
-	PsShape (const PsShape&);
+	PsShape(const PsShape&);
 	PsShape();
 	virtual ~PsShape();
 
 	virtual float	GetAngle() const;
-	virtual const std::string&	GetName() const;
-	virtual void	GetPosition (float&, float&) const = 0;
+	virtual const	std::string& GetName() const;
+	virtual void	GetPosition(float&, float&) const = 0;
 
-	virtual bool	InContent (float, float) const;
-	virtual bool	InResize (float, float, float, int&) const;
-	virtual bool	InRotate (float, float, float, int&) const;
-	virtual bool	InTorsion (float, float, float, int&) const;
+	virtual bool	InContent(float, float) const;
+	virtual bool	InResize(float, float, float, int&) const;
+	virtual bool	InRotate(float, float, float, int&) const;
+	virtual bool	InTorsion(float, float, float, int&) const;
 
-	virtual void	SetAngle (float, bool = false, bool = false) = 0;
-	virtual void	SetName (const std::string&);
-	virtual void	SetPosition (float, float, bool = false) = 0;
-	virtual void	SetSize (float, float, float = 0, float = 0, float = 0, float = 0, bool = false, bool = false) = 0;
-	virtual void	SetTorsion (float, float, bool = false) = 0;
+	virtual void	SetAngle(float, bool = false, bool = false) = 0;
+	virtual void	SetName(const std::string&);
+	virtual void	SetPosition(float, float, bool = false) = 0;
+	virtual void	SetSize(float, float, float = 0, float = 0, float = 0, float = 0, bool = false, bool = false) = 0;
+	virtual void	SetTorsion(float, float, bool = false) = 0;
 
-	virtual void	ToAbsolute (float, float, float&, float&) const;
-	virtual float	ToAngle (float, float) const;
-	virtual void	ToRelative (float, float, float&, float&) const;
+	virtual void	ToAbsolute(float, float, float&, float&) const;
+	virtual float	ToAngle(float, float) const;
+	virtual void	ToRelative(float, float, float&, float&) const;
 
-	virtual ErrID	FileLoad (FILE*);
-	virtual ErrID	FileSave (FILE*) const;
+	virtual ErrID	FileLoad(FILE*);
+	virtual ErrID	FileSave(FILE*) const;
 
 	float			h;
 	float			i;
@@ -72,10 +72,10 @@ public:
 	float			w;
 
 public:
-	virtual void	FinalizePosition (float, float);
-	virtual void	FinalizeSize (float, float, float, float);
+	virtual void	FinalizePosition(float, float);
+	virtual void	FinalizeSize(float, float, float, float);
 
-	const PsShape*	parent;
+	const PsShape* parent;
 	std::string		name;
 
 	float			r;
