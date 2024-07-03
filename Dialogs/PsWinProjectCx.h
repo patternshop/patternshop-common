@@ -33,14 +33,11 @@ public:
 	virtual void Disable() = 0;
 };
 
-class PsWinProject
+class PsWinProjectCx
 {
 public:
-	PsWinProject(PsWin* psWin);
-	virtual ~PsWinProject();
-
-public:
-	static void Delete();
+	PsWinProjectCx(PsWin* psWin);
+	virtual ~PsWinProjectCx();
 
 public:
 	enum OpenCloseState { OPEN = 1, CLOSE = 2 };
@@ -77,13 +74,6 @@ public:
 	virtual void Show() = 0;
 	virtual void Update() = 0;
 	virtual void UpdateMouseCursor() = 0;
-
-protected:
-	static PsWinProject* instance; // Singleton
-
-public:
-	static PsWinProject& Instance();
-	static void setInstance(PsWinProject* instance);
 
 public:
 	virtual void OnLeftMouseButtonDown(PsPoint);

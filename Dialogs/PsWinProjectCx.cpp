@@ -27,12 +27,10 @@
 
 #include <assert.h>
 
-const int	PsWinProject::bloc_count_size = 22;
-const int	PsWinProject::item_count_size = 29;
+const int	PsWinProjectCx::bloc_count_size = 22;
+const int	PsWinProjectCx::item_count_size = 29;
 
-PsWinProject* PsWinProject::instance = 0;
-
-PsWinProject::PsWinProject(PsWin* psWin) : psWin(psWin)
+PsWinProjectCx::PsWinProjectCx(PsWin* psWin) : psWin(psWin)
 {
 	bDragging = false;
 	selected = NULL;
@@ -41,7 +39,7 @@ PsWinProject::PsWinProject(PsWin* psWin) : psWin(psWin)
 	dragTopmost = false;
 }
 
-PsWinProject::~PsWinProject()
+PsWinProjectCx::~PsWinProjectCx()
 {
 	std::map<uint32, SoftwareBuffer*>::iterator i = imageList.begin();
 	for (; i != imageList.end(); ++i)
@@ -53,27 +51,7 @@ PsWinProject::~PsWinProject()
 
 }
 
-void PsWinProject::setInstance(PsWinProject* newInstance)
-{
-	instance = newInstance;
-}
-
-PsWinProject& PsWinProject::Instance()
-{
-	// Unsafe
-	return *instance;
-}
-
-void PsWinProject::Delete()
-{
-	if (instance)
-	{
-		delete instance;
-		instance = 0;
-	}
-}
-
-void PsWinProject::OnLeftMouseButtonDown(PsPoint point)
+void PsWinProjectCx::OnLeftMouseButtonDown(PsPoint point)
 {
 	//PsRect k;
 	//scrollbar->GetClientRect(&k);
@@ -200,7 +178,7 @@ void PsWinProject::OnLeftMouseButtonDown(PsPoint point)
 	}
 }
 
-void PsWinProject::OnLButtonDownIn(PsPoint point, PsImage* image)
+void PsWinProjectCx::OnLButtonDownIn(PsPoint point, PsImage* image)
 {
 	if (point.y > ypos_precalc &&
 		point.y < ypos_precalc + item_count_size)
@@ -228,7 +206,7 @@ void PsWinProject::OnLButtonDownIn(PsPoint point, PsImage* image)
 	ypos_precalc += item_count_size;
 }
 
-void PsWinProject::OnLeftMouseButtonUp(PsPoint point)
+void PsWinProjectCx::OnLeftMouseButtonUp(PsPoint point)
 {
 	PsProject* project = PsController::Instance().project;
 	if (!project) return;
@@ -418,7 +396,7 @@ void PsWinProject::OnLeftMouseButtonUp(PsPoint point)
 }
 
 
-void PsWinProject::OnMyMouseMove(PsPoint point)
+void PsWinProjectCx::OnMyMouseMove(PsPoint point)
 {
 	//scrollbar->GetClientRect(&s);
 	if (!bDragging)
@@ -454,7 +432,7 @@ void PsWinProject::OnMyMouseMove(PsPoint point)
 	}
 }
 
-SoftwareBuffer* PsWinProject::loadThumb(PsTexture* g)
+SoftwareBuffer* PsWinProjectCx::loadThumb(PsTexture* g)
 {
 	//-- transformation dans le format de manipulation
 	int bpp;
@@ -523,7 +501,7 @@ SoftwareBuffer* PsWinProject::loadThumb(PsTexture* g)
 	return img;
 }
 
-void PsWinProject::relaseThumb(PsTexture* texture)
+void PsWinProjectCx::relaseThumb(PsTexture* texture)
 {
 	if (imageList.find(texture->GetAutoGenId()) != imageList.end())
 	{
@@ -537,7 +515,7 @@ void PsWinProject::relaseThumb(PsTexture* texture)
 	}
 }
 
-void PsWinProject::DrawMatrixBloc(PsMatrix* matrix)
+void PsWinProjectCx::DrawMatrixBloc(PsMatrix* matrix)
 {
 	if (ypos_precalc + bloc_count_size > 0)
 	{
@@ -600,7 +578,7 @@ void PsWinProject::DrawMatrixBloc(PsMatrix* matrix)
 	ypos_precalc += bloc_count_size;
 }
 
-void PsWinProject::DrawImageBloc(PsImage* image)
+void PsWinProjectCx::DrawImageBloc(PsImage* image)
 {
 	if (ypos_precalc + item_count_size > 0)
 	{
@@ -683,7 +661,7 @@ void PsWinProject::DrawImageBloc(PsImage* image)
 	ypos_precalc += item_count_size;
 }
 
-void PsWinProject::DrawBackgroundBloc()
+void PsWinProjectCx::DrawBackgroundBloc()
 {
 	PsProject* project = PsController::Instance().project;
 
@@ -749,7 +727,7 @@ void PsWinProject::DrawBackgroundBloc()
 	}
 }
 
-void PsWinProject::DrawInsertionCaret()
+void PsWinProjectCx::DrawInsertionCaret()
 {
 	psWin->SetPenColor(0, 0, 0);
 	psWin->SetBrushColor(0, 0, 0);
@@ -776,7 +754,7 @@ void PsWinProject::DrawInsertionCaret()
 	psWin->DrawPolygon(pts, 3);
 }
 
-void PsWinProject::GenericUpdate()
+void PsWinProjectCx::GenericUpdate()
 {
 	PsProject* project = PsController::Instance().project;
 
