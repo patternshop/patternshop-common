@@ -39,7 +39,6 @@ PsWinProject::PsWinProject(PsWin* psWin) : psWin(psWin)
 	dragLast = NULL;
 	dragBefore = NULL;
 	dragTopmost = false;
-	instance = NULL;
 }
 
 PsWinProject::~PsWinProject()
@@ -54,15 +53,15 @@ PsWinProject::~PsWinProject()
 
 }
 
+void PsWinProject::setInstance(PsWinProject* newInstance)
+{
+	instance = newInstance;
+}
+
 PsWinProject& PsWinProject::Instance()
 {
 	// Unsafe
 	return *instance;
-}
-
-void PsWinProject::setInstance(PsWinProject* newInstance)
-{
-	instance = newInstance;
 }
 
 void PsWinProject::Delete()
@@ -714,7 +713,7 @@ void PsWinProject::DrawBackgroundBloc()
 				}*/
 				img->BitBlt((*psWin), p, u);
 				p += img->GetWidth() + 5;
-				//spot.BitBlt(*this, p, ypos_precalc + 5);	
+				//spot.BitBlt(*this, p, ypos_precalc + 5);
 				//p += 18 + 5;
 				PsRect t;
 				t.left = p; t.top = ypos_precalc;

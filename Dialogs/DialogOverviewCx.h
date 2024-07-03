@@ -23,10 +23,10 @@
 class DialogOverviewCx
 {
 public:
-	DialogOverviewCx();
+	DialogOverviewCx(PsWin* psWin);
 
 public:
-	inline void Update() { bUpdated = false; }
+	void Update();
 
 protected:
 	PsRect GetSelectionRectangle(int, int);
@@ -34,6 +34,16 @@ protected:
 public:
 	void OnLeftMouseButtonDown(PsPoint);
 	void OnLeftMouseButtonUp(PsPoint);
+
+public:
+	void FastUpdate();
+	void CleanBackground();
+
+protected:
+	virtual void DrawRedSelection() = 0;
+
+protected:
+	PsWin* psWin;
 
 public:
 	SoftwareBuffer m_RenduImage;
