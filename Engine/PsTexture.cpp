@@ -225,7 +225,7 @@ void	GetPixel32Bits(uint8* buffer, int w, int, int x, int y, int* color)
 bool	PsTexture::Register(int width, int height, int bpp, uint8* pixels)
 {
 	TGetPixel	getPixel;
-	uint8* buffer;
+	uint8*		buffer;
 	int			color[4];
 	int			h;
 	int			i;

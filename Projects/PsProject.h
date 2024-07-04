@@ -39,7 +39,7 @@ typedef std::list<PsMatrix*>	MatrixList;
  */
 class	PsProject
 {
-	friend class	PsRender;
+	friend class		PsRender;
 
 public:
 	PsProject();
@@ -68,16 +68,16 @@ public:
 	bool				LogCanUndo() const;
 	void				LogInit();
 	int					LogUndoCount();
-	const char* LogRedoLastName() const;
-	const char* LogUndoLastName() const;
+	const char*			LogRedoLastName() const;
+	const char*			LogUndoLastName() const;
 	bool				LogMustAdd() const;
 	void				LogRedo();
 	void				LogUndo();
 
-
 public:
 	void  RenderToScreen();
 
+public:
 	bool  RenderToFile(const char*, int, int);
 
 public:
@@ -87,6 +87,7 @@ public:
 	void  ToolModifyMove(int, int, int, int, PsController::Tool);
 	void  ToolScrollDrag(int, int, int, int);
 
+public:
 	PsController::Tool	ToolMagnifyStart();
 	PsController::Tool	ToolModifyScan(int, int, bool);
 	PsController::Tool	ToolScrollStart();
@@ -107,8 +108,8 @@ public:
 	};
 
 public:
-	PsPattern* pattern;
-	MatrixList	matrices;
+	PsPattern*		pattern;
+	MatrixList		matrices;
 	ImageList		images;
 
 public:
@@ -116,22 +117,22 @@ public:
 	bool				bHideColor;
 
 public:
-	PsImage* image;
-	PsMatrix* matrix;
-	PsShape* shape;
+	PsImage*		image;
+	PsMatrix*		matrix;
+	PsShape*		shape;
 	PsRender		renderer;
 
 public:
 	bool				bNeedSave;
 	bool				bPatternsIsSelected;
-	int				  iLayerId;
+	int					iLayerId;
 	Mode				mode;
 
 private:
 	bool				log_insert;
-	LogList			log_redo;
-	LogList			log_undo;
-	int				  init_corner;
+	LogList				log_redo;
+	LogList				log_undo;
+	int					init_corner;
 	bool				center;
 
 	// variables temporaires utilisées pour la manipulation à la souris 
@@ -145,8 +146,8 @@ private:
 	float				prev_w;
 	float				prev_x;
 	float				prev_y;
-	PsVector    prev_origin;
-	PsVector    prev_origin_z0;
+	PsVector			prev_origin;
+	PsVector			prev_origin_z0;
 };
 
 #endif /* PS_PROJECT_H__ */

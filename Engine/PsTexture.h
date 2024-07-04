@@ -39,7 +39,7 @@ public:
 	bool			LoadFromBuffer(uint8*);
 	bool			LoadFromFile(const char*);
 
-	uint8* GetBuffer(size_t&) const;
+	uint8*			GetBuffer(size_t&) const;
 	GLuint			GetID() const;
 	void			GetSize(int&, int&) const;
 
@@ -47,7 +47,7 @@ public:
 
 	static void		SetMaxResol(int);
 
-	uint8* GetBufferUncompressed(int& bpp) const;
+	uint8*			GetBufferUncompressed(int& bpp) const;
 
 	int				GetBits() { return *(int*)(buffer + 2 * sizeof(int)); }
 
@@ -59,13 +59,14 @@ public:
 	bool			RegisterAndSave(int, int, int, uint8*);
 
 	static int		max_resol;
-	uint8* buffer;
+	uint8*			buffer;
 	GLuint			id;
 	int				width;
 	int				height;
 
-private: // identifiant unique de texture
-	uint32	autogen_id;
+private: 
+	// identifiant unique de texture
+	uint32			autogen_id;
 	static uint32	autogen_id_top;
 };
 

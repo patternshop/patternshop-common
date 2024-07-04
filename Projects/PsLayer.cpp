@@ -15,7 +15,6 @@
  * along with Patternshop.  If not, see <http://www.gnu.org/licenses/>
 */
 #include "PsTexture.h"
-#include "PsController.h"
 #include "PsLayer.h"
 #include "PsProject.h"
 
