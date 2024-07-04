@@ -87,8 +87,8 @@ public:
 
 	~PsController();
 
-	static PsController& Instance();
-	static void				      Delete();
+	static PsController&	Instance();
+	static void				Delete();
 
 	bool					GetOption(Option, bool = false) const;
 
@@ -96,9 +96,9 @@ public:
 	void					MouseMove(int, int);
 	void					MouseRelease(int, int, int);
 
-	void          UpdateWindow();
-	void          UpdateDialogProject();
-	void          UpdateDialogOverview(bool bQuick = true);
+	void					UpdateWindow();
+	void					UpdateDialogProject();
+	void					UpdateDialogOverview(bool bQuick = true);
 
 #ifndef _MACOSX
 	void					SetActive(CPatternshopView*);
@@ -111,21 +111,21 @@ public:
 	void					SetTool(Tool);
 
 	Tool					tool, prev_tool;					// Outil actuellement sélectionné
-	PsProject* project;
+	PsProject*				project;
 
 public:
 	PsController();
 
 #ifdef WIN32
 	HCURSOR					cursor[CONTROLLER_COUNT_CURSOR];	// Tableau des curseurs
-	CPatternshopView* active;								// Fenêtre active de l'application
+	CPatternshopView*		active;								// Fenêtre active de l'application
 #endif
 
-	static PsController* instance;							// Instance de PsController(singleton)
+	static PsController*	instance;							// Instance de PsController(singleton)
 	// Projet actif(lié à "active")
 	bool					option[CONTROLLER_COUNT_OPTION];	// Valeurs des options
 	int						prev_x;								// Utilisé en interne pour sauver la position
 	int						prev_y;								//   du pointeur lors d'un clic.
 
-	bool          bMouseButtonIsDown;
+	bool					bMouseButtonIsDown;
 };

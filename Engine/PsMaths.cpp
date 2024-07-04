@@ -213,7 +213,7 @@ float PsRotator::FromDegree(float r)
 	return (r * PS_MATH_PI / 180.0);
 }
 
-#ifdef _WINDOWS
+#ifndef round
 /*
 ** Cette fonction arrondie un double
 */
@@ -225,7 +225,7 @@ double round(double a)
 	if (ca - a < a - fa) return ca;
 	else return fa;
 }
-#endif /* _WINDOWS */
+#endif /* round */
 
 #ifdef _MACOSX
 /*

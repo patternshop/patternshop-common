@@ -14,9 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Patternshop.  If not, see <http://www.gnu.org/licenses/>
 */
-#ifndef DIALOG_OVERVIEW_CORE_H__
-
-#define DIALOG_OVERVIEW_CORE_H__
+#pragma once
 
 #include "PsWin.h"
 #include "PsHardware.h"
@@ -25,10 +23,10 @@
 class DialogOverviewCx
 {
 public:
-	DialogOverviewCx();
+	DialogOverviewCx(PsWin* psWin);
 
 public:
-	inline void Update() { bUpdated = false; }
+	void Update();
 
 protected:
 	PsRect GetSelectionRectangle(int, int);
@@ -38,6 +36,16 @@ public:
 	void OnLeftMouseButtonUp(PsPoint);
 
 public:
+	void FastUpdate();
+	void CleanBackground();
+
+protected:
+	virtual void DrawRedSelection() = 0;
+
+protected:
+	PsWin* psWin;
+
+public:
 	SoftwareBuffer m_RenduImage;
 	SoftwareBuffer window_buffer, window_buffer2;
 	float r_size_x, r_size_y, r_zoom;
@@ -45,5 +53,3 @@ public:
 	int border_size;
 	bool bUpdated;
 };
-
-#endif /* DIALOG_OVERVIEW_CORE_H__ */

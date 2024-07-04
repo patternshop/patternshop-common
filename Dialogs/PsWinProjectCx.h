@@ -33,11 +33,11 @@ public:
 	virtual void Disable() = 0;
 };
 
-class PsWinProjectModel
+class PsWinProjectCx
 {
-protected:
-	PsWinProjectModel();
-	virtual ~PsWinProjectModel();
+public:
+	PsWinProjectCx(PsWin* psWin);
+	virtual ~PsWinProjectCx();
 
 public:
 	enum OpenCloseState { OPEN = 1, CLOSE = 2 };
@@ -47,6 +47,7 @@ public: // ...
 	int totalHSize;
 
 protected:
+	PsWin* psWin;
 	int matNameCount, motifNameCount, imageNameCount;
 	PsShape* selected;
 	static const int bloc_count_size, item_count_size;
@@ -72,39 +73,12 @@ public:
 public:
 	virtual void Show() = 0;
 	virtual void Update() = 0;
-	virtual void GenericUpdate() = 0;
 	virtual void UpdateMouseCursor() = 0;
-	virtual void OnLeftMouseButtonDown(PsPoint) = 0;
-	virtual void OnLeftMouseButtonUp(PsPoint) = 0;
-	virtual void OnMyMouseMove(PsPoint) = 0;
-};
-
-#ifdef _WINDOWS
-#include "PsWinProjectWin32.h"
-typedef PsWinProjectWin32 PsWinProjectView;
-#else /* _MACOSX */
-#include "PsWinProjectMac.h"
-typedef PsWinProjectMac PsWinProjectView;
-#endif
-
-
-class PsWinProject : public PsWinProjectView
-{
-protected:
-	PsWinProject();
 
 public:
-	static PsWinProject& Instance();
-	static void Delete();
-	virtual ~PsWinProject();
-
-protected:
-	static PsWinProject* instance; // Singleton
-
-public:
-	void OnLeftMouseButtonDown(PsPoint);
-	void OnLeftMouseButtonUp(PsPoint);
-	void OnMyMouseMove(PsPoint);
+	virtual void OnLeftMouseButtonDown(PsPoint);
+	virtual void OnLeftMouseButtonUp(PsPoint);
+	virtual void OnMyMouseMove(PsPoint);
 
 protected:
 	void OnLButtonDownIn(PsPoint, PsImage*);
@@ -115,6 +89,6 @@ protected:
 	void DrawInsertionCaret();
 
 public:
-	void GenericUpdate();
+	virtual void GenericUpdate();
 	void relaseThumb(PsTexture*);
 };

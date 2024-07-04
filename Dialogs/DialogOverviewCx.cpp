@@ -16,14 +16,19 @@
 */
 
 #include "PsProject.h"
-#include "PsWinOverview.h"
+#include "DialogOverviewCx.h"
 
-DialogOverviewCx::DialogOverviewCx()
+DialogOverviewCx::DialogOverviewCx(PsWin* psWin) : psWin(psWin)
 {
 	bUpdated = false;
 	bDragging = false;
 	zooming = false;
 	border_size = 60;
+}
+
+void DialogOverviewCx::Update()
+{ 
+	if (bUpdated) bUpdated = false;
 }
 
 PsRect DialogOverviewCx::GetSelectionRectangle(int iWindowWidth, int iWindowHeight)
@@ -122,117 +127,27 @@ void DialogOverviewCx::OnLeftMouseButtonUp(PsPoint p)
 		zooming = false;
 }
 
-void PsWinOverview::UpdateMiniImage()
+void DialogOverviewCx::CleanBackground()
 {
-	PsRender& renderer = PsController::Instance().project->renderer;
-
-	float size_x = renderer.size_x;
-	float size_y = renderer.size_y;
-	float scroll_x = renderer.scroll_x;
-	float scroll_y = renderer.scroll_y;
-	/*float x1 = renderer.x1;
-	float x2 = renderer.x2;
-	float y1 = renderer.y1;
-	float y2 = renderer.y2;*/
-	float zoom = renderer.zoom;
-	bool showbox = PsController::Instance().GetOption(PsController::OPTION_BOX_SHOW);
-	bool showmat = PsController::Instance().GetOption(PsController::OPTION_HIGHLIGHT_SHOW);
-	int height = window_buffer2.GetHeight() - 14;
-
-	PsController::Instance().SetOption(PsController::OPTION_BOX_SHOW, false);
-	PsController::Instance().SetOption(PsController::OPTION_HIGHLIGHT_SHOW, false);
-	renderer.SetSize(window_buffer2.GetWidth(), height);
-	renderer.CenterView();
-
-	PsController::Instance().project->RenderToScreen();
-	hardwareRenderer.CopyToSoftBuffer(m_RenduImage);
-
-	PsRect z; // calcul de la zone de l'image
-	z.left = (0 - renderer.x1) / (renderer.x2 - renderer.x1) * window_buffer2.GetWidth();
-	z.right = (renderer.doc_x - renderer.x1) / (renderer.x2 - renderer.x1) * window_buffer2.GetWidth();
-	z.bottom = height - (renderer.doc_y - renderer.y1) / (renderer.y2 - renderer.y1) * height;
-	z.top = height - (0 - renderer.y1) / (renderer.y2 - renderer.y1) * height;
-	r_size_x = z.right - z.left;
-	r_size_y = z.bottom - z.top;
-	r_zoom = renderer.zoom;
-
-	SetTarget(&window_buffer2);
-	CleanBackground();
-	SetTarget(NULL);
-
-	int x = FloatToInt((m_RenduImage.GetWidth() - r_size_x) / 2);
-	int y = FloatToInt((height - r_size_y) / 2);
-
-#ifdef _WINDOWS
-	CDC dc;
-	dc.CreateCompatibleDC(NULL);
-	dc.SelectObject(window_buffer2.buffer);
-	CDC dc2;
-	dc2.CreateCompatibleDC(NULL);
-	dc2.SelectObject(m_RenduImage.buffer);
-	dc.BitBlt(x, y, r_size_x, r_size_y, &dc2, z.left, m_RenduImage.buffer.GetHeight() - height + z.top, SRCCOPY);
-	dc2.DeleteDC();
-#else /* _MACOSX */
-	SetTarget(&window_buffer2);
-	CGRect subRect = CGRectMake(z.left, m_RenduImage.GetHeight() - height + z.top, r_size_x, r_size_y);
-	CGImageRef subImage = CGImageCreateWithImageInRect(m_RenduImage.buffer, subRect);
-	SoftwareBuffer sb;
-	sb.buffer = subImage;
-	DrawSoftwareBuffer(sb, x, y);
-	SetTarget(NULL);
-#endif
-
-	PsRect r;
-	r.left = x - 1;
-	r.top = y - 1;
-	r.right = x + r_size_x + 1;
-	r.bottom = y + r_size_y + 1;
-
-#ifdef _WINDOWS
-	dc.DrawEdge(&r, EDGE_SUNKEN, BF_RECT);
-#else /* _MACOSX */
-	/*
-	SetPenColor(0, 0, 0);
-	MovePenTo(r.left + 1, r.top + 2);
-	DrawLineTo(r.right, r.top + 2);
-	DrawLineTo(r.right, r.bottom + 1);
-	DrawLineTo(r.left + 1, r.bottom + 1);
-	DrawLineTo(r.left + 1, r.top + 2);
-	 */
-#endif
-
-	PsController::Instance().SetOption(PsController::OPTION_HIGHLIGHT_SHOW, showmat);
-	PsController::Instance().SetOption(PsController::OPTION_BOX_SHOW, showbox);
-	renderer.SetSize(size_x, size_y);
-	renderer.SetZoom(zoom);
-	renderer.SetScroll(scroll_x, scroll_y);
-
-#ifdef _MACOSX
-	//PsController::Instance().project->RenderToScreen(); // trouver mieux en direct rendering...
-#endif
+	psWin->SetPenColor(212, 208, 200);
+	psWin->SetBrushColor(212, 208, 200);
+	psWin->DrawRectangle(0, 0, window_buffer2.GetWidth(), window_buffer2.GetHeight());
 }
 
-void PsWinOverview::CleanBackground()
-{
-	SetPenColor(212, 208, 200);
-	SetBrushColor(212, 208, 200);
-	DrawRectangle(0, 0, window_buffer2.GetWidth(), window_buffer2.GetHeight());
-}
-
-void PsWinOverview::FastUpdate()
+void DialogOverviewCx::FastUpdate()
 {
 	if (!PsController::Instance().project)
 	{
-		SetTarget(&window_buffer);
+		psWin->SetTarget(&window_buffer);
 		CleanBackground();
-		SetTarget(NULL);
+		psWin->SetTarget(NULL);
 		return;
 	}
 
-	SetTarget(&window_buffer);
+	psWin->SetTarget(&window_buffer);
 
 
-	DrawSoftwareBuffer(window_buffer2, 0, 0);
+	psWin->DrawSoftwareBuffer(window_buffer2, 0, 0);
 
 	if (PsController::Instance().project)
 	{
@@ -241,28 +156,28 @@ void PsWinOverview::FastUpdate()
 		PsRender& renderer = PsController::Instance().project->renderer;
 
 		// barre de zoom
-		SetPenColor(0, 0, 0);
-		MovePenTo(border_size, window_buffer2.GetHeight() - 11);
-		DrawLineTo(window_buffer2.GetWidth() - 20, window_buffer2.GetHeight() - 11);
+		psWin->SetPenColor(0, 0, 0);
+		psWin->MovePenTo(border_size, window_buffer2.GetHeight() - 11);
+		psWin->DrawLineTo(window_buffer2.GetWidth() - 20, window_buffer2.GetHeight() - 11);
 		float fZoomRange = renderer.fZoomMax - renderer.fZoomMin;
 		int iLineWidth = (window_buffer2.GetWidth() - border_size - 20);
 		int x = FloatToInt((1 - (renderer.zoom - renderer.fZoomMin) / fZoomRange) * iLineWidth);
-		MovePenTo(border_size + x, window_buffer2.GetHeight() - 10);
-		DrawLineTo(border_size + x - 5, window_buffer2.GetHeight() - 5);
-		DrawLineTo(border_size + x + 5, window_buffer2.GetHeight() - 5);
-		DrawLineTo(border_size + x, window_buffer2.GetHeight() - 10);
+		psWin->MovePenTo(border_size + x, window_buffer2.GetHeight() - 10);
+		psWin->DrawLineTo(border_size + x - 5, window_buffer2.GetHeight() - 5);
+		psWin->DrawLineTo(border_size + x + 5, window_buffer2.GetHeight() - 5);
+		psWin->DrawLineTo(border_size + x, window_buffer2.GetHeight() - 10);
 
 		// version texte
-		SetBrushColor(255, 255, 255);
-		DrawRectangle(0, window_buffer2.GetHeight() - 14, border_size - 5, window_buffer2.GetHeight());
+		psWin->SetBrushColor(255, 255, 255);
+		psWin->DrawRectangle(0, window_buffer2.GetHeight() - 14, border_size - 5, window_buffer2.GetHeight());
 		char buffer_t[1024];
 		sprintf(buffer_t, "%.2f%%", (1.f / renderer.zoom) * 100.f);
 		PsRect p;
 		p.left = 5; p.top = window_buffer2.GetHeight() - 15;
 		p.right = window_buffer2.GetWidth(); p.bottom = window_buffer2.GetHeight();
-		SetTextColor(0, 0, 0);
-		DrawText(buffer_t, p, PSFONT_NORMAL);
+		psWin->SetTextColor(0, 0, 0);
+		psWin->DrawText(buffer_t, p, PsWin::PSFONT_NORMAL);
 	}
 
-	SetTarget(NULL);
+	psWin->SetTarget(NULL);
 }

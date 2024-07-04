@@ -14,9 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Patternshop.  If not, see <http://www.gnu.org/licenses/>
 */
-#ifndef PS_ACTION_H___
-
-#define PS_ACTION_H___
+#pragma once
 
 #include "PsImage.h"
 #include "PsMatrix.h"
@@ -257,6 +255,3 @@ class	LogPatternScale : public LogPatternAction
 	private:
 		float				fScale;
 };
-
-#endif /* PS_ACTION_H___ */
-

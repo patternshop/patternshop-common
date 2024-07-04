@@ -22,7 +22,7 @@
 
 class PsWin
 {
-protected:
+public:
 	typedef enum
 	{
 		PSFONT_NORMAL,
