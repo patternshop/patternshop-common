@@ -1,3 +1,5 @@
+// PsImage.cpp
+
 /**
  * This file is part of Patternshop Project.
  *
@@ -20,8 +22,7 @@
 #include "PsMaths.h"
 
 /*
-** Une image est toujours contenue dans une matrice, elle utilise donc le constructeur
-** correspondant de l'PsShape.
+** An image is always contained in a matrix, so it uses the corresponding constructor of PsShape.
 */
 PsImage::PsImage(PsMatrix* parent) :
 	PsShape(*parent)
@@ -33,20 +34,20 @@ PsImage::~PsImage()
 }
 
 /*
-** Retourne la matrice dans laquelle est contenue l'image.
+** Returns the matrix in which the image is contained.
 */
 PsMatrix* PsImage::GetParent() const
 {
-	return (PsMatrix*)parent;
+	return (PsMatrix*)this->parent;
 }
 
 /*
-** Charge les données de l'image depuis un fichier.
+** Loads the image data from a file.
 */
-ErrID				PsImage::FileLoad(FILE* file)
+ErrID PsImage::FileLoad(FILE* file)
 {
 	uint8* buffer;
-	size_t			size;
+	size_t size;
 
 	if (fread(&size, sizeof(size), 1, file) != 1)
 		return ERROR_FILE_READ;
@@ -56,21 +57,21 @@ ErrID				PsImage::FileLoad(FILE* file)
 	if (fread(buffer, sizeof(*buffer), size, file) != size)
 		return ERROR_FILE_READ;
 
-	if (!TextureFromBuffer(buffer))
+	if (!this->TextureFromBuffer(buffer))
 		return ERROR_FILE_READ;
 
 	return PsShape::FileLoad(file);
 }
 
 /*
-** Enregistre les données de l'image dans un fichier.
+** Saves the image data to a file.
 */
-ErrID				PsImage::FileSave(FILE* file) const
+ErrID PsImage::FileSave(FILE* file) const
 {
 	uint8* buffer;
-	size_t			size;
+	size_t size;
 
-	if (!(buffer = texture.GetBuffer(size)))
+	if (!(buffer = this->texture.GetBuffer(size)))
 		return ERROR_FILE_WRITE;
 
 	if (fwrite(&size, sizeof(size), 1, file) != 1)
@@ -83,13 +84,13 @@ ErrID				PsImage::FileSave(FILE* file) const
 }
 
 /*
-** Récupere la position absolue de l'image (voir PsShape::ToAbsolute)
+** Retrieves the absolute position of the image (see PsShape::ToAbsolute)
 */
-void	PsImage::GetPosition(float& x, float& y) const
+void PsImage::GetPosition(float& x, float& y) const
 {
-	if (parent)
+	if (this->parent)
 	{
-		parent->ToAbsolute(this->x, this->y, x, y);
+		this->parent->ToAbsolute(this->x, this->y, x, y);
 	}
 	else
 	{
@@ -99,30 +100,30 @@ void	PsImage::GetPosition(float& x, float& y) const
 }
 
 /*
-** Change l'angle de rotation de l'image, avec éventuelle contrainte à PI / 8.
+** Changes the rotation angle of the image, with optional constraint to PI / 8.
 */
-void	PsImage::SetAngle(float r, bool constrain, bool)
+void PsImage::SetAngle(float r, bool constrain, bool)
 {
 	if (constrain)
-		r = (int)(r / (PS_MATH_PI / 8)) * (PS_MATH_PI / 8);
+		r = (float)(r / ((float)PS_MATH_PI / 8.0f)) * ((float)PS_MATH_PI / 8.0f);
 
 	this->r = r;
 }
 
 /*
-** Change la position de l'image (voir PsShape::ToRelative)
+** Changes the position of the image (see PsShape::ToRelative)
 */
-void				PsImage::SetPosition(float x, float y, bool constrain)
+void PsImage::SetPosition(float x, float y, bool constrain)
 {
 	const PsMatrix* matrix;
-	float			rx;
-	float			ry;
+	float rx;
+	float ry;
 
 	if (this->parent)
 	{
-		parent->ToRelative(x, y, rx, ry);
+		this->parent->ToRelative(x, y, rx, ry);
 
-		if (constrain && (matrix = dynamic_cast<const PsMatrix*> (this->parent)) && matrix->div_is_active && matrix->div_x > 0 && matrix->div_y > 0)
+		if (constrain && (matrix = dynamic_cast<const PsMatrix*>(this->parent)) && matrix->div_is_active && matrix->div_x > 0 && matrix->div_y > 0)
 		{
 			rx = (int)((rx + SHAPE_SIZE / matrix->div_x + SHAPE_SIZE) * matrix->div_x / SHAPE_SIZE / 2) * SHAPE_SIZE * 2 / matrix->div_x - SHAPE_SIZE;
 			ry = (int)((ry + SHAPE_SIZE / matrix->div_y + SHAPE_SIZE) * matrix->div_y / SHAPE_SIZE / 2) * SHAPE_SIZE * 2 / matrix->div_y - SHAPE_SIZE;
@@ -145,17 +146,16 @@ void				PsImage::SetPosition(float x, float y, bool constrain)
 }
 
 /*
-** Change la taille de l'image, avec éventuelle contrainte sur les ratios. Voir la fonction
-** "PsShape::FinalizeSize" pour savoir à quoi servent les paramètres inv_x et inv_y, et la fonction
-** "PsMatrix::SetSize" pour les paramètres old_w et old_h.
-** FIXME : Il serait peut-être utile de redimentionner l'image en fonction de la taille
-** de la matrice qui la contient (afin de ne pas avoir d'image démesurée par rapport à la
-** matrice).
+** Changes the size of the image, with optional constraint on the ratios. See the function
+** "PsShape::FinalizeSize" to know what the parameters inv_x and inv_y are for, and the function
+** "PsMatrix::SetSize" for the parameters old_w and old_h.
+** FIXME: It might be useful to resize the image based on the size of the matrix that contains it
+** (to avoid having an oversized image relative to the matrix).
 */
-void		PsImage::SetSize(float w, float h, float inv_x, float inv_y, float old_w, float old_h, bool constrain, bool)
+void PsImage::SetSize(float w, float h, float inv_x, float inv_y, float old_w, float old_h, bool constrain, bool)
 {
-	float	ratio_h;
-	float	ratio_w;
+	float ratio_h;
+	float ratio_w;
 
 	if ((constrain || this->constraint) && old_w && old_h)
 	{
@@ -166,34 +166,33 @@ void		PsImage::SetSize(float w, float h, float inv_x, float inv_y, float old_w, 
 		w = old_w * (ratio_h + ratio_w) / 2;
 	}
 
-	// FIXME : Limiter la taille maximum de l'image
+	// FIXME: Limit the maximum size of the image
 
 	PsShape::FinalizeSize(w, h, inv_x, inv_y);
 }
 
 /*
-** Change la torsion de l'image (opération impossible, donc sans effet)
+** Changes the torsion of the image (impossible operation, so no effect)
 */
-void	PsImage::SetTorsion(float, float, bool)
+void PsImage::SetTorsion(float, float, bool)
 {
 }
 
 /*
-** Charge une texture depuis un buffer (utilisé lors du chargement d'un fichier). À cause
-** de la façon dont les calculs sont effectués par la suite, La taille d'une image du point
-** de vue de PatternShop doit être la moitié de sa taille réelle.
+** Loads a texture from a buffer (used when loading a file). Due to the way calculations are performed
+** subsequently, the size of an image from PatternShop's point of view must be half its actual size.
 */
-bool	PsImage::TextureFromBuffer(uint8* buffer, bool resize)
+bool PsImage::TextureFromBuffer(uint8* buffer, bool resize)
 {
-	int	x;
-	int	y;
+	int x;
+	int y;
 
-	if (!texture.LoadFromBuffer(buffer))
+	if (!this->texture.LoadFromBuffer(buffer))
 		return false;
 
 	if (resize)
 	{
-		texture.GetSize(x, y);
+		this->texture.GetSize(x, y);
 		this->SetSize(x / 2.0f, y / 2.0f);
 	}
 
@@ -201,20 +200,20 @@ bool	PsImage::TextureFromBuffer(uint8* buffer, bool resize)
 }
 
 /*
-** Charge une texture depuis un fichier.
+** Loads a texture from a file.
 */
-bool	PsImage::TextureFromFile(const char* file, bool resize)
+bool PsImage::TextureFromFile(const char* file, bool resize)
 {
-	int	x;
-	int	y;
+	int x;
+	int y;
 
-	if (!texture.LoadFromFile(file))
+	if (!this->texture.LoadFromFile(file))
 		return false;
 
 	if (resize)
 	{
-		texture.GetSize(x, y);
-		this->SetSize(x, y);
+		this->texture.GetSize(x, y);
+		this->SetSize((float)x, (float)y);
 	}
 
 	return true;

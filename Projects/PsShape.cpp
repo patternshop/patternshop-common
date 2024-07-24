@@ -18,36 +18,36 @@
 #include "PsMaths.h"
 
 /*
-** Constructeur pour une PsShape contenue dans une autre.
+** Constructor for a PsShape contained within another.
 */
 PsShape::PsShape(const PsShape& parent) :
-	parent(&parent),
-	h(200),
-	i(0),
-	j(0),
-	r(0),
-	w(200),
-	x(0),
-	y(0),
-	hide(false),
-	constraint(false)
+    parent(&parent),
+    h(200),
+    i(0),
+    j(0),
+    r(0),
+    w(200),
+    x(0),
+    y(0),
+    hide(false),
+    constraint(false)
 {
 }
 
 /*
-** Constructeur pour une PsShape autonome.
+** Constructor for an autonomous PsShape.
 */
 PsShape::PsShape() :
-	parent(0),
-	h(0),
-	i(0),
-	j(0),
-	r(0),
-	w(0),
-	x(0),
-	y(0),
-	hide(false),
-	constraint(false)
+    parent(0),
+    h(0),
+    i(0),
+    j(0),
+    r(0),
+    w(0),
+    x(0),
+    y(0),
+    hide(false),
+    constraint(false)
 {
 }
 
@@ -56,277 +56,276 @@ PsShape::~PsShape()
 }
 
 /*
-** Récupere l'angle de rotation de l'PsShape.
+** Retrieves the rotation angle of the PsShape.
 */
-float	PsShape::GetAngle() const
+float    PsShape::GetAngle() const
 {
-	return this->r;
+    return this->r;
 }
 
 /*
-** Récupere le nom de cette PsShape (techniquement inutile, mais ce nom sera affiché
-** dans les boites de dialogue, pour l'utilisateur).
+** Retrieves the name of this PsShape (technically unnecessary, but this name will be displayed
+** in dialog boxes for the user).
 */
 const std::string& PsShape::GetName() const
 {
-	return this->name;
+    return this->name;
 }
 
 /*
-** Charge les données d'une PsShape depuis un fichier ouvert.
-** FIXME : Le nom n'est pas chargé (ni sauvegardé)
+** Loads the data of a PsShape from an open file.
+** FIXME: The name is not loaded (nor saved)
 */
-ErrID	PsShape::FileLoad(FILE* file)
+ErrID    PsShape::FileLoad(FILE* file)
 {
-	if (fread(&h, sizeof(h), 1, file) != 1 ||
-		fread(&i, sizeof(i), 1, file) != 1 ||
-		fread(&j, sizeof(j), 1, file) != 1 ||
-		fread(&r, sizeof(r), 1, file) != 1 ||
-		fread(&w, sizeof(w), 1, file) != 1 ||
-		fread(&x, sizeof(x), 1, file) != 1 ||
-		fread(&y, sizeof(y), 1, file) != 1 ||
-		fread(&hide, sizeof(hide), 1, file) != 1 ||
-		fread(&constraint, sizeof(constraint), 1, file) != 1)
-		return ERROR_FILE_READ;
+    if (fread(&this->h, sizeof(this->h), 1, file) != 1 ||
+        fread(&this->i, sizeof(this->i), 1, file) != 1 ||
+        fread(&this->j, sizeof(this->j), 1, file) != 1 ||
+        fread(&this->r, sizeof(this->r), 1, file) != 1 ||
+        fread(&this->w, sizeof(this->w), 1, file) != 1 ||
+        fread(&this->x, sizeof(this->x), 1, file) != 1 ||
+        fread(&this->y, sizeof(this->y), 1, file) != 1 ||
+        fread(&this->hide, sizeof(this->hide), 1, file) != 1 ||
+        fread(&this->constraint, sizeof(this->constraint), 1, file) != 1)
+        return ERROR_FILE_READ;
 
-	return ERROR_NONE;
+    return ERROR_NONE;
 }
 
 /*
-** Enregistre les données d'une PsShape dans un fichier ouvert.
-** FIXME : Le nom n'est pas chargé (ni sauvegardé)
+** Saves the data of a PsShape to an open file.
+** FIXME: The name is not loaded (nor saved)
 */
-ErrID	PsShape::FileSave(FILE* file) const
+ErrID    PsShape::FileSave(FILE* file) const
 {
-	if (fwrite(&h, sizeof(h), 1, file) != 1 ||
-		fwrite(&i, sizeof(i), 1, file) != 1 ||
-		fwrite(&j, sizeof(j), 1, file) != 1 ||
-		fwrite(&r, sizeof(r), 1, file) != 1 ||
-		fwrite(&w, sizeof(w), 1, file) != 1 ||
-		fwrite(&x, sizeof(x), 1, file) != 1 ||
-		fwrite(&y, sizeof(y), 1, file) != 1 ||
-		fwrite(&hide, sizeof(hide), 1, file) != 1 ||
-		fwrite(&constraint, sizeof(constraint), 1, file) != 1)
-		return ERROR_FILE_WRITE;
+    if (fwrite(&this->h, sizeof(this->h), 1, file) != 1 ||
+        fwrite(&this->i, sizeof(this->i), 1, file) != 1 ||
+        fwrite(&this->j, sizeof(this->j), 1, file) != 1 ||
+        fwrite(&this->r, sizeof(this->r), 1, file) != 1 ||
+        fwrite(&this->w, sizeof(this->w), 1, file) != 1 ||
+        fwrite(&this->x, sizeof(this->x), 1, file) != 1 ||
+        fwrite(&this->y, sizeof(this->y), 1, file) != 1 ||
+        fwrite(&this->hide, sizeof(this->hide), 1, file) != 1 ||
+        fwrite(&this->constraint, sizeof(this->constraint), 1, file) != 1)
+        return ERROR_FILE_WRITE;
 
-	return ERROR_NONE;
+    return ERROR_NONE;
 }
 
 /*
-** Change la position de l'PsShape. Cette méthode qui devrait s'appeller "SetPosition" porte le préfixe
-** "Finalize", qui indique qu'un autre traitement sera nécessaire par la classe qui héritera d'PsShape,
-** avant d'appeler cette méthode, et que son appel seul ne suffit donc pas.
+** Changes the position of the PsShape. This method, which should be called "SetPosition", has the prefix
+** "Finalize", indicating that another process will be necessary by the class inheriting from PsShape,
+** before calling this method, and that its call alone is therefore not sufficient.
 */
-void	PsShape::FinalizePosition(float x, float y)
+void    PsShape::FinalizePosition(float x, float y)
 {
-	this->x = x;
-	this->y = y;
+    this->x = x;
+    this->y = y;
 }
 
 /*
-** Change la taille de l'PsShape, en largeur (w) et hauteur (h). Le point "inv_x, inv_y" est
-** le "point invariant" : celui qui ne doit pas bouger lors du redimentionnement. Quand
-** l'utilisateur redimentionne une PsShape, ce point est la poignée opposée à celle qui est
-** tirée actuellement. Si inv_x et inv_y restent à 0, l'PsShape change simplement de taille
-** sans compenser aucun déplacement.
+** Changes the size of the PsShape, in width (w) and height (h). The point "inv_x, inv_y" is
+** the "invariant point": the one that should not move during resizing. When
+** the user resizes a PsShape, this point is the handle opposite to the one that is
+** currently being dragged. If inv_x and inv_y remain at 0, the PsShape simply changes size
+** without compensating for any displacement.
 */
-void		PsShape::FinalizeSize(float w, float h, float inv_x, float inv_y)
+void        PsShape::FinalizeSize(float w, float h, float inv_x, float inv_y)
 {
-	float	inv_x1;
-	float	inv_x2;
-	float	inv_y1;
-	float	inv_y2;
+    float    inv_x1;
+    float    inv_x2;
+    float    inv_y1;
+    float    inv_y2;
 
-	ToAbsolute(inv_x, inv_y, inv_x1, inv_y1);
+    this->ToAbsolute(inv_x, inv_y, inv_x1, inv_y1);
 
-	this->h = h;
-	this->w = w;
+    this->h = h;
+    this->w = w;
 
-	if (inv_x || inv_y)
-	{
-		ToAbsolute(inv_x, inv_y, inv_x2, inv_y2);
+    if (inv_x || inv_y)
+    {
+        this->ToAbsolute(inv_x, inv_y, inv_x2, inv_y2);
 
-		inv_x2 -= inv_x1;
-		inv_y2 -= inv_y1;
+        inv_x2 -= inv_x1;
+        inv_y2 -= inv_y1;
 
-		GetPosition(inv_x1, inv_y1);
-		SetPosition(inv_x1 + inv_x2, inv_y1 + inv_y2);
-	}
+        this->GetPosition(inv_x1, inv_y1);
+        this->SetPosition(inv_x1 + inv_x2, inv_y1 + inv_y2);
+    }
 }
 
 /*
-** Teste si un point (en absolu, par rapport au document et non à la fenêtre, cf fonction
-** PsRender::Convert) est dans une PsShape ou non.
+** Tests if a point (in absolute terms, relative to the document and not the window, see function
+** PsRender::Convert) is in a PsShape or not.
 */
-bool		PsShape::InContent(float ax, float ay) const
+bool        PsShape::InContent(float ax, float ay) const
 {
-	float	rx, ry;
+    float    rx, ry;
 
-	ToRelative(ax, ay, rx, ry);
+    this->ToRelative(ax, ay, rx, ry);
 
-	return rx >= -SHAPE_SIZE && rx <= SHAPE_SIZE && ry >= -SHAPE_SIZE && ry <= SHAPE_SIZE;
+    return rx >= -SHAPE_SIZE && rx <= SHAPE_SIZE && ry >= -SHAPE_SIZE && ry <= SHAPE_SIZE;
 }
 
 /*
-** Teste si un point est sur l'une des poignées de redimentionnement d'une PsShape, et enregistre
-** dans "i" l'index de la poignée (0 = haut/gauche, etc dans le sens horaire). Cette fonction doit
-** prendre le zoom en paramètre, pour que la taille des poignées ne soient pas affectées par lui
-** (on doit donc pouvoir annuler ses effets).
+** Tests if a point is on one of the resizing handles of a PsShape, and records
+** in "i" the index of the handle (0 = top/left, etc. in a clockwise direction). This function must
+** take the zoom into account, so that the size of the handles is not affected by it
+** (we must therefore be able to cancel its effects).
 */
-bool		PsShape::InResize(float px, float py, float zoom, int& i) const
+bool        PsShape::InResize(float px, float py, float zoom, int& i) const
 {
-	float	size = SHAPE_SIZE_RESIZE * zoom;
-	float	corner[4][2];
+    float    size = SHAPE_SIZE_RESIZE * zoom;
+    float    corner[4][2];
 
-	ToAbsolute(-SHAPE_SIZE, -SHAPE_SIZE, corner[0][0], corner[0][1]);
-	ToAbsolute(SHAPE_SIZE, -SHAPE_SIZE, corner[1][0], corner[1][1]);
-	ToAbsolute(-SHAPE_SIZE, SHAPE_SIZE, corner[2][0], corner[2][1]);
-	ToAbsolute(SHAPE_SIZE, SHAPE_SIZE, corner[3][0], corner[3][1]);
+    this->ToAbsolute(-SHAPE_SIZE, -SHAPE_SIZE, corner[0][0], corner[0][1]);
+    this->ToAbsolute(SHAPE_SIZE, -SHAPE_SIZE, corner[1][0], corner[1][1]);
+    this->ToAbsolute(-SHAPE_SIZE, SHAPE_SIZE, corner[2][0], corner[2][1]);
+    this->ToAbsolute(SHAPE_SIZE, SHAPE_SIZE, corner[3][0], corner[3][1]);
 
-	for (i = 0; i < 4; ++i)
-		if (px >= corner[i][0] - size && px <= corner[i][0] + size && py >= corner[i][1] - size && py <= corner[i][1] + size)
-			return true;
+    for (i = 0; i < 4; ++i)
+        if (px >= corner[i][0] - size && px <= corner[i][0] + size && py >= corner[i][1] - size && py <= corner[i][1] + size)
+            return true;
 
-	return false;
+    return false;
 }
 
 /*
-** Teste si un point est à l'un des emplacements de rotation; même remarques que pour
-** le redimentionnement.
+** Tests if a point is at one of the rotation locations; same remarks as for
+** resizing.
 */
-bool		PsShape::InRotate(float px, float py, float zoom, int& i) const
+bool        PsShape::InRotate(float px, float py, float zoom, int& i) const
 {
-	float	size = SHAPE_SIZE_ROTATE * zoom;
-	float	corner[4][2];
-	float	angle;
-	float	ax;
-	float	ay;
+    float    size = SHAPE_SIZE_ROTATE * zoom;
+    float    corner[4][2];
+    float    angle;
+    float    ax;
+    float    ay;
 
-	ToAbsolute(-SHAPE_SIZE, -SHAPE_SIZE, corner[0][0], corner[0][1]);
-	ToAbsolute(SHAPE_SIZE, -SHAPE_SIZE, corner[1][0], corner[1][1]);
-	ToAbsolute(-SHAPE_SIZE, SHAPE_SIZE, corner[2][0], corner[2][1]);
-	ToAbsolute(SHAPE_SIZE, SHAPE_SIZE, corner[3][0], corner[3][1]);
+    this->ToAbsolute(-SHAPE_SIZE, -SHAPE_SIZE, corner[0][0], corner[0][1]);
+    this->ToAbsolute(SHAPE_SIZE, -SHAPE_SIZE, corner[1][0], corner[1][1]);
+    this->ToAbsolute(-SHAPE_SIZE, SHAPE_SIZE, corner[2][0], corner[2][1]);
+    this->ToAbsolute(SHAPE_SIZE, SHAPE_SIZE, corner[3][0], corner[3][1]);
 
-	for (i = 0; i < 4; ++i)
-	{
-		angle = ToAngle(corner[i][0], corner[i][1]);
+    for (i = 0; i < 4; ++i)
+    {
+        angle = this->ToAngle(corner[i][0], corner[i][1]);
 
-		ax = size * cos(angle) - size * sin(angle);
-		ay = size * sin(angle) + size * cos(angle);
+        ax = size * cos(angle) - size * sin(angle);
+        ay = size * sin(angle) + size * cos(angle);
 
-		if (px >= corner[i][0] + ax - size && px <= corner[i][0] + ax + size && py >= corner[i][1] + ay - size && py <= corner[i][1] + ay + size)
-			return true;
-	}
+        if (px >= corner[i][0] + ax - size && px <= corner[i][0] + ax + size && py >= corner[i][1] + ay - size && py <= corner[i][1] + ay + size)
+            return true;
+    }
 
-	return false;
+    return false;
 }
 
 /*
-** Teste si un point est sur l'une des poignées de torsion, toujours les mêmes remarques
-** que pour les deux fonctions précedentes.
+** Tests if a point is on one of the torsion handles, same remarks
+** as for the two previous functions.
 */
-bool	PsShape::InTorsion(float px, float py, float zoom, int& i) const
+bool    PsShape::InTorsion(float px, float py, float zoom, int& i) const
 {
-	float	size = SHAPE_SIZE_TORSIO * zoom;
-	float	corner[4][2];
+    float    size = SHAPE_SIZE_TORSIO * zoom;
+    float    corner[4][2];
 
-	ToAbsolute(0, -SHAPE_SIZE, corner[0][0], corner[0][1]);
-	ToAbsolute(SHAPE_SIZE, 0, corner[1][0], corner[1][1]);
-	ToAbsolute(0, SHAPE_SIZE, corner[2][0], corner[2][1]);
-	ToAbsolute(-SHAPE_SIZE, 0, corner[3][0], corner[3][1]);
+    this->ToAbsolute(0, -SHAPE_SIZE, corner[0][0], corner[0][1]);
+    this->ToAbsolute(SHAPE_SIZE, 0, corner[1][0], corner[1][1]);
+    this->ToAbsolute(0, SHAPE_SIZE, corner[2][0], corner[2][1]);
+    this->ToAbsolute(-SHAPE_SIZE, 0, corner[3][0], corner[3][1]);
 
-	for (i = 0; i < 4; ++i)
-		if (px >= corner[i][0] - size && px <= corner[i][0] + size && py >= corner[i][1] - size && py <= corner[i][1] + size)
-			return true;
+    for (i = 0; i < 4; ++i)
+        if (px >= corner[i][0] - size && px <= corner[i][0] + size && py >= corner[i][1] - size && py <= corner[i][1] + size)
+            return true;
 
-	return false;
+    return false;
 }
 
 /*
-** Change le nom de l'PsShape (voir GetName).
+** Changes the name of the PsShape (see GetName).
 */
-void	PsShape::SetName(const std::string& name)
+void    PsShape::SetName(const std::string& name)
 {
-	this->name = name;
+    this->name = name;
 }
 
 /*
-** Transforme les coordonnées relatives de l'PsShape en coordonnées absolues. Les coordonnées
-** relatives permettent des calculs bien plus simples à l'interieur d'une PsShape (son coin
-** haut/gauche est toujours à -SHAPE_SIZE, -SHAPE_SIZE quelles que soient les transformations
-** appliquées, par exemple). Les coordonnées absolues prennent en compte ces transformations.
+** Transforms the relative coordinates of the PsShape into absolute coordinates. Relative coordinates
+** allow much simpler calculations within a PsShape (its top/left corner is always at -SHAPE_SIZE, -SHAPE_SIZE
+** regardless of the transformations applied, for example). Absolute coordinates take these transformations into account.
 */
-void		PsShape::ToAbsolute(float rx, float ry, float& ax, float& ay) const
+void        PsShape::ToAbsolute(float rx, float ry, float& ax, float& ay) const
 {
-	float	sx;
-	float	sy;
-	float	tx;
-	float	ty;
+    float    sx;
+    float    sy;
+    float    tx;
+    float    ty;
 
-	tx = rx * w / (SHAPE_SIZE * 2) + i * ry / (SHAPE_SIZE * 2);
-	ty = ry * h / (SHAPE_SIZE * 2) + j * rx / (SHAPE_SIZE * 2);
+    tx = rx * this->w / (SHAPE_SIZE * 2) + this->i * ry / (SHAPE_SIZE * 2);
+    ty = ry * this->h / (SHAPE_SIZE * 2) + this->j * rx / (SHAPE_SIZE * 2);
 
-	if (parent)
-		parent->ToAbsolute(x, y, sx, sy);
-	else
-	{
-		sx = x;
-		sy = y;
-	}
+    if (this->parent)
+        this->parent->ToAbsolute(this->x, this->y, sx, sy);
+    else
+    {
+        sx = this->x;
+        sy = this->y;
+    }
 
-	ax = tx * cos(r) - ty * sin(r) + sx;
-	ay = tx * sin(r) + ty * cos(r) + sy;
+    ax = tx * cos(this->r) - ty * sin(this->r) + sx;
+    ay = tx * sin(this->r) + ty * cos(this->r) + sy;
 }
 
 /*
-** Retourne l'angle entre le centre de l'PsShape et le point "ax, ay", en radians.
+** Returns the angle between the center of the PsShape and the point "ax, ay", in radians.
 */
-float		PsShape::ToAngle(float ax, float ay) const
+float        PsShape::ToAngle(float ax, float ay) const
 {
-	float	tx;
-	float	ty;
+    float    tx;
+    float    ty;
 
-	if (parent)
-		parent->ToAbsolute(x, y, tx, ty);
-	else
-	{
-		tx = x;
-		ty = y;
-	}
+    if (this->parent)
+        this->parent->ToAbsolute(this->x, this->y, tx, ty);
+    else
+    {
+        tx = this->x;
+        ty = this->y;
+    }
 
-	if (ax < tx)
-		return (float)atan((ay - ty) / (ax - tx)) + PS_MATH_PI;
-	else if (ax > tx)
-		return (float)atan((ay - ty) / (ax - tx));
-	else
-		return (ay < ty ? -PS_MATH_PI : PS_MATH_PI) / 2.0f;
+    if (ax < tx)
+        return (float)atan((ay - ty) / (ax - tx)) + PS_MATH_PI;
+    else if (ax > tx)
+        return (float)atan((ay - ty) / (ax - tx));
+    else
+        return (ay < ty ? -PS_MATH_PI : PS_MATH_PI) / 2.0f;
 }
 
 /*
-** Conversion de coordonnées absolues (donc au niveau du document) en coordonnées relatives
-** à l'PsShape (voir ToAbsolute).
+** Conversion of absolute coordinates (therefore at the document level) to coordinates relative
+** to the PsShape (see ToAbsolute).
 */
-void		PsShape::ToRelative(float ax, float ay, float& rx, float& ry) const
+void        PsShape::ToRelative(float ax, float ay, float& rx, float& ry) const
 {
-	float	sx;
-	float	sy;
-	float	tx;
-	float	ty;
+    float    sx;
+    float    sy;
+    float    tx;
+    float    ty;
 
-	if (parent)
-		parent->ToAbsolute(x, y, sx, sy);
-	else
-	{
-		sx = x;
-		sy = y;
-	}
+    if (this->parent)
+        this->parent->ToAbsolute(this->x, this->y, sx, sy);
+    else
+    {
+        sx = this->x;
+        sy = this->y;
+    }
 
-	sx = ax - sx;
-	sy = ay - sy;
+    sx = ax - sx;
+    sy = ay - sy;
 
-	tx = (sx * cos(-r) - sy * sin(-r));
-	ty = (sx * sin(-r) + sy * cos(-r));
+    tx = (sx * cos(-this->r) - sy * sin(-this->r));
+    ty = (sx * sin(-this->r) + sy * cos(-this->r));
 
-	rx = (tx - i * ty / h) / (w - j / h) * (SHAPE_SIZE * 2);
-	ry = (ty - j * tx / w) / (h - i / w) * (SHAPE_SIZE * 2);
+    rx = (tx - this->i * ty / this->h) / (this->w - this->j / this->h) * (SHAPE_SIZE * 2);
+    ry = (ty - this->j * tx / this->w) / (this->h - this->i / this->w) * (SHAPE_SIZE * 2);
 }
