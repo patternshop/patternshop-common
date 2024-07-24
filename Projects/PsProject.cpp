@@ -1,3 +1,5 @@
+ï»¿// PsProject.cpp
+
 /**
  * This file is part of Patternshop Project.
  *
@@ -14,6 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Patternshop.  If not, see <http://www.gnu.org/licenses/>
 */
+
 #include <stdio.h>
 #include "PsProject.h"
 #include "PsController.h"
@@ -23,19 +26,18 @@
 #include "PsSoftRender.h"
 #include "PsWinPropertiesCx.h"
 
-// project parameters
-#define ZOOM_COEF		0.02f
-#define LOG_SIZE		50
+// Project parameters
+#define ZOOM_COEF        0.02f
+#define LOG_SIZE         50
 
 // File format version
-
 #define MAJOR_VERSION 1
 #define MINOR_VERSION 0
 #define CANDIDATE_VERSION 2
 
 //--------------------------AUTO--------------------------
 
-#define PROJECT_VERSION	(MAJOR_VERSION * 1000000 + MINOR_VERSION * 1000 + CANDIDATE_VERSION)
+#define PROJECT_VERSION    (MAJOR_VERSION * 1000000 + MINOR_VERSION * 1000 + CANDIDATE_VERSION)
 
 #define BIG_ENDIAN_FILE 1
 #define LITTLE_ENDIAN_FILE 0
@@ -48,7 +50,7 @@
 //--------------------------AUTO (END)----------------------
 
 /*
-** Initialement, aucun patron n'est selectionné, ni aucune matrice, ni aucune image, etc.
+** Initially, no pattern, matrix, image, etc. is selected.
 */
 PsProject::PsProject() :
 	pattern(0),
@@ -58,30 +60,29 @@ PsProject::PsProject() :
 	center(true),
 	log_insert(false)
 {
-	iColor[0] = 255;
-	iColor[1] = 255;
-	iColor[2] = 255;
-	bHideColor = false;
-	bNeedSave = false;
-	iLayerId = 0;
-	bPatternsIsSelected = false;
+	this->iColor[0] = 255;
+	this->iColor[1] = 255;
+	this->iColor[2] = 255;
+	this->bHideColor = false;
+	this->bNeedSave = false;
+	this->iLayerId = 0;
+	this->bPatternsIsSelected = false;
 }
-
 
 PsProject::~PsProject()
 {
-	LogFlush();
+	this->LogFlush();
 }
 
 /*
-** Duplique l'image actuellement sélectionnée
+** Duplicates the currently selected image
 */
-ErrID				PsProject::CloneImage()
+ErrID PsProject::CloneImage()
 {
 	uint8* buffer1;
 	uint8* buffer2;
 	PsImage* image;
-	size_t		size;
+	size_t size;
 
 	if (!this->image)
 		return ERROR_IMAGE_SELECT;
@@ -108,7 +109,7 @@ ErrID				PsProject::CloneImage()
 	else
 	{
 		this->images.push_back(image);
-		image->SetPosition(PROJECT_VERSION / 2.0f, GetHeight() / 2.0f);
+		image->SetPosition(PROJECT_VERSION / 2.0f, this->GetHeight() / 2.0f);
 	}
 
 	this->LogAdd(new LogNewImage(*this, image, true));
@@ -118,16 +119,16 @@ ErrID				PsProject::CloneImage()
 }
 
 /*
-** Duplique la matrice actuellement sélectionnée
+** Duplicates the currently selected matrix
 */
-ErrID					PsProject::CloneMatrix()
+ErrID PsProject::CloneMatrix()
 {
 	uint8* buffer1;
 	uint8* buffer2;
 	PsMatrix* matrix;
-	ImageList::iterator		ti;
+	ImageList::iterator ti;
 	PsImage* image;
-	size_t				size;
+	size_t size;
 
 	if (!this->matrix)
 		return ERROR_MATRIX_SELECT;
@@ -139,7 +140,7 @@ ErrID					PsProject::CloneMatrix()
 	matrix->SetAngle(this->matrix->GetAngle());
 	matrix->SetSize(this->matrix->w, this->matrix->h);
 	matrix->SetTorsion(this->matrix->i, this->matrix->j);
-	matrix->SetPosition(GetWidth() / 2.0f, GetHeight() / 2.0f);
+	matrix->SetPosition(this->GetWidth() / 2.0f, this->GetHeight() / 2.0f);
 
 	this->LogAdd(new LogNewMatrix(*this, matrix, true));
 
@@ -170,9 +171,9 @@ ErrID					PsProject::CloneMatrix()
 }
 
 /*
-** Remplace l'image actuellement sélectionnée
+** Replaces the currently selected image
 */
-ErrID	PsProject::ReplaceImage(const char* file)
+ErrID PsProject::ReplaceImage(const char* file)
 {
 	if (!this->image)
 		return ERROR_IMAGE_SELECT;
@@ -186,38 +187,38 @@ ErrID	PsProject::ReplaceImage(const char* file)
 }
 
 /*
-** Supprime l'image sélectionnée de la matrice qui la contient.
+** Deletes the selected image from the matrix that contains it.
 */
-ErrID	PsProject::DelImage()
+ErrID PsProject::DelImage()
 {
-	ImageList::iterator		ti;
-	MatrixList::iterator	tm;
+	ImageList::iterator ti;
+	MatrixList::iterator tm;
 
-	if (!image)
+	if (!this->image)
 		return ERROR_IMAGE_SELECT;
 
-	this->LogAdd(new LogDelImage(*this, image, false));
+	this->LogAdd(new LogDelImage(*this, this->image, false));
 
-	if (!image->parent)
-		this->images.remove(image);
+	if (!this->image->parent)
+		this->images.remove(this->image);
 	else
-		this->matrix->images.remove(image);
+		this->matrix->images.remove(this->image);
 
 	delete this->image;
 
-	PsMatrix* b = matrix;
-	SelectImage(0);
-	matrix = b;
+	PsMatrix* b = this->matrix;
+	this->SelectImage(0);
+	this->matrix = b;
 
 	return ERROR_NONE;
 }
 
 /*
-** Supprime la matrice sélectionnée, et en sélectionne une autre si il en reste.
+** Deletes the selected matrix and selects another one if any remain.
 */
-ErrID					PsProject::DelMatrix()
+ErrID PsProject::DelMatrix()
 {
-	ImageList::iterator	t;
+	ImageList::iterator t;
 
 	if (!this->matrix)
 		return ERROR_MATRIX_SELECT;
@@ -230,29 +231,29 @@ ErrID					PsProject::DelMatrix()
 	this->matrices.remove(this->matrix);
 	delete this->matrix;
 
-	SelectMatrix(0);
+	this->SelectMatrix(0);
 
 	return ERROR_NONE;
 }
 
 /*
-** Supprime le patron sélectionné, et en sélectionne un autre si il en reste.
+** Deletes the selected pattern and selects another one if any remain.
 */
-ErrID	PsProject::DelPattern()
+ErrID PsProject::DelPattern()
 {
-	if (!pattern)
+	if (!this->pattern)
 		return ERROR_PATTERN_SELECT;
 
-	delete pattern;
-	pattern = 0;
+	delete this->pattern;
+	this->pattern = 0;
 
 	return ERROR_NONE;
 }
 
 /*
-** Importe une nouvelle image hors matrice.
+** Imports a new image outside of a matrix.
 */
-ErrID		PsProject::NewImage(const char* file)
+ErrID PsProject::NewImage(const char* file)
 {
 	PsImage* image;
 
@@ -261,10 +262,10 @@ ErrID		PsProject::NewImage(const char* file)
 	if (!image->TextureFromFile(file))
 		return ERROR_IMAGE_LOAD;
 
-	image->SetPosition(GetWidth() / 2.0f, GetHeight() / 2.0f);
-	images.push_back(image);
+	image->SetPosition(this->GetWidth() / 2.0f, this->GetHeight() / 2.0f);
+	this->images.push_back(image);
 
-	SelectImage(image);
+	this->SelectImage(image);
 
 	this->LogAdd(new LogNewImage(*this, image, true));
 
@@ -272,32 +273,32 @@ ErrID		PsProject::NewImage(const char* file)
 }
 
 /*
-** Importe une nouvelle image dans la matrice courante, si il y en a une.
+** Imports a new image into the current matrix, if there is one.
 */
-ErrID		PsProject::NewMotif(const char* file)
+ErrID PsProject::NewMotif(const char* file)
 {
 	PsImage* image;
-	float	x;
-	float	y;
+	float x;
+	float y;
 
-	if (!matrix)
+	if (!this->matrix)
 	{
 		if (this->matrices.size() == 0)
 			this->NewMatrix();
 
-		matrix = *this->matrices.begin();
+		this->matrix = *this->matrices.begin();
 	}
 
-	image = new PsImage(matrix);
+	image = new PsImage(this->matrix);
 
 	if (!image->TextureFromFile(file))
 		return ERROR_IMAGE_LOAD;
 
-	matrix->images.push_back(image);
-	matrix->GetPosition(x, y);
+	this->matrix->images.push_back(image);
+	this->matrix->GetPosition(x, y);
 	image->SetPosition(x, y);
 
-	SelectImage(image);
+	this->SelectImage(image);
 
 	this->LogAdd(new LogNewImage(*this, image, true));
 
@@ -305,65 +306,63 @@ ErrID		PsProject::NewMotif(const char* file)
 }
 
 /*
-** Crée une nouvelle matrice dans le document. Sa taille initiale est pour l'instant le quart
-** de celle du document, mais ceci est totalement arbitraire(oui le quart et non pas le 8ième,
-** la remarque de PsImage::TextureFromBuffer s'applique ici également).
+** Creates a new matrix in the document. Its initial size is currently a quarter
+** of that of the document, but this is completely arbitrary (yes, a quarter and not an eighth,
+** the remark of PsImage::TextureFromBuffer also applies here).
 */
-ErrID	PsProject::NewMatrix()
+ErrID PsProject::NewMatrix()
 {
-	matrix = new PsMatrix();
-	image = 0;
+	this->matrix = new PsMatrix();
+	this->image = 0;
 
-	matrices.push_back(matrix);
-	matrix->SetPosition(GetWidth() / 2.0f, GetHeight() / 2.0f);
-	matrix->SetSize((float)PsMatrix::default_w, (float)PsMatrix::default_h);
+	this->matrices.push_back(this->matrix);
+	this->matrix->SetPosition(this->GetWidth() / 2.0f, this->GetHeight() / 2.0f);
+	this->matrix->SetSize((float)PsMatrix::default_w, (float)PsMatrix::default_h);
 
-	SelectMatrix(matrix);
+	this->SelectMatrix(this->matrix);
 
-	this->LogAdd(new LogNewMatrix(*this, matrix, true));
+	this->LogAdd(new LogNewMatrix(*this, this->matrix, true));
 
 	return ERROR_NONE;
 }
 
 /*
-** Crée un nouveau patron dans le document.
+** Creates a new pattern in the document.
 */
-ErrID	PsProject::NewPattern(const char* file)
+ErrID PsProject::NewPattern(const char* file)
 {
-	if (pattern)
-		delete pattern;
+	if (this->pattern)
+		delete this->pattern;
 
-	pattern = new PsPattern();
+	this->pattern = new PsPattern();
 
-	if (!pattern->TextureFromFile(file))
+	if (!this->pattern->TextureFromFile(file))
 	{
-		delete pattern;
-		pattern = 0;
+		delete this->pattern;
+		this->pattern = 0;
 		return ERROR_PATTERN_LOAD;
 	}
 
-	//-- paramétrage initial
-	for (int i = 0; i < pattern->GetChannelsCount(); ++i)
+	//-- initial setup
+	for (int i = 0; i < this->pattern->GetChannelsCount(); ++i)
 	{
-		PsLayer* layer = pattern->aLayers[i];
-		layer->vTranslation.X = GetWidth() / 2.f;
-		layer->vTranslation.Y = GetHeight() / 2.f;
+		PsLayer* layer = this->pattern->aLayers[i];
+		layer->vTranslation.X = this->GetWidth() / 2.f;
+		layer->vTranslation.Y = this->GetHeight() / 2.f;
 	}
 	//--
 
-	pattern->UpdateScale(GetWidth(), GetHeight());
+	this->pattern->UpdateScale(this->GetWidth(), this->GetHeight());
 
-	this->pattern = pattern;
-	iLayerId = 0;
+	this->pattern = this->pattern;
+	this->iLayerId = 0;
 
 	return ERROR_NONE;
 }
 
-/*
-** Charge le projet depuis un fichier. La macro constante "PROJECT_VERSION" permet de vérifier la version
-** de la sauvegarde et sert donc de magic number, le reste devrait être assez explicite, on charge tous
-** les champs du projet en s'aidant de leurs methodes FileLoad.
-*/
+// Loads the project from a file. The constant macro "PROJECT_VERSION" is used to check the version
+// of the save and thus serves as a magic number. The rest should be quite explicit; we load all
+// the fields of the project using their FileLoad methods.
 
 #define PROJECT_VERSION_OLD_BETA 3213654 // 111222333
 
@@ -531,8 +530,8 @@ ErrID			PsProject::FileSave(const char* path)
 }
 
 /*
-** Remet un projet à zéro, en effacant tout ce qu'il contient. À terme, cette fonction
-** pourait devenir inutile, et être recopiée simplement dans le destructeur de "PsProject".
+** Remet un projet Ã  zÃ©ro, en effacant tout ce qu'il contient. Ã€ terme, cette fonction
+** pourait devenir inutile, et Ãªtre recopiÃ©e simplement dans le destructeur de "PsProject".
 */
 void						PsProject::LogFlush()
 {
@@ -562,7 +561,7 @@ void						PsProject::LogFlush()
 }
 
 /*
-** Insere un nouvel élement dans le log
+** Insere un nouvel Ã©lement dans le log
 */
 void					PsProject::LogAdd(PsAction* log)
 {
@@ -587,7 +586,7 @@ void					PsProject::LogAdd(PsAction* log)
 }
 
 /*
-** Vérifie si une action peut être rétablie
+** VÃ©rifie si une action peut Ãªtre rÃ©tablie
 */
 bool	PsProject::LogCanRedo() const
 {
@@ -595,7 +594,7 @@ bool	PsProject::LogCanRedo() const
 }
 
 /*
-** Vérifie si une action peut être annulée
+** VÃ©rifie si une action peut Ãªtre annulÃ©e
 */
 bool	PsProject::LogCanUndo() const
 {
@@ -603,7 +602,7 @@ bool	PsProject::LogCanUndo() const
 }
 
 /*
-** Initialise une nouvelle action(marque la fin de l'action précedente)
+** Initialise une nouvelle action(marque la fin de l'action prÃ©cedente)
 */
 void	PsProject::LogInit()
 {
@@ -611,7 +610,7 @@ void	PsProject::LogInit()
 }
 
 /*
-** Retourne le nombre d'éléments dans la liste d'annulation
+** Retourne le nombre d'Ã©lÃ©ments dans la liste d'annulation
 */
 int	PsProject::LogUndoCount()
 {
@@ -619,7 +618,7 @@ int	PsProject::LogUndoCount()
 }
 
 /*
-** Retourne le nom de la dernière action "refaisable" enregistrée
+** Retourne le nom de la derniÃ¨re action "refaisable" enregistrÃ©e
 */
 const char* PsProject::LogRedoLastName() const
 {
@@ -627,7 +626,7 @@ const char* PsProject::LogRedoLastName() const
 }
 
 /*
-** Retourne le nom de la dernière action "annulable" enregistrée
+** Retourne le nom de la derniÃ¨re action "annulable" enregistrÃ©e
 */
 const char* PsProject::LogUndoLastName() const
 {
@@ -635,7 +634,7 @@ const char* PsProject::LogUndoLastName() const
 }
 
 /*
-** Vérifie si l'action est nouvelle, et doit être enregistrée(et reset le flag le cas échéant)
+** VÃ©rifie si l'action est nouvelle, et doit Ãªtre enregistrÃ©e(et reset le flag le cas Ã©chÃ©ant)
 */
 bool	PsProject::LogMustAdd() const
 {
@@ -673,7 +672,7 @@ void	PsProject::LogRedo()
 }
 
 /*
-** Annule la dernière action
+** Annule la derniÃ¨re action
 */
 void		PsProject::LogUndo()
 {
@@ -732,7 +731,7 @@ ErrID	PsProject::MatrixReset()
 }
 
 /*
-** Déclanche l'affichage du projet dans le contexte actif, en utilisant un rendu
+** DÃ©clanche l'affichage du projet dans le contexte actif, en utilisant un rendu
 ** hardware(donc OpenGL).
 */
 void	PsProject::RenderToScreen()
@@ -765,7 +764,7 @@ void	PsProject::RenderToScreen()
 }
 
 /*
-** Déclanche le rendu dans un fichier
+** DÃ©clanche le rendu dans un fichier
 */
 bool	PsProject::RenderToFile(const char* filename, int x, int y)
 {
@@ -791,7 +790,7 @@ bool	PsProject::RenderToFile(const char* filename, int x, int y)
 }
 
 /*
-** Sélectionne une image dans le projet(et la matrice qui la contient).
+** SÃ©lectionne une image dans le projet(et la matrice qui la contient).
 */
 void	PsProject::SelectImage(PsImage* image)
 {
@@ -810,7 +809,7 @@ void	PsProject::SelectImage(PsImage* image)
 }
 
 /*
-** Sélectionne une matrice dans le projet.
+** SÃ©lectionne une matrice dans le projet.
 */
 void	PsProject::SelectMatrix(PsMatrix* matrix)
 {
@@ -829,8 +828,8 @@ void	PsProject::SelectMatrix(PsMatrix* matrix)
 }
 
 /*
-** Sélectionne un patron. Seul le patron sélectionné est affiché, et si aucun patron n'est
-** sélectionné(SelectPattern(0)), alors on voit simplement le fond, comme à la création
+** SÃ©lectionne un patron. Seul le patron sÃ©lectionnÃ© est affichÃ©, et si aucun patron n'est
+** sÃ©lectionnÃ©(SelectPattern(0)), alors on voit simplement le fond, comme Ã  la crÃ©ation
 ** d'un nouveau projet.
 */
 /*void	PsProject::SelectPattern(PsPattern* pattern)
@@ -839,7 +838,7 @@ void	PsProject::SelectMatrix(PsMatrix* matrix)
 }*/
 
 /*
-** Déplacement de l'outil "loupe"(magnify).
+** DÃ©placement de l'outil "loupe"(magnify).
 */
 void		PsProject::ToolMagnifyDrag(int y, int old_x, int old_y)
 {
@@ -875,8 +874,8 @@ PsController::Tool	PsProject::ToolMagnifyStart()
 }
 
 /*
-** Déplacement de l'outil "Modify"(qui a besoin de savoir dans quel mode il est, pour
-** connaitre l'operation à effectuer parmis déplacement, rotation, redimentionnement...)
+** DÃ©placement de l'outil "Modify"(qui a besoin de savoir dans quel mode il est, pour
+** connaitre l'operation Ã  effectuer parmis dÃ©placement, rotation, redimentionnement...)
 */
 void		PsProject::ToolModifyMove(int x, int y, int old_x, int old_y, PsController::Tool tool)
 {
@@ -1027,9 +1026,9 @@ void		PsProject::ToolModifyMove(int x, int y, int old_x, int old_y, PsController
 }
 
 /*
-** Scan de la zone de travail pour savoir quel curseur à afficher lors de l'utilisaton de l'outil
-** "modify". Si le booleen "set" est à vrai, l'utilisateur a cliqué, donc on change de mode en plus
-** de changer éventuellement de curseur.
+** Scan de la zone de travail pour savoir quel curseur Ã  afficher lors de l'utilisaton de l'outil
+** "modify". Si le booleen "set" est Ã  vrai, l'utilisateur a cliquÃ©, donc on change de mode en plus
+** de changer Ã©ventuellement de curseur.
 */
 PsController::Tool PsProject::ToolModifyScan(int x, int y, bool set)
 {
@@ -1079,7 +1078,7 @@ PsController::Tool PsProject::ToolModifyScan(int x, int y, bool set)
 				prev_y = layer->vTranslation.Y;
 
 				/*
-				** Préparation des paramètres de projection
+				** PrÃ©paration des paramÃ¨tres de projection
 				 */
 				PsVector oeil = renderer.GetEyeLocation();
 				PsVector direction(fx, fy, 0);
@@ -1267,7 +1266,7 @@ PsController::Tool PsProject::ToolModifyScan(int x, int y, bool set)
 }
 
 /*
-** Déplacement de l'outil "drag".
+** DÃ©placement de l'outil "drag".
 */
 void PsProject::ToolScrollDrag(int x, int y, int prev_x, int prev_y)
 {
