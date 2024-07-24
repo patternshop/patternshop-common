@@ -27,45 +27,27 @@
 #include "PsWinPropertiesCx.h"
 
 /*
-** Scan de la zone de travail pour savoir quel curseur à afficher lors de l'utilisaton de l'outil
-** "modify". Si le booleen "set" est à vrai, l'utilisateur a cliqué, donc on change de mode en plus
-** de changer éventuellement de curseur.
+** Scan the work area to determine which cursor to display when using the "modify" tool.
+** If the boolean "set" is true, the user has clicked, so we change mode in addition to possibly changing the cursor.
 */
 PsController::Tool PsProject::ToolModifyScan(int x, int y, bool set)
 {
-	float									fx;
-	float									fy;
+	float fx;
+	float fy;
 
-	renderer.Convert(x, y, fx, fy);
+	this->renderer.Convert(x, y, fx, fy);
 
-	if (bPatternsIsSelected && !pattern->hide)
+	if (this->bPatternsIsSelected && !this->pattern->hide)
 	{
-		PsLayer* layer = pattern->aLayers[iLayerId];
+		PsLayer* layer = this->pattern->aLayers[this->iLayerId];
 
-		/*
-		if (layer->InResize(fx, fy, renderer.zoom, init_corner))
-		 {
-			PsController::Instance().SetCursor((PsCursor)(CURSOR_SIZE1 +(int)((layer->ToAngle(fx, fy) + PS_MATH_PI / 2) * 2 / PS_MATH_PI) % 2));
-
-			if (set)
-			{
-				prev_x = layer->vTranslation.X;
-				prev_y = layer->vTranslation.Y;
-				prev_h = layer->fScale * layer->fGizmoSize;
-				prev_w = layer->fScale * layer->fGizmoSize;
-			}
-
-			return PsController::TOOL_MODIFY_SIZE;
-		 }
-		 */
-
-		if (layer->InRotate(fx, fy, renderer.zoom, init_corner))
+		if (layer->InRotate(fx, fy, this->renderer.zoom, this->init_corner))
 		{
 			PsController::Instance().SetCursor((PsCursor)(CURSOR_ROTATE1 + (int)((layer->ToAngle(fx, fy) + PS_MATH_PI / 2) * 2 / PS_MATH_PI) % 4));
 
 			if (set)
 			{
-				prev_r = layer->rRotation.Yaw;
+				this->prev_r = layer->rRotation.Yaw;
 			}
 
 			return PsController::TOOL_MODIFY_ROTATE;
@@ -75,42 +57,40 @@ PsController::Tool PsProject::ToolModifyScan(int x, int y, bool set)
 		{
 			if (set)
 			{
-				prev_x = layer->vTranslation.X;
-				prev_y = layer->vTranslation.Y;
+				this->prev_x = layer->vTranslation.X;
+				this->prev_y = layer->vTranslation.Y;
 
 				/*
-				** Préparation des paramètres de projection
-				 */
-				PsVector oeil = renderer.GetEyeLocation();
+				** Preparation of projection parameters
+				*/
+				PsVector eye = this->renderer.GetEyeLocation();
 				PsVector direction(fx, fy, 0);
-				direction -= oeil;
+				direction -= eye;
 				PsVector normal(0.f, 0.f, 1.f);
 
 				/*
-				** Point d'intersection click souris & plan en z = 0
-				 */
+				** Intersection point of mouse click & plane at z = 0
+				*/
 				PsVector vZ0 = layer->vTranslation;
 				vZ0.Z = 0.f;
-				PsVector* p = LinePlaneIntersection(oeil, direction, vZ0, normal);
+				PsVector* p = LinePlaneIntersection(eye, direction, vZ0, normal);
 				if (p)
 				{
-					prev_origin_z0 = *p;
+					this->prev_origin_z0 = *p;
 					delete p;
 				}
 
 				/*
-				** Point d'intersection click souris & PsLayer
+				** Intersection point of mouse click & PsLayer
 				*/
 				normal = RotateVertex(normal, PsRotator::FromDegree(layer->rRotation.Roll),
 					PsRotator::FromDegree(layer->rRotation.Pitch), PsRotator::FromDegree(layer->rRotation.Yaw));
-				p = LinePlaneIntersection(oeil, direction, layer->vTranslation, normal);
+				p = LinePlaneIntersection(eye, direction, layer->vTranslation, normal);
 				if (p)
 				{
-					prev_origin = *p;
+					this->prev_origin = *p;
 					delete p;
 				}
-
-
 			}
 
 			PsController::Instance().SetCursor(CURSOR_MOVE);
@@ -121,96 +101,96 @@ PsController::Tool PsProject::ToolModifyScan(int x, int y, bool set)
 		return PsController::TOOL_MODIFY;
 	}
 
-	if (image && !image->hide && (!matrix || !matrix->hide))
+	if (this->image && !this->image->hide && (!this->matrix || !this->matrix->hide))
 	{
-		if (image->InResize(fx, fy, renderer.zoom, init_corner))
+		if (this->image->InResize(fx, fy, this->renderer.zoom, this->init_corner))
 		{
-			PsController::Instance().SetCursor((PsCursor)(CURSOR_SIZE1 + (int)((image->ToAngle(fx, fy) + PS_MATH_PI / 2) * 2 / PS_MATH_PI) % 2));
+			PsController::Instance().SetCursor((PsCursor)(CURSOR_SIZE1 + (int)((this->image->ToAngle(fx, fy) + PS_MATH_PI / 2) * 2 / PS_MATH_PI) % 2));
 
 			if (set)
 			{
-				SelectImage(image);
-				image->GetPosition(prev_x, prev_y);
-				prev_h = image->h;
-				prev_w = image->w;
+				this->SelectImage(this->image);
+				this->image->GetPosition(this->prev_x, this->prev_y);
+				this->prev_h = this->image->h;
+				this->prev_w = this->image->w;
 			}
 
 			return PsController::TOOL_MODIFY_SIZE;
 		}
-		else if (image->InRotate(fx, fy, renderer.zoom, init_corner))
+		else if (this->image->InRotate(fx, fy, this->renderer.zoom, this->init_corner))
 		{
-			PsController::Instance().SetCursor((PsCursor)(CURSOR_ROTATE1 + (int)((image->ToAngle(fx, fy) + PS_MATH_PI / 2) * 2 / PS_MATH_PI) % 4));
+			PsController::Instance().SetCursor((PsCursor)(CURSOR_ROTATE1 + (int)((this->image->ToAngle(fx, fy) + PS_MATH_PI / 2) * 2 / PS_MATH_PI) % 4));
 
 			if (set)
 			{
-				SelectImage(image);
-				prev_r = image->GetAngle();
+				this->SelectImage(this->image);
+				this->prev_r = this->image->GetAngle();
 			}
 
 			return PsController::TOOL_MODIFY_ROTATE;
 		}
 	}
 
-	if (matrix && !matrix->hide)
+	if (this->matrix && !this->matrix->hide)
 	{
-		if (matrix->InResize(fx, fy, renderer.zoom, init_corner))
+		if (this->matrix->InResize(fx, fy, this->renderer.zoom, this->init_corner))
 		{
-			PsController::Instance().SetCursor((PsCursor)(CURSOR_SIZE1 + (int)((matrix->ToAngle(fx, fy) + PS_MATH_PI / 2) * 2 / PS_MATH_PI) % 2));
+			PsController::Instance().SetCursor((PsCursor)(CURSOR_SIZE1 + (int)((this->matrix->ToAngle(fx, fy) + PS_MATH_PI / 2) * 2 / PS_MATH_PI) % 2));
 
 			if (set)
 			{
-				SelectMatrix(matrix);
-				matrix->GetPosition(prev_x, prev_y);
-				prev_h = matrix->h;
-				prev_w = matrix->w;
+				this->SelectMatrix(this->matrix);
+				this->matrix->GetPosition(this->prev_x, this->prev_y);
+				this->prev_h = this->matrix->h;
+				this->prev_w = this->matrix->w;
 			}
 
 			return PsController::TOOL_MODIFY_SIZE;
 		}
-		else if (matrix->InTorsion(fx, fy, renderer.zoom, init_corner))
+		else if (this->matrix->InTorsion(fx, fy, this->renderer.zoom, this->init_corner))
 		{
 			if (set) PsController::Instance().SetCursor(CURSOR_TORSIO2);
 			else PsController::Instance().SetCursor(CURSOR_TORSIO1);
 
 			if (set)
 			{
-				SelectMatrix(matrix);
-				prev_i = matrix->i;
-				prev_j = matrix->j;
+				this->SelectMatrix(this->matrix);
+				this->prev_i = this->matrix->i;
+				this->prev_j = this->matrix->j;
 			}
 
 			return PsController::TOOL_MODIFY_TORSIO;
 		}
-		else if (matrix->InRotate(fx, fy, renderer.zoom, init_corner))
+		else if (this->matrix->InRotate(fx, fy, this->renderer.zoom, this->init_corner))
 		{
-			PsController::Instance().SetCursor((PsCursor)(CURSOR_ROTATE1 + (int)((matrix->ToAngle(fx, fy) + PS_MATH_PI / 2) * 2 / PS_MATH_PI) % 4));
+			PsController::Instance().SetCursor((PsCursor)(CURSOR_ROTATE1 + (int)((this->matrix->ToAngle(fx, fy) + PS_MATH_PI / 2) * 2 / PS_MATH_PI) % 4));
 
 			if (set)
 			{
-				SelectMatrix(matrix);
-				prev_r = matrix->r;
+				this->SelectMatrix(this->matrix);
+				this->prev_r = this->matrix->r;
 			}
 
 			return PsController::TOOL_MODIFY_ROTATE;
 		}
 	}
 
-	if (PsController::Instance().GetOption(PsController::OPTION_AUTOMATIC) || (!image && !matrix))
+	if (PsController::Instance().GetOption(PsController::OPTION_AUTOMATIC) || (!this->image && !this->matrix))
 	{
 		ImageList::reverse_iterator j;
-		for (j = images.rbegin(); j != images.rend(); ++j)
+		for (j = this->images.rbegin(); j != this->images.rend(); ++j)
 			if (!(*j)->hide && (*j)->InContent(fx, fy))
 			{
 				PsController::Instance().SetCursor(CURSOR_MOVE);
 				if (set)
 				{
-					SelectImage(*j);
-					(*j)->GetPosition(prev_x, prev_y);
+					this->SelectImage(*j);
+					(*j)->GetPosition(this->prev_x, this->prev_y);
 				}
 				return PsController::TOOL_MODIFY_MOVE;
 			}
 		MatrixList::reverse_iterator i;
-		for (i = matrices.rbegin(); i != matrices.rend(); ++i)
+		for (i = this->matrices.rbegin(); i != this->matrices.rend(); ++i)
 		{
 			for (j = (*i)->images.rbegin(); !(*i)->hide && j != (*i)->images.rend(); ++j)
 				if (!(*j)->hide && (*j)->InContent(fx, fy))
@@ -218,44 +198,44 @@ PsController::Tool PsProject::ToolModifyScan(int x, int y, bool set)
 					PsController::Instance().SetCursor(CURSOR_MOVE);
 					if (set)
 					{
-						SelectImage(*j);
-						(*j)->GetPosition(prev_x, prev_y);
+						this->SelectImage(*j);
+						(*j)->GetPosition(this->prev_x, this->prev_y);
 					}
 					return PsController::TOOL_MODIFY_MOVE;
 				}
 		}
-		for (i = matrices.rbegin(); i != matrices.rend(); ++i)
+		for (i = this->matrices.rbegin(); i != this->matrices.rend(); ++i)
 			if (!(*i)->hide && (*i)->InContent(fx, fy))
 			{
 				PsController::Instance().SetCursor(CURSOR_MOVE);
 				if (set)
 				{
-					SelectMatrix(*i);
-					(*i)->GetPosition(prev_x, prev_y);
+					this->SelectMatrix(*i);
+					(*i)->GetPosition(this->prev_x, this->prev_y);
 				}
 				return PsController::TOOL_MODIFY_MOVE;
 			}
 	}
-	else if (image && !image->hide && !matrix->hide)
+	else if (this->image && !this->image->hide && !this->matrix->hide)
 	{
 		PsController::Instance().SetCursor(CURSOR_MOVE);
 
 		if (set)
 		{
-			SelectImage(image);
-			image->GetPosition(prev_x, prev_y);
+			this->SelectImage(this->image);
+			this->image->GetPosition(this->prev_x, this->prev_y);
 		}
 
 		return PsController::TOOL_MODIFY_MOVE;
 	}
-	else if (matrix && !matrix->hide)
+	else if (this->matrix && !this->matrix->hide)
 	{
 		PsController::Instance().SetCursor(CURSOR_MOVE);
 
 		if (set)
 		{
-			SelectMatrix(matrix);
-			matrix->GetPosition(prev_x, prev_y);
+			this->SelectMatrix(this->matrix);
+			this->matrix->GetPosition(this->prev_x, this->prev_y);
 		}
 
 		return PsController::TOOL_MODIFY_MOVE;
@@ -267,44 +247,44 @@ PsController::Tool PsProject::ToolModifyScan(int x, int y, bool set)
 }
 
 /*
-** Déplacement de l'outil "drag".
+** Movement of the "drag" tool.
 */
 void PsProject::ToolScrollDrag(int x, int y, int prev_x, int prev_y)
 {
-	renderer.SetScroll(prev_scrollx + (prev_x - x) * renderer.zoom, prev_scrolly + (prev_y - y) * renderer.zoom);
+	this->renderer.SetScroll(this->prev_scrollx + (prev_x - x) * this->renderer.zoom, this->prev_scrolly + (prev_y - y) * this->renderer.zoom);
 	PsController::Instance().UpdateWindow();
 	PsController::Instance().UpdateDialogOverview();
 }
 
 /*
-** Initialisation de l'outil "drag".
+** Initialization of the "drag" tool.
 */
 PsController::Tool PsProject::ToolScrollStart()
 {
-	renderer.GetScroll(prev_scrollx, prev_scrolly);
+	this->renderer.GetScroll(this->prev_scrollx, this->prev_scrolly);
 	return PsController::TOOL_SCROLL_DRAG;
 }
 
 /*
-** Retourne la largeur du document en pixels.
+** Returns the width of the document in pixels.
 */
 int PsProject::GetWidth()
 {
-	return renderer.doc_x;
+	return this->renderer.doc_x;
 }
 
 /*
-** Retourne la hauteur du document en pixels.
+** Returns the height of the document in pixels.
 */
 int PsProject::GetHeight()
 {
-	return renderer.doc_y;
+	return this->renderer.doc_y;
 }
 
 /*
-** Retourne le nombre de pixels par pouce dans le document.
+** Returns the number of pixels per inch in the document.
 */
 int PsProject::GetDpi()
 {
-	return renderer.dpi;
+	return this->renderer.dpi;
 }
