@@ -1,4 +1,4 @@
-/**
+ï»¿/**
  * This file is part of Patternshop Project.
  *
  * Patternshop is free software: you can redistribute it and/or modify
@@ -38,42 +38,40 @@ bool PsDlgExportCx::Initialize()
 	if (!PsController::Instance().project)
 		return false;
 
-	//-- récupération du projet
-	project = PsController::Instance().project;
-	assert(project);
-	assert(project->matrix);
-	assert(project->matrix->i == 0);
-	assert(project->matrix->j == 0);
-	dpi = project->renderer.dpi;
-	z = 100;
+	//-- retrieving the project
+	this->project = PsController::Instance().project;
+	assert(this->project);
+	assert(this->project->matrix);
+	assert(this->project->matrix->i == 0);
+	assert(this->project->matrix->j == 0);
+	this->dpi = this->project->renderer.dpi;
+	this->z = 100;
 	//--
 
-	if (!CheckRotation())
+	if (!this->CheckRotation())
 		if (!GetQuestion(QUESTION_EXPORT_ROTATION))
 			return false;
 
-
-	//-- récupération des coins de la matrice
-	TweakRotation();
-	GetMatrixWindow();
-	w = (int)(right - left);
-	h = (int)(bottom - top);
+	//-- retrieving the corners of the matrix
+	this->TweakRotation();
+	this->GetMatrixWindow();
+	this->w = (int)(this->right - this->left);
+	this->h = (int)(this->bottom - this->top);
 	//--
 
-	//-- rendus
-	CreateExportImage();
-	CreatePreviewImage();
+	//-- rendering
+	this->CreateExportImage();
+	this->CreatePreviewImage();
 	//--
 
-	//-- rétablisement du rendu
-	RestoreRotation();
-	project->renderer.Recalc();
+	//-- restoring the rendering
+	this->RestoreRotation();
+	this->project->renderer.Recalc();
 	PsController::Instance().UpdateWindow();
 	//--
 
 	return true;
 }
-
 bool PsDlgExportCx::CheckRotation()
 {
 	int Angle = (int)round(project->matrix->r * 180.f / PS_MATH_PI);
@@ -87,7 +85,7 @@ bool PsDlgExportCx::CheckRotation()
 }
 
 /*
-** Mise à plat de l'angle de la matrice
+** Mise ï¿½ plat de l'angle de la matrice
 */
 void PsDlgExportCx::TweakRotation()
 {
@@ -97,7 +95,7 @@ void PsDlgExportCx::TweakRotation()
 }
 
 /*
-** Rétablisement de l'angle
+** Rï¿½tablisement de l'angle
 */
 void PsDlgExportCx::RestoreRotation()
 {
@@ -144,7 +142,7 @@ GLuint PsDlgExportCx::CreateExportTexture(int iMaxSize)
 
 	PsRender& renderer = project->renderer;
 
-	//-- récupération des coins de la matrice
+	//-- rï¿½cupï¿½ration des coins de la matrice
 	TweakRotation();
 	GetMatrixWindow();
 	w = (int)(right - left);
@@ -187,7 +185,7 @@ GLuint PsDlgExportCx::CreateExportTexture(int iMaxSize)
 
 	glPopMatrix();
 
-	//-- rétablisement du rendu
+	//-- rï¿½tablisement du rendu
 	RestoreRotation();
 	project->renderer.Recalc();
 	PsController::Instance().UpdateWindow();
@@ -198,87 +196,83 @@ GLuint PsDlgExportCx::CreateExportTexture(int iMaxSize)
 
 void PsDlgExportCx::CreateExportImage()
 {
-
-	//-- dimensionnement du buffer
-	double rw = (exportZone.width - 10) / (right - left);
-	double rh = (exportZone.height - 20) / (bottom - top);
+	//-- sizing the buffer
+	double rw = (exportZone.width - 10) / (this->right - this->left);
+	double rh = (exportZone.height - 20) / (this->bottom - this->top);
 	double maxScale = rw;
 	if (rh < rw) maxScale = rh;
-	exportImage.Create((int)((right - left) * maxScale), (int)((bottom - top) * maxScale), 24);
+	exportImage.Create((int)((this->right - this->left) * maxScale), (int)((this->bottom - this->top) * maxScale), 24);
 	//--
 
-	PsRender& renderer = project->renderer;
+	PsRender& renderer = this->project->renderer;
 
 	glPushMatrix();
 
-	//-- centrage de la vue sur la matrice
-	renderer.x1 = left;
-	renderer.x2 = right;
-	renderer.y1 = bottom;
-	renderer.y2 = top;
+	//-- centering the view on the matrix
+	renderer.x1 = this->left;
+	renderer.x2 = this->right;
+	renderer.y1 = this->bottom;
+	renderer.y2 = this->top;
 	glViewport(0, 0, exportImage.GetWidth(), exportImage.GetHeight());
 	glPushMatrix();
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	glOrtho(left, right, bottom, top, -1, 1);
+	glOrtho(this->left, this->right, this->bottom, this->top, -1, 1);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	glPopMatrix();
 	//--
 
-	//-- rendu dans le backbuffer
+	//-- rendering into the backbuffer
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	renderer.DrawBack(*project, exportImage.GetWidth(), exportImage.GetHeight());
-	renderer.DrawShape(*(project->matrix));
+	renderer.DrawBack(*this->project, exportImage.GetWidth(), exportImage.GetHeight());
+	renderer.DrawShape(*(this->project->matrix));
 	hardwareRenderer.CopyToSoftBuffer(exportImage);
 
 	glPopMatrix();
 }
 
-
 void PsDlgExportCx::CreatePreviewImage()
 {
-
-	//-- fenêtrage
-	GetMatrixWindow();
-	right += (right - left) * 2;
-	bottom += (bottom - top) * 2;
+	//-- windowing
+	this->GetMatrixWindow();
+	this->right += (this->right - this->left) * 2;
+	this->bottom += (this->bottom - this->top) * 2;
 	//--
 
-	//-- dimensionnement du buffer
-	double rw = (previewZone.width - 10) / (right - left) / 3;
-	double rh = (previewZone.height - 20) / (bottom - top) / 3;
+	//-- sizing the buffer
+	double rw = (previewZone.width - 10) / (this->right - this->left) / 3;
+	double rh = (previewZone.height - 20) / (this->bottom - this->top) / 3;
 	double maxScale = rw;
 	if (rh < rw) maxScale = rh;
-	previewImage.Create((right - left) * maxScale * 3, (bottom - top) * maxScale * 3, 24);
+	previewImage.Create((this->right - this->left) * maxScale * 3, (this->bottom - this->top) * maxScale * 3, 24);
 	//--
 
-	PsRender& renderer = project->renderer;
+	PsRender& renderer = this->project->renderer;
 
-	//-- début
-
+	//-- start
 	glPushMatrix();
 	//--
 
-	//-- centrage de la vue sur la matrice
-	renderer.x1 = left;
-	renderer.x2 = right;
-	renderer.y1 = bottom;
-	renderer.y2 = top;
+	//-- centering the view on the matrix
+	renderer.x1 = this->left;
+	renderer.x2 = this->right;
+	renderer.y1 = this->bottom;
+	renderer.y2 = this->top;
 	glViewport(0, 0, previewImage.GetWidth(), previewImage.GetHeight());
 	glPushMatrix();
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	glOrtho(left, right, bottom, top, -1, 1);
+	glOrtho(this->left, this->right, this->bottom, this->top, -1, 1);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	glPopMatrix();
 	//--
 
-	//-- rendu dans le backbuffer
+	//-- rendering into the backbuffer
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	renderer.DrawBack(*project, previewImage.GetWidth(), previewImage.GetHeight());
-	renderer.DrawShape(*(project->matrix));
+	renderer.DrawBack(*this->project, previewImage.GetWidth(), previewImage.GetHeight());
+	renderer.DrawShape(*(this->project->matrix));
 	hardwareRenderer.CopyToSoftBuffer(previewImage);
 	//--
 
@@ -289,37 +283,37 @@ void PsDlgExportCx::OnValidation(const char* filename)
 {
 	PsController::Instance().SetProgress(-1);
 
-	TweakRotation();
+	this->TweakRotation();
 
-	// arrondi de la dimension en pixels
-	double pixel_width = round(w * z / 100.f);
-	double pixel_height = round(h * z / 100.f);
+	// rounding the dimension in pixels
+	double pixel_width = round(this->w * this->z / 100.f);
+	double pixel_height = round(this->h * this->z / 100.f);
 	//--
 
-	//-- zoom de la matrice
-	float w_backup = project->matrix->w;
-	float h_backup = project->matrix->h;
-	project->matrix->SetSize(project->matrix->w * z / 100.f, project->matrix->h * z / 100.f, 0, 0, 0, 0, false, true);
+	//-- zooming the matrix
+	float w_backup = this->project->matrix->w;
+	float h_backup = this->project->matrix->h;
+	this->project->matrix->SetSize(this->project->matrix->w * this->z / 100.f, this->project->matrix->h * this->z / 100.f, 0, 0, 0, 0, false, true);
 	//--
 
-	//-- fenêtrage
-	GetMatrixWindow();
+	//-- windowing
+	this->GetMatrixWindow();
 	//--
 
-	PsRender& renderer = project->renderer;
+	PsRender& renderer = this->project->renderer;
 
-	//-- centrage de la vue sur la matrice
-	renderer.x1 = left;
-	renderer.x2 = right;
-	renderer.y1 = bottom;
-	renderer.y2 = top;
+	//-- centering the view on the matrix
+	renderer.x1 = this->left;
+	renderer.x2 = this->right;
+	renderer.y1 = this->bottom;
+	renderer.y2 = this->top;
 	//--
 
 	PsController::Instance().SetProgress(5);
 
-	//-- enregistrement du dpi
+	//-- saving the dpi
 	int dpi_backup = renderer.dpi;
-	renderer.dpi = dpi;
+	renderer.dpi = this->dpi;
 	//--
 
 	InitSoftwareFile(pixel_width, pixel_height);
@@ -327,19 +321,18 @@ void PsDlgExportCx::OnValidation(const char* filename)
 	PsController::Instance().SetProgress(10);
 
 	renderer.SetEngine(PsRender::ENGINE_SOFTWARE);
-	renderer.DrawShape(*(project->matrix));
+	renderer.DrawShape(*(this->project->matrix));
 
 	PsController::Instance().SetProgress(40);
-	flushSoftwareFile(filename, project->bHideColor);
+	flushSoftwareFile(filename, this->project->bHideColor);
 
+	this->RestoreRotation();
 
-	RestoreRotation();
-
-	//-- restaurantion de la taille originale
-	project->matrix->SetSize(w_backup, h_backup, 0, 0, 0, 0, false, true);
+	//-- restoring the original size
+	this->project->matrix->SetSize(w_backup, h_backup, 0, 0, 0, 0, false, true);
 	//--
 
-	//-- restaurantion du dpi
+	//-- restoring the dpi
 	renderer.dpi = dpi_backup;
 	//--
 

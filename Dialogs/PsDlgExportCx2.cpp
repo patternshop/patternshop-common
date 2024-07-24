@@ -23,8 +23,8 @@
 
 void PsDlgExportCx::SetZ(double z_)
 {
-	z = z_;
-	Update();
+	this->z = z_;
+	this->Update();
 }
 
 void PsDlgExportCx::GetTextValue(double px, int indexType, char* buffer)
@@ -33,23 +33,23 @@ void PsDlgExportCx::GetTextValue(double px, int indexType, char* buffer)
 	switch (indexType)
 	{
 	case 0:
-		v = px / dpi;
+		v = px / this->dpi;
 		sprintf(buffer, "%.3f", v);
 		break;
 	case 1:
-		v = px / (dpi / 2.54f);
+		v = px / (this->dpi / 2.54f);
 		sprintf(buffer, "%.2f", v);
 		break;
 	case 2:
-		v = px * 10.f / (dpi / 2.54f);
+		v = px * 10.f / (this->dpi / 2.54f);
 		sprintf(buffer, "%.3f", v);
 		break;
 	case 3:
-		v = px / dpi / 0.0138888f;
+		v = px / this->dpi / 0.0138888f;
 		sprintf(buffer, "%.1f", v);
 		break;
 	case 4:
-		v = px / dpi * 6.f;
+		v = px / this->dpi * 6.f;
 		sprintf(buffer, "%.1f", v);
 		break;
 	case 5:
@@ -67,11 +67,11 @@ double PsDlgExportCx::GetDoubleValue(int indexType, char* buffer)
 	double v = atof(buffer);
 	switch (indexType)
 	{
-	case 0: return v * dpi; break;
-	case 1: return v * dpi / 2.54f; break;
-	case 2: return v * (dpi / 2.54f) / 10.f; break;
-	case 3: return v * dpi * 0.0138888f; break;
-	case 4: return v * dpi / 6.f; break;
+	case 0: return v * this->dpi; break;
+	case 1: return v * this->dpi / 2.54f; break;
+	case 2: return v * (this->dpi / 2.54f) / 10.f; break;
+	case 3: return v * this->dpi * 0.0138888f; break;
+	case 4: return v * this->dpi / 6.f; break;
 	case 5: return v; break;
 	default: break;
 	}
