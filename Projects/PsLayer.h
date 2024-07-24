@@ -46,8 +46,6 @@ public:
 	virtual			~PsLayer();
 
 public:
-	virtual ErrID	FileLoad(FILE*);
-	virtual ErrID	FileSave(FILE*) const;
 	virtual ErrID	Register(int, int, uint8*);
 
 public:

@@ -1,16 +1,16 @@
 /**
  * This file is part of Patternshop Project.
- * 
+ *
  * Patternshop is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * Patternshop is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with Patternshop.  If not, see <http://www.gnu.org/licenses/>
 */
@@ -30,32 +30,29 @@ class	PsRender;
 */
 class	PsImage : public PsShape
 {
-friend class	PsRender;
+	friend class	PsRender;
 
 public:
-					PsImage (PsMatrix*);
+	PsImage(PsMatrix*);
 	virtual			~PsImage();
 
-	virtual ErrID	FileLoad (FILE*);
-	virtual ErrID	FileSave (FILE*) const;
+	virtual PsMatrix* GetParent() const;
+	virtual void	GetPosition(float&, float&) const;
 
-	virtual PsMatrix*	GetParent() const;
-	virtual void	GetPosition (float&, float&) const;
+	bool			TextureFromBuffer(uint8*, bool = true);
+	bool			TextureFromFile(const char*, bool = true);
 
-	bool			TextureFromBuffer (uint8*, bool = true);
-	bool			TextureFromFile (const char*, bool = true);
+	virtual void	SetAngle(float, bool = false, bool = false);
+	virtual void	SetPosition(float, float, bool = false);
+	virtual void	SetSize(float, float, float = 0, float = 0, float = 0, float = 0, bool = false, bool = false);
+	virtual void	SetTorsion(float, float, bool = false);
 
-	virtual void	SetAngle (float, bool = false, bool = false);
-	virtual void	SetPosition (float, float, bool = false);
-	virtual void	SetSize (float, float, float = 0, float = 0, float = 0, float = 0, bool = false, bool = false);
-	virtual void	SetTorsion (float, float, bool = false);
+	PsTexture& GetTexture() { return texture; }
 
-	PsTexture&		GetTexture() { return texture; }
-	
 	const uint32	GetAutoGenId() { return texture.GetAutoGenId(); }
 
-	float			corner[4][2];
 
-private:
-	PsTexture			texture;
+public:
+	PsTexture		texture;
+	float			corner[4][2];
 };

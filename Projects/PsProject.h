@@ -82,8 +82,6 @@ public:
 	ErrID				NewMotif(const char*);
 	ErrID				NewMatrix();
 	ErrID				NewPattern(const char*);
-	ErrID				FileLoad(const char*);
-	ErrID				FileSave(const char*);
 	ErrID				MatrixColor();
 	ErrID				MatrixReset();
 
@@ -153,13 +151,13 @@ public:
 	bool				bPatternsIsSelected;
 	int					iLayerId;
 	Mode				mode;
+	bool				center;
 
 private:
 	bool				log_insert;
 	LogList				log_redo;
 	LogList				log_undo;
 	int					init_corner;
-	bool				center;
 
 	// variables temporaires utilisées pour la manipulation à la souris 
 	float				prev_scrollx;

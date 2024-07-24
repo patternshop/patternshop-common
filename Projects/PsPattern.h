@@ -40,9 +40,6 @@ public:
 	PsPattern();
 	virtual ~PsPattern();
 
-	virtual ErrID FileLoad(FILE*);
-	virtual ErrID FileSave(FILE*) const;
-
 	const std::string& GetName() const;
 	void SetName(const std::string&);
 	const uint32 GetAutoGenId() { return texture.GetAutoGenId(); }

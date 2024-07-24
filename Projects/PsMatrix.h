@@ -44,9 +44,6 @@ public:
 	PsMatrix();
 	virtual			~PsMatrix();
 
-	virtual ErrID	FileLoad(FILE*);
-	virtual ErrID	FileSave(FILE*) const;
-
 	virtual void	DoResetAll();
 	virtual void	DoChangeColor();
 

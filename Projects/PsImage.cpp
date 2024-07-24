@@ -42,48 +42,6 @@ PsMatrix* PsImage::GetParent() const
 }
 
 /*
-** Loads the image data from a file.
-*/
-ErrID PsImage::FileLoad(FILE* file)
-{
-	uint8* buffer;
-	size_t size;
-
-	if (fread(&size, sizeof(size), 1, file) != 1)
-		return ERROR_FILE_READ;
-
-	buffer = new uint8[size];
-
-	if (fread(buffer, sizeof(*buffer), size, file) != size)
-		return ERROR_FILE_READ;
-
-	if (!this->TextureFromBuffer(buffer))
-		return ERROR_FILE_READ;
-
-	return PsShape::FileLoad(file);
-}
-
-/*
-** Saves the image data to a file.
-*/
-ErrID PsImage::FileSave(FILE* file) const
-{
-	uint8* buffer;
-	size_t size;
-
-	if (!(buffer = this->texture.GetBuffer(size)))
-		return ERROR_FILE_WRITE;
-
-	if (fwrite(&size, sizeof(size), 1, file) != 1)
-		return ERROR_FILE_WRITE;
-
-	if (fwrite(buffer, sizeof(*buffer), size, file) != size)
-		return ERROR_FILE_WRITE;
-
-	return PsShape::FileSave(file);
-}
-
-/*
 ** Retrieves the absolute position of the image (see PsShape::ToAbsolute)
 */
 void PsImage::GetPosition(float& x, float& y) const

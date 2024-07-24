@@ -23,169 +23,94 @@ GLfloat ModelView[16];
 GLfloat Viewport[4];
 
 /*
-** PsLayer utilise le constructeur par défaut d'PsShape, donc sans conteneur.
+** PsLayer uses the default constructor of PsShape, so without container.
 */
 PsLayer::PsLayer()
 {
-	ucData = NULL;
-	iFinalTextureId = 0;
-	iMaskTextureId = 0;
-	fGizmoSize = 1000;
-	fScale = 1.f;
+	this->ucData = NULL;
+	this->iFinalTextureId = 0;
+	this->iMaskTextureId = 0;
+	this->fGizmoSize = 1000;
+	this->fScale = 1.f;
 }
 
 /*
 */
 PsLayer::~PsLayer()
 {
-	if (iFinalTextureId)
+	if (this->iFinalTextureId)
 	{
-		glDeleteTextures(1, &iFinalTextureId);
-		iFinalTextureId = 0;
+		glDeleteTextures(1, &this->iFinalTextureId);
+		this->iFinalTextureId = 0;
 	}
 
-	if (iMaskTextureId)
+	if (this->iMaskTextureId)
 	{
-		glDeleteTextures(1, &iMaskTextureId);
-		iMaskTextureId = 0;
+		glDeleteTextures(1, &this->iMaskTextureId);
+		this->iMaskTextureId = 0;
 	}
 
-	if (ucData)
+	if (this->ucData)
 	{
-		delete[] ucData;
-		ucData = 0;
+		delete[] this->ucData;
+		this->ucData = 0;
 	}
 }
 
 /*
-** Charge les données d'une calque (ceci comprend toutes les images qu'elle contient) depuis un fichier.
+** Creates the object instance as well as the associated texture.
 */
-ErrID PsLayer::FileLoad(FILE* file)
+ErrID PsLayer::Register(int width, int height, uint8* channel)
 {
-
-	if (fread(&iWidth, sizeof(int), 1, file) != 1)
-		return ERROR_FILE_READ;
-
-	if (fread(&iHeight, sizeof(int), 1, file) != 1)
-		return ERROR_FILE_READ;
-
-	ucData = new uint8[iWidth * iHeight];
-	if (fread(ucData, sizeof(*ucData), iWidth * iHeight, file) != iWidth * iHeight)
-		return ERROR_FILE_READ;
-
-	if (Register(iWidth, iHeight, ucData) != ERROR_NONE)
-		return ERROR_FILE_READ;
-
-	if (fread(&vTranslation, sizeof(PsVector), 1, file) != 1)
-		return ERROR_FILE_READ;
-
-	if (fread(&rRotation, sizeof(PsRotator), 1, file) != 1)
-		return ERROR_FILE_READ;
-
-	/*
-	if (fread (&fPlaneWidth, sizeof (float), 1, file) != 1)
-	return ERROR_FILE_READ;
-
-	if (fread (&fPlaneHeight, sizeof (float), 1, file) != 1)
-	return ERROR_FILE_READ;
-	*/
-
-	if (fread(&fScale, sizeof(float), 1, file) != 1)
-		return ERROR_FILE_READ;
-
-	return ERROR_NONE;
-}
-
-/*
-** Sauvegarde toutes les données d'une calque dans un fichier.
-*/
-ErrID PsLayer::FileSave(FILE* file) const
-{
-
-	if (fwrite(&iWidth, sizeof(int), 1, file) != 1)
-		return ERROR_FILE_WRITE;
-
-	if (fwrite(&iHeight, sizeof(int), 1, file) != 1)
-		return ERROR_FILE_WRITE;
-
-	if (fwrite(ucData, sizeof(*ucData), iWidth * iHeight, file) != iWidth * iHeight)
-		return ERROR_FILE_WRITE;
-
-	if (fwrite(&vTranslation, sizeof(PsVector), 1, file) != 1)
-		return ERROR_FILE_WRITE;
-
-	if (fwrite(&rRotation, sizeof(PsRotator), 1, file) != 1)
-		return ERROR_FILE_WRITE;
-
-	/*
-	if (fwrite (&fPlaneWidth, sizeof (float), 1, file) != 1)
-	return ERROR_FILE_WRITE;
-
-	if (fwrite (&fPlaneHeight, sizeof (float), 1, file) != 1)
-	return ERROR_FILE_WRITE;
-	*/
-
-	if (fwrite(&fScale, sizeof(float), 1, file) != 1)
-		return ERROR_FILE_WRITE;
-
-	return ERROR_NONE;
-}
-
-/*
-** Crée l'instance d'object ainsi que la texture associée.
-*/
-ErrID	PsLayer::Register(int width, int height, uint8* channel)
-{
-
-	//-- copie des données
+	//-- copy data
 	this->ucData = channel;
 	this->iWidth = width;
 	this->iHeight = height;
 	//--
 
-	return CreateTexture();
+	return this->CreateTexture();
 }
 
 /*
-** Redimensionne la texture (Max 512x512)
+** Resizes the texture (Max 512x512)
 */
 ErrID PsLayer::CreateTexture()
 {
-	//-- choix de la taille cible
+	//-- choose target size
 	int h, w;
 	int max_resol = 512;
-	for (h = 1; h < iHeight && h < max_resol; )
+	for (h = 1; h < this->iHeight && h < max_resol; )
 		h <<= 1;
-	for (w = 1; w < iWidth && w < max_resol; )
+	for (w = 1; w < this->iWidth && w < max_resol; )
 		w <<= 1;
 	//--
 
-	//-- préparation des données
+	//-- prepare data
 	uint8* texture_buffer = new uint8[w * h];
 	for (int x = w; x--; )
 	{
 		for (int y = h; y--; )
 		{
 			int v = 0, n = 0;
-			int i = x * iWidth / w;
+			int i = x * this->iWidth / w;
 			do
 			{
-				int j = y * iHeight / h;
+				int j = y * this->iHeight / h;
 				do
 				{
-					v += ucData[i + j * iWidth];
+					v += this->ucData[i + j * this->iWidth];
 					++n;
-				} while (++j < (y + 1) * iHeight / h);
-			} while (++i < (x + 1) * iWidth / w);
+				} while (++j < (y + 1) * this->iHeight / h);
+			} while (++i < (x + 1) * this->iWidth / w);
 			texture_buffer[(x + y * w)] = (v / n > 127 ? 255 : 0);
 		}
 	}
 	//--
 
-	//-- creation de la texture
+	//-- create texture
 	glEnable(GL_TEXTURE_2D);
-	glGenTextures(1, &iMaskTextureId);
-	glBindTexture(GL_TEXTURE_2D, iMaskTextureId);
+	glGenTextures(1, &this->iMaskTextureId);
+	glBindTexture(GL_TEXTURE_2D, this->iMaskTextureId);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, w, h, 0, GL_ALPHA, GL_UNSIGNED_BYTE, texture_buffer);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -197,8 +122,7 @@ ErrID PsLayer::CreateTexture()
 }
 
 /* Perform one transform operation */
-static void
-Transform(GLfloat* matrix, GLfloat* in, GLfloat* out)
+static void Transform(GLfloat* matrix, GLfloat* in, GLfloat* out)
 {
 	int ii;
 
@@ -215,8 +139,7 @@ Transform(GLfloat* matrix, GLfloat* in, GLfloat* out)
 * Lighting is left as an exercise for the reader.
 */
 
-static void
-DoTransform(GLfloat* in, GLfloat* out)
+static void DoTransform(GLfloat* in, GLfloat* out)
 {
 	GLfloat tmp[4];
 	GLfloat invW;       /* 1/w */
@@ -276,9 +199,9 @@ void PsLayer::InitProjection(PsRender& renderer)
 	glLoadIdentity();
 	//glTranslatef(renderer.size_x / 2.f, 0.f, -10001.f);
 	PsVector vEye = renderer.GetEyeLocation();
-	gluLookAt(vEye.X, vEye.Y, vEye.Z, // oeuil   
-		vEye.X, vEye.Y, 1.f, // point de fuite 
-		0.0f, 1.0f, 0.0f); // vecteur d'orientation
+	gluLookAt(vEye.X, vEye.Y, vEye.Z, // eye   
+		vEye.X, vEye.Y, 1.f, // vanishing point 
+		0.0f, 1.0f, 0.0f); // orientation vector
 	//glRotatef(0.0f, 0.0f, 1.0f, 0.0f);
 	glGetFloatv(GL_MODELVIEW_MATRIX, ModelView);
 	glPopMatrix();
@@ -286,43 +209,42 @@ void PsLayer::InitProjection(PsRender& renderer)
 
 void PsLayer::UpdateProjection(PsRender& renderer)
 {
-
 	float fLayerWidth = renderer.doc_x;
 	float fLayerHeight = renderer.doc_y;
 
-	InitProjection(renderer);
+	this->InitProjection(renderer);
 
-	vProjected[0].X = -fLayerWidth / 2.f;
-	vProjected[0].Y = -fLayerHeight / 2.f;
-	vProjected[1].X = fLayerWidth / 2.f;
-	vProjected[1].Y = -fLayerHeight / 2.f;
-	vProjected[2].X = fLayerWidth / 2.f;
-	vProjected[2].Y = fLayerHeight / 2.f;
-	vProjected[3].X = -fLayerWidth / 2.f;
-	vProjected[3].Y = fLayerHeight / 2.f;
+	this->vProjected[0].X = -fLayerWidth / 2.f;
+	this->vProjected[0].Y = -fLayerHeight / 2.f;
+	this->vProjected[1].X = fLayerWidth / 2.f;
+	this->vProjected[1].Y = -fLayerHeight / 2.f;
+	this->vProjected[2].X = fLayerWidth / 2.f;
+	this->vProjected[2].Y = fLayerHeight / 2.f;
+	this->vProjected[3].X = -fLayerWidth / 2.f;
+	this->vProjected[3].Y = fLayerHeight / 2.f;
 
 	for (int i = 0; i < 4; ++i)
 	{
-		vProjected[i].Z = 0.f;
+		this->vProjected[i].Z = 0.f;
 
 		// scale
-		vProjected[i] = vProjected[i] * fScale;
+		this->vProjected[i] = this->vProjected[i] * this->fScale;
 
 		// rotation
-		vProjected[i] = RotateVertex(vProjected[i], PsRotator::FromDegree(rRotation.Roll),
-			PsRotator::FromDegree(rRotation.Pitch), PsRotator::FromDegree(rRotation.Yaw));
+		this->vProjected[i] = RotateVertex(this->vProjected[i], PsRotator::FromDegree(this->rRotation.Roll),
+			PsRotator::FromDegree(this->rRotation.Pitch), PsRotator::FromDegree(this->rRotation.Yaw));
 
 		// translation
-		vProjected[i].X += vTranslation.X;
-		vProjected[i].Y += vTranslation.Y;
-		vProjected[i].Z += vTranslation.Z;
+		this->vProjected[i].X += this->vTranslation.X;
+		this->vProjected[i].Y += this->vTranslation.Y;
+		this->vProjected[i].Z += this->vTranslation.Z;
 
 		// projection
 
 		GLfloat quadV[4];
-		quadV[0] = vProjected[i].X;
-		quadV[1] = vProjected[i].Y;
-		quadV[2] = vProjected[i].Z;
+		quadV[0] = this->vProjected[i].X;
+		quadV[1] = this->vProjected[i].Y;
+		quadV[2] = this->vProjected[i].Z;
 		quadV[3] = 1.f;
 
 		GLfloat tmp[4];
@@ -331,72 +253,69 @@ void PsLayer::UpdateProjection(PsRender& renderer)
 		//glTexCoord4f(quadT[i][0] * tmp[3], quadT[i][1] * tmp[3], 0.0f, tmp[3]);
 		//glVertex3fv(tmp);
 
-		vProjected[i].X = tmp[0];
-		vProjected[i].Y = tmp[1];
-		vProjected[i].Z = tmp[2];
+		this->vProjected[i].X = tmp[0];
+		this->vProjected[i].Y = tmp[1];
+		this->vProjected[i].Z = tmp[2];
 
-		fW[i] = tmp[3];
+		this->fW[i] = tmp[3];
 
-		// centrage de la perspective
-		vProjected[i].X += renderer.doc_x / 2.f;
-		vProjected[i].Y += renderer.doc_y / 2.f;
-
+		// center the perspective
+		this->vProjected[i].X += renderer.doc_x / 2.f;
+		this->vProjected[i].Y += renderer.doc_y / 2.f;
 	}
 }
 
 void PsLayer::UpdateGizmoProjection(PsRender& renderer)
 {
-
-	float fLayerWidth = fGizmoSize;
+	float fLayerWidth = this->fGizmoSize;
 	float fLayerHeight = renderer.doc_y;
 
-	InitProjection(renderer);
+	this->InitProjection(renderer);
 
-	vProjectedGizmo[0].X = -fGizmoSize / 2.f;
-	vProjectedGizmo[0].Y = -fGizmoSize / 2.f;
-	vProjectedGizmo[1].X = fGizmoSize / 2.f;
-	vProjectedGizmo[1].Y = -fGizmoSize / 2.f;
-	vProjectedGizmo[2].X = fGizmoSize / 2.f;
-	vProjectedGizmo[2].Y = fGizmoSize / 2.f;
-	vProjectedGizmo[3].X = -fGizmoSize / 2.f;
-	vProjectedGizmo[3].Y = fGizmoSize / 2.f;
+	this->vProjectedGizmo[0].X = -this->fGizmoSize / 2.f;
+	this->vProjectedGizmo[0].Y = -this->fGizmoSize / 2.f;
+	this->vProjectedGizmo[1].X = this->fGizmoSize / 2.f;
+	this->vProjectedGizmo[1].Y = -this->fGizmoSize / 2.f;
+	this->vProjectedGizmo[2].X = this->fGizmoSize / 2.f;
+	this->vProjectedGizmo[2].Y = this->fGizmoSize / 2.f;
+	this->vProjectedGizmo[3].X = -this->fGizmoSize / 2.f;
+	this->vProjectedGizmo[3].Y = this->fGizmoSize / 2.f;
 
 	for (int i = 0; i < 4; ++i)
 	{
-		// lecture des positions des coins 
-		vProjectedGizmo[i].Z = 0.f;
+		// reading the positions of the corners
+		this->vProjectedGizmo[i].Z = 0.f;
 
 		// scale
-		vProjectedGizmo[i] = vProjectedGizmo[i] * fScale;
+		this->vProjectedGizmo[i] = this->vProjectedGizmo[i] * this->fScale;
 
 		// rotation
-		vProjectedGizmo[i] = RotateVertex(vProjectedGizmo[i], PsRotator::FromDegree(rRotation.Roll),
-			PsRotator::FromDegree(rRotation.Pitch), PsRotator::FromDegree(rRotation.Yaw));
+		this->vProjectedGizmo[i] = RotateVertex(this->vProjectedGizmo[i], PsRotator::FromDegree(this->rRotation.Roll),
+			PsRotator::FromDegree(this->rRotation.Pitch), PsRotator::FromDegree(this->rRotation.Yaw));
 
 		// translation
-		vProjectedGizmo[i].X += vTranslation.X;
-		vProjectedGizmo[i].Y += vTranslation.Y;
-		vProjectedGizmo[i].Z += vTranslation.Z;
+		this->vProjectedGizmo[i].X += this->vTranslation.X;
+		this->vProjectedGizmo[i].Y += this->vTranslation.Y;
+		this->vProjectedGizmo[i].Z += this->vTranslation.Z;
 
 		// projection    
 		GLfloat quadV[4];
-		quadV[0] = vProjectedGizmo[i].X;
-		quadV[1] = vProjectedGizmo[i].Y;
-		quadV[2] = vProjectedGizmo[i].Z;
+		quadV[0] = this->vProjectedGizmo[i].X;
+		quadV[1] = this->vProjectedGizmo[i].Y;
+		quadV[2] = this->vProjectedGizmo[i].Z;
 		quadV[3] = 1.f;
 
 		GLfloat tmp[4];
 		DoTransform(quadV, tmp);
 
-		vProjectedGizmo[i].X = tmp[0];
-		vProjectedGizmo[i].Y = tmp[1];
-		vProjectedGizmo[i].Z = 0.f;//tmp[2];
-		fW[i] = 1.f;//tmp[3];
+		this->vProjectedGizmo[i].X = tmp[0];
+		this->vProjectedGizmo[i].Y = tmp[1];
+		this->vProjectedGizmo[i].Z = 0.f; // tmp[2];
+		this->fW[i] = 1.f; // tmp[3];
 
-		// centrage de la perspective
-		vProjectedGizmo[i].X += renderer.doc_x / 2.f;
-		vProjectedGizmo[i].Y += renderer.doc_y / 2.f;
-
+		// centering the perspective
+		this->vProjectedGizmo[i].X += renderer.doc_x / 2.f;
+		this->vProjectedGizmo[i].Y += renderer.doc_y / 2.f;
 	}
 }
 
@@ -406,43 +325,41 @@ bool PsLayer::MouseIsInside(int x, int y) const
 
 	PsVector vCenter;
 	for (int i = 0; i < 4; ++i)
-		vCenter += vProjectedGizmo[i];
+		vCenter += this->vProjectedGizmo[i];
 	vCenter /= 4;
 
 	for (int i = 0; i < 4; ++i)
 	{
-		PsVector vN = vProjectedGizmo[(i + 1) % 4] - vProjectedGizmo[i];
+		PsVector vN = this->vProjectedGizmo[(i + 1) % 4] - this->vProjectedGizmo[i];
 		vN = RotateVertex(vN, 0, 0, 3.14f / 2.f);
 
-		PsVector vAP = vPoint - vProjectedGizmo[i];
-		PsVector vAC = vProjectedGizmo[(i + 2) % 4] - vProjectedGizmo[i];
+		PsVector vAP = vPoint - this->vProjectedGizmo[i];
+		PsVector vAC = this->vProjectedGizmo[(i + 2) % 4] - this->vProjectedGizmo[i];
 
 		if (!SameSign(DotProduct2x2(vAP, vN), DotProduct2x2(vAC, vN)))
 			return false;
-
 	}
 
 	return true;
 }
 
 /*
-** Teste si un point est à l'un des emplacements de rotation; même remarques que pour
-** le redimentionnement.
+** Tests if a point is at one of the rotation locations; same remarks as for resizing.
 */
 bool PsLayer::InRotate(float px, float py, float zoom, int& i) const
 {
-	float	size = SHAPE_SIZE_ROTATE * zoom;
+	float size = SHAPE_SIZE_ROTATE * zoom;
 
 	for (i = 0; i < 4; ++i)
 	{
-		float angle = ToAngle(vProjectedGizmo[i].X, vProjectedGizmo[i].Y);
+		float angle = this->ToAngle(this->vProjectedGizmo[i].X, this->vProjectedGizmo[i].Y);
 		float ax = size * cos(angle) - size * sin(angle);
 		float ay = size * sin(angle) + size * cos(angle);
 
-		if (px >= vProjectedGizmo[i].X + ax - size
-			&& px <= vProjectedGizmo[i].X + ax + size
-			&& py >= vProjectedGizmo[i].Y + ay - size
-			&& py <= vProjectedGizmo[i].Y + ay + size)
+		if (px >= this->vProjectedGizmo[i].X + ax - size
+			&& px <= this->vProjectedGizmo[i].X + ax + size
+			&& py >= this->vProjectedGizmo[i].Y + ay - size
+			&& py <= this->vProjectedGizmo[i].Y + ay + size)
 			return true;
 	}
 
@@ -450,12 +367,12 @@ bool PsLayer::InRotate(float px, float py, float zoom, int& i) const
 }
 
 /*
-** Retourne l'angle entre le centre de l'PsShape et le point "ax, ay", en radians.
+** Returns the angle between the center of the PsShape and the point "ax, ay", in radians.
 */
-float	PsLayer::ToAngle(float ax, float ay) const
+float PsLayer::ToAngle(float ax, float ay) const
 {
-	float tx = vTranslation.X;
-	float ty = vTranslation.Y;
+	float tx = this->vTranslation.X;
+	float ty = this->vTranslation.Y;
 
 	if (ax < tx)
 		return (float)atan((ay - ty) / (ax - tx)) + PS_MATH_PI;
@@ -466,20 +383,20 @@ float	PsLayer::ToAngle(float ax, float ay) const
 }
 
 /*
-** Teste si un point est sur l'une des poignées de redimentionnement d'une PsLayer, et enregistre
-** dans "i" l'index de la poignée (0 = haut/gauche, etc dans le sens horaire). Cette fonction doit
-** prendre le zoom en paramètre, pour que la taille des poignées ne soient pas affectées par lui
-** (on doit donc pouvoir annuler ses effets).
+** Tests if a point is on one of the resizing handles of a PsLayer, and records
+** in "i" the index of the handle (0 = top/left, etc. clockwise). This function must
+** take the zoom as a parameter, so that the size of the handles is not affected by it
+** (we must therefore be able to cancel its effects).
 */
 bool PsLayer::InResize(float px, float py, float zoom, int& i) const
 {
-	float	size = SHAPE_SIZE_RESIZE * zoom;
+	float size = SHAPE_SIZE_RESIZE * zoom;
 
 	for (i = 0; i < 4; ++i)
-		if (px >= vProjectedGizmo[i].X - size
-			&& px <= vProjectedGizmo[i].X + size
-			&& py >= vProjectedGizmo[i].Y - size
-			&& py <= vProjectedGizmo[i].Y + size)
+		if (px >= this->vProjectedGizmo[i].X - size
+			&& px <= this->vProjectedGizmo[i].X + size
+			&& py >= this->vProjectedGizmo[i].Y - size
+			&& py <= this->vProjectedGizmo[i].Y + size)
 			return true;
 
 	return false;

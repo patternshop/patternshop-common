@@ -63,13 +63,13 @@ public:
 	virtual float	ToAngle(float, float) const;
 	virtual void	ToRelative(float, float, float&, float&) const;
 
-	virtual ErrID	FileLoad(FILE*);
-	virtual ErrID	FileSave(FILE*) const;
-
 	float			h;
 	float			i;
 	float			j;
 	float			w;
+
+public:
+	// virtual void Accept(Visitor* visitor) const = 0;
 
 public:
 	virtual void	FinalizePosition(float, float);

@@ -73,46 +73,6 @@ const std::string& PsShape::GetName() const
 }
 
 /*
-** Loads the data of a PsShape from an open file.
-** FIXME: The name is not loaded (nor saved)
-*/
-ErrID    PsShape::FileLoad(FILE* file)
-{
-    if (fread(&this->h, sizeof(this->h), 1, file) != 1 ||
-        fread(&this->i, sizeof(this->i), 1, file) != 1 ||
-        fread(&this->j, sizeof(this->j), 1, file) != 1 ||
-        fread(&this->r, sizeof(this->r), 1, file) != 1 ||
-        fread(&this->w, sizeof(this->w), 1, file) != 1 ||
-        fread(&this->x, sizeof(this->x), 1, file) != 1 ||
-        fread(&this->y, sizeof(this->y), 1, file) != 1 ||
-        fread(&this->hide, sizeof(this->hide), 1, file) != 1 ||
-        fread(&this->constraint, sizeof(this->constraint), 1, file) != 1)
-        return ERROR_FILE_READ;
-
-    return ERROR_NONE;
-}
-
-/*
-** Saves the data of a PsShape to an open file.
-** FIXME: The name is not loaded (nor saved)
-*/
-ErrID    PsShape::FileSave(FILE* file) const
-{
-    if (fwrite(&this->h, sizeof(this->h), 1, file) != 1 ||
-        fwrite(&this->i, sizeof(this->i), 1, file) != 1 ||
-        fwrite(&this->j, sizeof(this->j), 1, file) != 1 ||
-        fwrite(&this->r, sizeof(this->r), 1, file) != 1 ||
-        fwrite(&this->w, sizeof(this->w), 1, file) != 1 ||
-        fwrite(&this->x, sizeof(this->x), 1, file) != 1 ||
-        fwrite(&this->y, sizeof(this->y), 1, file) != 1 ||
-        fwrite(&this->hide, sizeof(this->hide), 1, file) != 1 ||
-        fwrite(&this->constraint, sizeof(this->constraint), 1, file) != 1)
-        return ERROR_FILE_WRITE;
-
-    return ERROR_NONE;
-}
-
-/*
 ** Changes the position of the PsShape. This method, which should be called "SetPosition", has the prefix
 ** "Finalize", indicating that another process will be necessary by the class inheriting from PsShape,
 ** before calling this method, and that its call alone is therefore not sufficient.
