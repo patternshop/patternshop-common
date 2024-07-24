@@ -23,309 +23,308 @@
 
 bool FreeImage_BufferFromFile(const char*, uint8*&, int&, int&, int&);
 
-int	PsTexture::max_resol = 512;
+int PsTexture::max_resol = 512;
 uint32 PsTexture::autogen_id_top = 1;
 
 /*
-** Constructeur : par défaut, aucune texture chargée.
+** Constructor: by default, no texture is loaded.
 */
 PsTexture::PsTexture() :
-	buffer(0),
-	id(0)
+    buffer(0),
+    id(0)
 {
-	autogen_id = autogen_id_top++;
+    this->autogen_id = autogen_id_top++;
 }
 
 /*
-** Liberation de la texture éventuellement chargée, lors de la destruction.
+** Releases the texture if one was loaded, upon destruction.
 */
 PsTexture::~PsTexture()
 {
-	LogFlush();
+    this->LogFlush();
 }
 
 /*
-** Décharge la texture chargée, si il y en avait une.
+** Unloads the loaded texture, if there was one.
 */
-void	PsTexture::LogFlush()
+void PsTexture::LogFlush()
 {
-	if (buffer)
-	{
-		delete[] buffer;
-		buffer = 0;
-	}
+    if (this->buffer)
+    {
+        delete[] this->buffer;
+        this->buffer = 0;
+    }
 
-	if (id)
-	{
-		glDeleteTextures(1, &id);
-		id = 0;
-	}
+    if (this->id)
+    {
+        glDeleteTextures(1, &this->id);
+        this->id = 0;
+    }
 
-	PsWinProject::Instance().relaseThumb(this);
+    PsWinProject::Instance().relaseThumb(this);
 }
 
 /*
-** Retourne le buffer dans lequel a été enregistrée la texture compressée, et fixe "size" à la taille du
-** buffer en question. Ceci est utilisé lors de la sauvegarde d'une texture dans un fichier.
+** Returns the buffer in which the compressed texture was saved, and sets "size" to the size of
+** the buffer in question. This is used when saving a texture to a file.
 */
 uint8* PsTexture::GetBuffer(size_t& size) const
 {
-	size = 4 * sizeof(int) + *(int*)(buffer + 3 * sizeof(int));
+    size = 4 * sizeof(int) + *(int*)(this->buffer + 3 * sizeof(int));
 
-	return buffer;
+    return this->buffer;
 }
 
 uint8* PsTexture::GetBufferUncompressed(int& bpp) const
 {
-	uint8* uncomp;
-	int		width;
-	int		height;
-	uLongf	size;
+    uint8* uncomp;
+    int width;
+    int height;
+    uLongf size;
 
-	width = *(int*)(buffer + 0 * sizeof(int));
-	height = *(int*)(buffer + 1 * sizeof(int));
-	bpp = *(int*)(buffer + 2 * sizeof(int));
-	size = (width * height * bpp);
+    width = *(int*)(this->buffer + 0 * sizeof(int));
+    height = *(int*)(this->buffer + 1 * sizeof(int));
+    bpp = *(int*)(this->buffer + 2 * sizeof(int));
+    size = (width * height * bpp);
 
-	uncomp = new uint8[size];
-	int r = uncompress(uncomp, &size, buffer + 4 * sizeof(int), *(int*)(buffer + 3 * sizeof(int)));
-	assert(r == Z_OK);
-	return uncomp;
-
+    uncomp = new uint8[size];
+    int r = uncompress(uncomp, &size, this->buffer + 4 * sizeof(int), *(int*)(this->buffer + 3 * sizeof(int)));
+    assert(r == Z_OK);
+    return uncomp;
 }
 
 /*
-** Retourne l'ID de la texture, chargée par OpenGL.
+** Returns the ID of the texture, loaded by OpenGL.
 */
-GLuint	PsTexture::GetID() const
+GLuint PsTexture::GetID() const
 {
-	return this->id;
+    return this->id;
 }
 
 /*
-** Récupere la taille de la texture actuellement chargée.
+** Retrieves the size of the currently loaded texture.
 */
-void	PsTexture::GetSize(int& x, int& y) const
+void PsTexture::GetSize(int& x, int& y) const
 {
-	x = this->width;
-	y = this->height;
+    x = this->width;
+    y = this->height;
 }
 
 /*
-** Charge une texture depuis un buffer compressé(donc a priori depuis un fichier). Voir la fonction
-** "LoadFromFile" pour savoir comment est organisé ce buffer.
+** Loads a texture from a compressed buffer (presumably from a file). See the function
+** "LoadFromFile" to know how this buffer is organized.
 */
-bool	PsTexture::LoadFromBuffer(uint8* buffer)
+bool PsTexture::LoadFromBuffer(uint8* buffer)
 {
-	uint8* uncomp;
-	int			width;
-	int			height;
-	int			bpp;
-	uLongf		size;
+    uint8* uncomp;
+    int width;
+    int height;
+    int bpp;
+    uLongf size;
 
-	LogFlush();
+    this->LogFlush();
 
-	this->buffer = buffer;
+    this->buffer = buffer;
 
-	width = *(int*)(buffer + 0 * sizeof(int));
-	height = *(int*)(buffer + 1 * sizeof(int));
-	bpp = *(int*)(buffer + 2 * sizeof(int));
-	size = width * height * bpp;
+    width = *(int*)(this->buffer + 0 * sizeof(int));
+    height = *(int*)(this->buffer + 1 * sizeof(int));
+    bpp = *(int*)(this->buffer + 2 * sizeof(int));
+    size = width * height * bpp;
 
-	uncomp = new uint8[size];
+    uncomp = new uint8[size];
 
-	if (uncompress(uncomp, &size, buffer + 4 * sizeof(int), *(int*)(buffer + 3 * sizeof(int))) != Z_OK)
-		return false;
+    if (uncompress(uncomp, &size, this->buffer + 4 * sizeof(int), *(int*)(this->buffer + 3 * sizeof(int))) != Z_OK)
+        return false;
 
-	if (!Register(width, height, bpp, uncomp))
-		return false;
+    if (!this->Register(width, height, bpp, uncomp))
+        return false;
 
-	delete[] uncomp;
+    delete[] uncomp;
 
-	return true;
+    return true;
 }
 
 /*
-** Charge une texture depuis un fichier, de deux façon différentes : une copie intacte de la texture est
-** conservée dans un buffer, et une version redimentionnée est enregistrée pour OpenGL. Lors de la sauvegarde,
-** seule la copie intacte sera sauvegardée, l'autre pouvant bien sûr se constuire à partir d'elle.
-** La copie est compressée avec zlib; il pourrait être intelligent d'utiliser un vrai format adapté aux images
-**(et bien sûr non destructif, sinon perte de qualité à chaque sauvegarde du document), comme par exemple le
-** PNG. Le buffer contient, dans l'ordre : la largeur, la hauteur et les bpp(divisés par 8, cf fonction
-** "Register") sur 4 octets(int), puis la taille des données compressées, sur 4 octets également, et enfin
-** les données elles-même. Ceci nous donne la formule que l'on retrouve dans la fonction GetBuffer pour connaitre
-** la taille totale du buffer : 4 * sizeof(int) + *(int*)(buffer + 3 * sizeof(int))
-** FIXME : Il va y avoir un problème de compatibilité Mac/PC, puisque l'un va sauver et lire en big endian, alors
-** que l'autre sera en little endian. Il faudrait remplacer tout ça par des fonctions qui convertissent un int
-** en un tableau de 4 chars. À la reflexion, se problème va apparaitre partout au niveau des FileSave/FileLoad...
+** Loads a texture from a file in two different ways: an intact copy of the texture is
+** kept in a buffer, and a resized version is saved for OpenGL. When saving,
+** only the intact copy will be saved, the other can of course be constructed from it.
+** The copy is compressed with zlib; it might be smart to use a real format suitable for images
+** (and of course non-destructive, otherwise quality loss with each document save), such as
+** PNG. The buffer contains, in order: the width, height, and bpp (divided by 8, see function
+** "Register") on 4 bytes (int), then the size of the compressed data, also on 4 bytes, and finally
+** the data itself. This gives us the formula found in the GetBuffer function to know
+** the total size of the buffer: 4 * sizeof(int) + *(int*)(buffer + 3 * sizeof(int))
+** FIXME: There will be a compatibility issue between Mac/PC, since one will save and read in big endian,
+** while the other will be in little endian. We should replace all this with functions that convert an int
+** to an array of 4 chars. On reflection, this problem will appear everywhere at the FileSave/FileLoad level...
 */
-bool		PsTexture::LoadFromFile(const char* path)
+bool PsTexture::LoadFromFile(const char* path)
 {
-	int width, height, bpp;
-	uint8* pixels;
+    int width, height, bpp;
+    uint8* pixels;
 
-	if (!FreeImage_BufferFromFile(path, pixels, width, height, bpp))
-		return false;
+    if (!FreeImage_BufferFromFile(path, pixels, width, height, bpp))
+        return false;
 
-	LogFlush();
+    this->LogFlush();
 
-	return RegisterAndSave(width, height, bpp, pixels);
+    return this->RegisterAndSave(width, height, bpp, pixels);
 }
 
 /*
-** Enregistre une copie de l'image en mémoire dans le format interne puis en openGL
+** Saves a copy of the image in memory in the internal format and then in OpenGL
 */
-bool	PsTexture::RegisterAndSave(int width, int height, int bpp, uint8* pixels)
+bool PsTexture::RegisterAndSave(int width, int height, int bpp, uint8* pixels)
 {
-	uLongf	size = height * width * bpp * sizeof(uint8);
-	buffer = new uint8[4 * sizeof(int) + size];
+    uLongf size = height * width * bpp * sizeof(uint8);
+    this->buffer = new uint8[4 * sizeof(int) + size];
 
-	if (compress(this->buffer + 4 * sizeof(int), &size, pixels, size) != Z_OK)
-		return false;
+    if (compress(this->buffer + 4 * sizeof(int), &size, pixels, size) != Z_OK)
+        return false;
 
-	*(int*)(this->buffer + 0 * sizeof(int)) = width;
-	*(int*)(this->buffer + 1 * sizeof(int)) = height;
-	*(int*)(this->buffer + 2 * sizeof(int)) = bpp;
-	*(int*)(this->buffer + 3 * sizeof(int)) = size;
+    *(int*)(this->buffer + 0 * sizeof(int)) = width;
+    *(int*)(this->buffer + 1 * sizeof(int)) = height;
+    *(int*)(this->buffer + 2 * sizeof(int)) = bpp;
+    *(int*)(this->buffer + 3 * sizeof(int)) = size;
 
-	return Register(width, height, bpp, pixels);
+    return this->Register(width, height, bpp, pixels);
 }
 
-void	GetPixel24Bits(uint8* buffer, int w, int, int x, int y, int* color)
+void GetPixel24Bits(uint8* buffer, int w, int, int x, int y, int* color)
 {
 #ifndef __BIG_ENDIAN__
-	color[0] += buffer[(x + y * w) * 3 + 2];
-	color[2] += buffer[(x + y * w) * 3 + 0];
+    color[0] += buffer[(x + y * w) * 3 + 2];
+    color[2] += buffer[(x + y * w) * 3 + 0];
 #else
-	color[0] += buffer[(x + y * w) * 3 + 0];
-	color[2] += buffer[(x + y * w) * 3 + 2];
+    color[0] += buffer[(x + y * w) * 3 + 0];
+    color[2] += buffer[(x + y * w) * 3 + 2];
 #endif
-	color[1] += buffer[(x + y * w) * 3 + 1];
-	color[3] += 255;
+    color[1] += buffer[(x + y * w) * 3 + 1];
+    color[3] += 255;
 }
 
-void	GetPixel32Bits(uint8* buffer, int w, int, int x, int y, int* color)
+void GetPixel32Bits(uint8* buffer, int w, int, int x, int y, int* color)
 {
-#ifndef __BIG_ENDIAN__	
-	color[0] += buffer[(x + y * w) * 4 + 2];
-	color[2] += buffer[(x + y * w) * 4 + 0];
+#ifndef __BIG_ENDIAN__
+    color[0] += buffer[(x + y * w) * 4 + 2];
+    color[2] += buffer[(x + y * w) * 4 + 0];
 #else
-	color[0] += buffer[(x + y * w) * 4 + 0];
-	color[2] += buffer[(x + y * w) * 4 + 2];
+    color[0] += buffer[(x + y * w) * 4 + 0];
+    color[2] += buffer[(x + y * w) * 4 + 2];
 #endif
-	color[1] += buffer[(x + y * w) * 4 + 1];
-	color[3] += buffer[(x + y * w) * 4 + 3];
+    color[1] += buffer[(x + y * w) * 4 + 1];
+    color[3] += buffer[(x + y * w) * 4 + 3];
 }
 
 /*
-** Transforme la texture pour OpenGL, en la redimentionnant à la puissance de 2 la plus proche, mais avec une
-** taille maximum. La taille de l'image originale est width*height, elle est en mode "bpp * 8" (i.e : indiquer
-** 3 pour 24 bpp, 4 pour 32 bpp), et "pixels" est le tableau des pixels qui la composent.
+** Transforms the texture for OpenGL, resizing it to the nearest power of 2, but with a
+** maximum size. The original image size is width*height, it is in "bpp * 8" mode (i.e.: indicate
+** 3 for 24 bpp, 4 for 32 bpp), and "pixels" is the array of pixels that compose it.
 */
-bool	PsTexture::Register(int width, int height, int bpp, uint8* pixels)
+bool PsTexture::Register(int width, int height, int bpp, uint8* pixels)
 {
-	TGetPixel	getPixel;
-	uint8*		buffer;
-	int			color[4];
-	int			h;
-	int			i;
-	int			j;
-	int			n;
-	int			w;
-	int			x;
-	int			y;
+    TGetPixel getPixel;
+    uint8* buffer;
+    int color[4];
+    int h;
+    int i;
+    int j;
+    int n;
+    int w;
+    int x;
+    int y;
 
-	switch (bpp)
-	{
-	case 3: getPixel = GetPixel24Bits; break;
-	case 4: getPixel = GetPixel32Bits; break;
-	default: return false;
-	}
+    switch (bpp)
+    {
+    case 3: getPixel = GetPixel24Bits; break;
+    case 4: getPixel = GetPixel32Bits; break;
+    default: return false;
+    }
 
-	for (h = 1; h < height && h < max_resol; )
-		h <<= 1;
+    for (h = 1; h < height && h < max_resol; )
+        h <<= 1;
 
-	for (w = 1; w < width && w < max_resol; )
-		w <<= 1;
+    for (w = 1; w < width && w < max_resol; )
+        w <<= 1;
 
-	buffer = new uint8[w * h * 4];
-	this->width = width;
-	this->height = height;
+    buffer = new uint8[w * h * 4];
+    this->width = width;
+    this->height = height;
 
-	for (x = w; x--; )
-		for (y = h; y--; )
-		{
-			color[0] = 0;
-			color[1] = 0;
-			color[2] = 0;
-			color[3] = 0;
+    for (x = w; x--; )
+        for (y = h; y--; )
+        {
+            color[0] = 0;
+            color[1] = 0;
+            color[2] = 0;
+            color[3] = 0;
 
-			i = x * width / w;
-			n = 0;
+            i = x * width / w;
+            n = 0;
 
-			do
-			{
-				j = y * height / h;
+            do
+            {
+                j = y * height / h;
 
-				do
-				{
-					//					char a[928];
-					//					sprintf(a, "read [%i, %i] on [%i, %i](%i, %i => %i, %i)\n", i, j, width, height, x * width / w, y * height / h,(x + 1) * width / w,(y + 1) * height / h);
-					//					OutputDebugString(a);
+                do
+                {
+                    // char a[928];
+                    // sprintf(a, "read [%i, %i] on [%i, %i](%i, %i => %i, %i)\n", i, j, width, height, x * width / w, y * height / h,(x + 1) * width / w,(y + 1) * height / h);
+                    // OutputDebugString(a);
 
-					(*getPixel)(pixels, width, height, i, j, color);
-					++n;
-				} while (++j < (y + 1) * height / h);
-			} while (++i < (x + 1) * width / w);
+                    (*getPixel)(pixels, width, height, i, j, color);
+                    ++n;
+                } while (++j < (y + 1) * height / h);
+            } while (++i < (x + 1) * width / w);
 
-			buffer[(x + y * w) * 4 + 0] = color[0] / n;
-			buffer[(x + y * w) * 4 + 1] = color[1] / n;
-			buffer[(x + y * w) * 4 + 2] = color[2] / n;
-			buffer[(x + y * w) * 4 + 3] = color[3] / n;
-		}
+            buffer[(x + y * w) * 4 + 0] = color[0] / n;
+            buffer[(x + y * w) * 4 + 1] = color[1] / n;
+            buffer[(x + y * w) * 4 + 2] = color[2] / n;
+            buffer[(x + y * w) * 4 + 3] = color[3] / n;
+        }
 
-	glGenTextures(1, &id);
-	glBindTexture(GL_TEXTURE_2D, id);
+    glGenTextures(1, &this->id);
+    glBindTexture(GL_TEXTURE_2D, this->id);
 
 #ifdef _WINDOWS
-	bool linear = true;
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, linear ? GL_LINEAR : GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, linear ? GL_LINEAR : GL_NEAREST);
+    bool linear = true;
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, linear ? GL_LINEAR : GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, linear ? GL_LINEAR : GL_NEAREST);
 #else /* MAXOSX */
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
-	gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, w, h, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
+    gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, w, h, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
 #endif
 
-	delete[] buffer;
+    delete[] buffer;
 
-	return true;
+    return true;
 }
 
 /*
-** Décharge puis recharge la texture dans OpenGL.
+** Unloads and then reloads the texture in OpenGL.
 */
-void				PsTexture::Reload()
+void PsTexture::Reload()
 {
-	uint8* backup;
-	uint8* buffer;
-	size_t		size;
+    uint8* backup;
+    uint8* buffer;
+    size_t size;
 
-	buffer = GetBuffer(size);
+    buffer = this->GetBuffer(size);
 
-	backup = new uint8[size];
-	memcpy(backup, buffer, size * sizeof(*backup));
+    backup = new uint8[size];
+    memcpy(backup, buffer, size * sizeof(*backup));
 
-	LoadFromBuffer(backup);
+    this->LoadFromBuffer(backup);
 
-	delete[] backup;
+    delete[] backup;
 }
 
 /*
-** Change la résolution maximale des textures pour OpenGL
+** Changes the maximum resolution of textures for OpenGL
 */
-void		PsTexture::SetMaxResol(int resol)
+void PsTexture::SetMaxResol(int resol)
 {
-	max_resol = resol;
+    max_resol = resol;
 }
