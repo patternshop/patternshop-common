@@ -29,146 +29,146 @@
 
 void PsWinProjectCx::DrawMatrixBloc(PsMatrix* matrix)
 {
-	if (ypos_precalc + bloc_count_size > 0)
+	if (this->ypos_precalc + this->bloc_count_size > 0)
 	{
-		psWin->SetBrushColor(212, 208, 200);
-		psWin->SetPenColor(255, 255, 255);
+		this->psWin->SetBrushColor(212, 208, 200);
+		this->psWin->SetPenColor(255, 255, 255);
 		bool close = true;
-		if (openCloseMap[matrix] != CLOSE)
+		if (this->openCloseMap[matrix] != CLOSE)
 		{
-			psWin->DrawRectangle(0, ypos_precalc, 25, ypos_precalc + bloc_count_size
-				+ item_count_size * (int)matrix->images.size() - 1);
+			this->psWin->DrawRectangle(0, this->ypos_precalc, 25, this->ypos_precalc + this->bloc_count_size
+				+ this->item_count_size * (int)matrix->images.size() - 1);
 			close = false;
 		}
-		else psWin->DrawRectangle(0, ypos_precalc, 25, ypos_precalc + bloc_count_size - 1);
+		else this->psWin->DrawRectangle(0, this->ypos_precalc, 25, this->ypos_precalc + this->bloc_count_size - 1);
 
-		if (!matrix->hide) viewImage.BitBlt((*psWin), 4, ypos_precalc + 2);
-		else boxImage.BitBlt((*psWin), 4, ypos_precalc + 2);
+		if (!matrix->hide) this->viewImage.BitBlt((*this->psWin), 4, this->ypos_precalc + 2);
+		else this->boxImage.BitBlt((*this->psWin), 4, this->ypos_precalc + 2);
 
-		if (selected != matrix)
+		if (this->selected != matrix)
 		{
-			psWin->SetBrushColor(212, 208, 200);
-			psWin->SetPenColor(212, 208, 200);;
-			psWin->DrawRectangle(26, ypos_precalc, psWin->iWidth, ypos_precalc + bloc_count_size);
-			if (!close) openImage.BitBlt((*psWin), 27, ypos_precalc + 8);
-			else closeImage.BitBlt((*psWin), 27, ypos_precalc + 5);
-			directoryImage.BitBlt((*psWin), 45, ypos_precalc + 4);
+			this->psWin->SetBrushColor(212, 208, 200);
+			this->psWin->SetPenColor(212, 208, 200);;
+			this->psWin->DrawRectangle(26, this->ypos_precalc, this->psWin->iWidth, this->ypos_precalc + this->bloc_count_size);
+			if (!close) this->openImage.BitBlt((*this->psWin), 27, this->ypos_precalc + 8);
+			else this->closeImage.BitBlt((*this->psWin), 27, this->ypos_precalc + 5);
+			this->directoryImage.BitBlt((*this->psWin), 45, this->ypos_precalc + 4);
 		}
 		else
 		{
-			psWin->SetBrushColor(10, 36, 106);
-			psWin->SetPenColor(10, 36, 106);
-			psWin->DrawRectangle(26, ypos_precalc, psWin->iWidth, ypos_precalc + bloc_count_size);
-			if (!close) openImageB.BitBlt((*psWin), 27, ypos_precalc + 8);
-			else closeImageB.BitBlt((*psWin), 27, ypos_precalc + 5);
-			directoryImageB.BitBlt((*psWin), 45, ypos_precalc + 4);
+			this->psWin->SetBrushColor(10, 36, 106);
+			this->psWin->SetPenColor(10, 36, 106);
+			this->psWin->DrawRectangle(26, this->ypos_precalc, this->psWin->iWidth, this->ypos_precalc + this->bloc_count_size);
+			if (!close) this->openImageB.BitBlt((*this->psWin), 27, this->ypos_precalc + 8);
+			else this->closeImageB.BitBlt((*this->psWin), 27, this->ypos_precalc + 5);
+			this->directoryImageB.BitBlt((*this->psWin), 45, this->ypos_precalc + 4);
 		}
 		//
 		PsRect p;
 		char buffer[1024];
-		sprintf(buffer, "%s %d", GetLabel(LABEL_MATRIX), matNameCount);
-		p.left = 65; p.top = ypos_precalc;
-		p.right = psWin->iWidth; p.bottom = ypos_precalc + bloc_count_size;
+		sprintf(buffer, "%s %d", GetLabel(LABEL_MATRIX), this->matNameCount);
+		p.left = 65; p.top = this->ypos_precalc;
+		p.right = this->psWin->iWidth; p.bottom = this->ypos_precalc + this->bloc_count_size;
 		PsWin::PsFont MyFont = PsWin::PSFONT_NORMAL;
-		if (selected != matrix)
+		if (this->selected != matrix)
 		{
-			psWin->SetTextColor(0, 0, 0);
+			this->psWin->SetTextColor(0, 0, 0);
 		}
 		else
 		{
-			psWin->SetTextColor(255, 255, 255);
+			this->psWin->SetTextColor(255, 255, 255);
 			MyFont = PsWin::PSFONT_BOLD;
 		}
-		psWin->DrawText(buffer, p, MyFont);
+		this->psWin->DrawText(buffer, p, MyFont);
 		//
-		psWin->SetPenColor(255, 255, 255);
-		psWin->MovePenTo(28, ypos_precalc + bloc_count_size);
-		psWin->DrawLineTo(psWin->iWidth, ypos_precalc + bloc_count_size);
+		this->psWin->SetPenColor(255, 255, 255);
+		this->psWin->MovePenTo(28, this->ypos_precalc + this->bloc_count_size);
+		this->psWin->DrawLineTo(this->psWin->iWidth, this->ypos_precalc + this->bloc_count_size);
 	}
-	bloc_count++;
-	matNameCount++;
-	ypos_precalc += bloc_count_size;
+	this->bloc_count++;
+	this->matNameCount++;
+	this->ypos_precalc += this->bloc_count_size;
 }
 
 void PsWinProjectCx::DrawImageBloc(PsImage* image)
 {
-	if (ypos_precalc + item_count_size > 0)
+	if (this->ypos_precalc + this->item_count_size > 0)
 	{
 		int left_space_pixels = 5;
 		if (image->parent) left_space_pixels = 15;
 
-		if (!image->hide) viewImage.BitBlt((*psWin), 4, ypos_precalc + 4);
-		else boxImage.BitBlt((*psWin), 4, ypos_precalc + 4);
+		if (!image->hide) this->viewImage.BitBlt((*this->psWin), 4, this->ypos_precalc + 4);
+		else this->boxImage.BitBlt((*this->psWin), 4, this->ypos_precalc + 4);
 
-		psWin->SetBrushColor(255, 255, 255);
-		psWin->SetPenColor(255, 255, 255);
-		psWin->DrawRectangle(26, ypos_precalc, psWin->iWidth, ypos_precalc + item_count_size);
-		if (selected == image)
+		this->psWin->SetBrushColor(255, 255, 255);
+		this->psWin->SetPenColor(255, 255, 255);
+		this->psWin->DrawRectangle(26, this->ypos_precalc, this->psWin->iWidth, this->ypos_precalc + this->item_count_size);
+		if (this->selected == image)
 		{
-			psWin->SetBrushColor(10, 36, 106);
-			psWin->SetPenColor(10, 36, 106);
-			psWin->DrawRectangle(26, ypos_precalc, psWin->iWidth, ypos_precalc + item_count_size - 1);
+			this->psWin->SetBrushColor(10, 36, 106);
+			this->psWin->SetPenColor(10, 36, 106);
+			this->psWin->DrawRectangle(26, this->ypos_precalc, this->psWin->iWidth, this->ypos_precalc + this->item_count_size - 1);
 		}
 
-		SoftwareBuffer* img = imageList[image->GetAutoGenId()];
-		if (!img) img = loadThumb(&image->GetTexture());
+		SoftwareBuffer* img = this->imageList[image->GetAutoGenId()];
+		if (!img) img = this->loadThumb(&image->GetTexture());
 		assert(img);
 		int w = img->GetWidth();
 		int h = img->GetHeight();
 		int p = (32 - w) / 2 + left_space_pixels + 26;
-		int u = (item_count_size - h) / 2 + ypos_precalc;
-		img->BitBlt((*psWin), p, u);
-		if (selected == image)
+		int u = (this->item_count_size - h) / 2 + this->ypos_precalc;
+		img->BitBlt((*this->psWin), p, u);
+		if (this->selected == image)
 		{
-			psWin->SetPenColor(10, 36, 106);
-			psWin->MovePenTo(p, u);
-			psWin->DrawLineTo(p + w - 1, u);
-			psWin->DrawLineTo(p + w - 1, u + h - 1);
-			psWin->DrawLineTo(p, u + h - 1);
-			psWin->DrawLineTo(p, u);
-			psWin->SetPenColor(255, 255, 255);
-			psWin->MovePenTo(p - 1, u - 1);
-			psWin->DrawLineTo(p + w, u - 1);
-			psWin->DrawLineTo(p + w, u + h);
-			psWin->DrawLineTo(p - 1, u + h);
-			psWin->DrawLineTo(p - 1, u - 1);
+			this->psWin->SetPenColor(10, 36, 106);
+			this->psWin->MovePenTo(p, u);
+			this->psWin->DrawLineTo(p + w - 1, u);
+			this->psWin->DrawLineTo(p + w - 1, u + h - 1);
+			this->psWin->DrawLineTo(p, u + h - 1);
+			this->psWin->DrawLineTo(p, u);
+			this->psWin->SetPenColor(255, 255, 255);
+			this->psWin->MovePenTo(p - 1, u - 1);
+			this->psWin->DrawLineTo(p + w, u - 1);
+			this->psWin->DrawLineTo(p + w, u + h);
+			this->psWin->DrawLineTo(p - 1, u + h);
+			this->psWin->DrawLineTo(p - 1, u - 1);
 		}
 		else
 		{
-			psWin->SetPenColor(0, 0, 0);
-			psWin->MovePenTo(p, u);
-			psWin->DrawLineTo(p + w - 1, u);
-			psWin->DrawLineTo(p + w - 1, u + h - 1);
-			psWin->DrawLineTo(p, u + h - 1);
-			psWin->DrawLineTo(p, u);
+			this->psWin->SetPenColor(0, 0, 0);
+			this->psWin->MovePenTo(p, u);
+			this->psWin->DrawLineTo(p + w - 1, u);
+			this->psWin->DrawLineTo(p + w - 1, u + h - 1);
+			this->psWin->DrawLineTo(p, u + h - 1);
+			this->psWin->DrawLineTo(p, u);
 		}
 
 		PsRect t;
 		char buffer[1024];
-		if (image->parent) sprintf(buffer, "%s %d", GetLabel(LABEL_IMAGE), motifNameCount);
-		else sprintf(buffer, "%s %d", GetLabel(LABEL_IMAGE), imageNameCount);
-		t.left = 65 + left_space_pixels; t.top = ypos_precalc;
-		t.right = psWin->iWidth; t.bottom = ypos_precalc + item_count_size;
+		if (image->parent) sprintf(buffer, "%s %d", GetLabel(LABEL_IMAGE), this->motifNameCount);
+		else sprintf(buffer, "%s %d", GetLabel(LABEL_IMAGE), this->imageNameCount);
+		t.left = 65 + left_space_pixels; t.top = this->ypos_precalc;
+		t.right = this->psWin->iWidth; t.bottom = this->ypos_precalc + this->item_count_size;
 		PsWin::PsFont MyFont = PsWin::PSFONT_NORMAL;
-		if (selected != image)
+		if (this->selected != image)
 		{
-			psWin->SetTextColor(0, 0, 0);
+			this->psWin->SetTextColor(0, 0, 0);
 		}
 		else
 		{
-			psWin->SetTextColor(255, 255, 255);
+			this->psWin->SetTextColor(255, 255, 255);
 			MyFont = PsWin::PSFONT_BOLD;
 		}
-		psWin->DrawText(buffer, t, MyFont);
+		this->psWin->DrawText(buffer, t, MyFont);
 		//
-		if (bDragging && image != selected
-			&& dynamic_cast<PsImage*>(selected)
-			&& draggingPoint.y < ypos_precalc + item_count_size
-			&& draggingPoint.y > ypos_precalc)
+		if (this->bDragging && image != this->selected
+			&& dynamic_cast<PsImage*>(this->selected)
+			&& this->draggingPoint.y < this->ypos_precalc + this->item_count_size
+			&& this->draggingPoint.y > this->ypos_precalc)
 		{
-			DrawInsertionCaret();
-			dragBefore = image;
+			this->DrawInsertionCaret();
+			this->dragBefore = image;
 		}
 	}
-	ypos_precalc += item_count_size;
+	this->ypos_precalc += this->item_count_size;
 }
