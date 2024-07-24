@@ -19,7 +19,7 @@
 #define PS_DLG_EXPORT_CX__
 
 #include "PsHardware.h"
-#include "PsProject.h"
+#include "PsProjectController.h"
 
 class PsDlgExportCx
 {

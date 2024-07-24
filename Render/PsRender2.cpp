@@ -27,7 +27,7 @@
 #include "PsRender.h"
 #include "PsController.h"
 #include "PsTexture.h"
-#include "PsProject.h"
+#include "PsProjectController.h"
 #include "PsSoftRender.h"
 #include "PsHardware.h"
 #include "PsMaths.h"

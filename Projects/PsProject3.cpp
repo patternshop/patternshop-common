@@ -18,7 +18,7 @@
 */
 
 #include <stdio.h>
-#include "PsProject.h"
+#include "PsProjectController.h"
 #include "PsController.h"
 #include "PsAction.h"
 #include "PsMatrix.h"

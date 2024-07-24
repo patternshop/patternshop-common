@@ -16,7 +16,7 @@
 */
 #include "PsMaths.h"
 #include "PsSoftRender.h"
-#include "PsProject.h"
+#include "PsProjectController.h"
 #include "FreeImage.h"
 #include <map>
 

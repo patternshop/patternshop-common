@@ -16,7 +16,7 @@
 */
 #pragma once
 
-#include "PsProject.h"
+#include "PsProjectController.h"
 
 // File format version
 #define MAJOR_VERSION 1

@@ -26,7 +26,7 @@
 # include "PsMacCursor.h"
 #endif
 
-#include "PsProject.h"
+#include "PsProjectController.h"
 #include "PsWinPropertiesCx.h"
 #include "PsWinProject.h"
 #include "PsWinOverview.h"

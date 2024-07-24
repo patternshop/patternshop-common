@@ -15,7 +15,7 @@
  * along with Patternshop.  If not, see <http://www.gnu.org/licenses/>
 */
 
-#include "PsProject.h"
+#include "PsProjectController.h"
 #include "DialogOverviewCx.h"
 
 DialogOverviewCx::DialogOverviewCx(PsWin* psWin) : psWin(psWin)

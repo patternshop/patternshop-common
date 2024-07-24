@@ -16,7 +16,7 @@
 */
 #include "PsTexture.h"
 #include "PsLayer.h"
-#include "PsProject.h"
+#include "PsProjectController.h"
 
 GLfloat Projection[16];
 GLfloat ModelView[16];

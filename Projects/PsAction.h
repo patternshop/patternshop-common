@@ -18,7 +18,7 @@
 
 #include "PsImage.h"
 #include "PsMatrix.h"
-#include "PsProject.h"
+#include "PsProjectController.h"
 
 class	PsAction
 {

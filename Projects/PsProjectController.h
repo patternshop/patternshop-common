@@ -33,6 +33,11 @@ typedef std::list<PsMatrix*>	MatrixList;
 #define ZOOM_COEF        0.02f
 #define LOG_SIZE         50
 
+class	PsProject
+{
+
+};
+
 /*
 ** Cette classe représente un projet, donc principalement une liste de shapes (qui elles-même contiennent
 ** des images), une liste de patrons, et un document qui est symbolisé par la classe PsRender (la seule chose

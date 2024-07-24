@@ -16,7 +16,7 @@
 */
 #pragma once
 
-#include "PsProject.h"
+#include "PsProjectController.h"
 
 /*
 ** This class loads a project.
