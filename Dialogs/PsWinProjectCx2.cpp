@@ -31,21 +31,21 @@ void PsWinProjectCx::OnLeftMouseButtonUp(PsPoint point)
 {
 	PsProject* project = PsController::Instance().project;
 	if (!project) return;
-	if (bDragging)
+	if (this->bDragging)
 	{
-		bDragging = false;
-		if (dynamic_cast<PsImage*>(selected))
+		this->bDragging = false;
+		if (dynamic_cast<PsImage*>(this->selected))
 		{
-			if (dragBefore)
+			if (this->dragBefore)
 			{
-				PsImage* imageSource = (PsImage*)selected;
+				PsImage* imageSource = (PsImage*)this->selected;
 				PsMatrix* matrixSource = (PsMatrix*)imageSource->parent;
-				PsMatrix* matrixDest = (PsMatrix*)dragBefore->parent;
+				PsMatrix* matrixDest = (PsMatrix*)this->dragBefore->parent;
 				if (imageSource)
 				{
 					// > log
-					ImageList::iterator	t;
-					int					j;
+					ImageList::iterator t;
+					int j;
 					if (matrixSource)
 					{
 						for (j = 0, t = matrixSource->images.begin(); t != matrixSource->images.end() && *t != imageSource; ++t)
@@ -67,18 +67,18 @@ void PsWinProjectCx::OnLeftMouseButtonUp(PsPoint point)
 					ImageList* images = &project->images;
 					if (matrixDest) images = &matrixDest->images;
 					ImageList::iterator i = images->begin();
-					bool operation_succesfull = false;
+					bool operation_successful = false;
 					for (; i != images->end(); ++i)
 					{
-						if (*i == dragBefore)
+						if (*i == this->dragBefore)
 						{
 							++i;
 							images->insert(i, imageSource);
-							operation_succesfull = true;
+							operation_successful = true;
 							break;
 						}
 					}
-					if (!operation_succesfull) // Garde fou
+					if (!operation_successful) // Failsafe
 						images->push_back(imageSource);
 					if (imageSource->parent)
 					{
@@ -91,16 +91,16 @@ void PsWinProjectCx::OnLeftMouseButtonUp(PsPoint point)
 					project->SelectImage(imageSource);
 				}
 			}
-			else if (dragLast)
+			else if (this->dragLast)
 			{
-				PsImage* imageSource = (PsImage*)selected;
+				PsImage* imageSource = (PsImage*)this->selected;
 				PsMatrix* matrixSource = (PsMatrix*)imageSource->parent;
-				PsMatrix* matrixDest = (PsMatrix*)dragLast;
+				PsMatrix* matrixDest = (PsMatrix*)this->dragLast;
 				if (imageSource)
 				{
 					// > log
-					ImageList::iterator	t;
-					int					j;
+					ImageList::iterator t;
+					int j;
 					if (matrixSource)
 					{
 						for (j = 0, t = matrixSource->images.begin(); t != matrixSource->images.end() && *t != imageSource; ++t)
@@ -131,15 +131,15 @@ void PsWinProjectCx::OnLeftMouseButtonUp(PsPoint point)
 					project->SelectImage(imageSource);
 				}
 			}
-			else if (dragTopmost)
+			else if (this->dragTopmost)
 			{
-				PsImage* imageSource = (PsImage*)selected;
+				PsImage* imageSource = (PsImage*)this->selected;
 				PsMatrix* matrixSource = (PsMatrix*)imageSource->parent;
 				if (imageSource)
 				{
 					// > log
-					ImageList::iterator	t;
-					int					j;
+					ImageList::iterator t;
+					int j;
 					if (matrixSource)
 					{
 						for (j = 0, t = matrixSource->images.begin(); t != matrixSource->images.end() && *t != imageSource; ++t)
@@ -173,15 +173,15 @@ void PsWinProjectCx::OnLeftMouseButtonUp(PsPoint point)
 		}
 		else
 		{
-			if (dragLast && project)
+			if (this->dragLast && project)
 			{
-				PsMatrix* matrixSource = (PsMatrix*)selected;
-				PsMatrix* matrixDest = (PsMatrix*)dragLast;
+				PsMatrix* matrixSource = (PsMatrix*)this->selected;
+				PsMatrix* matrixDest = (PsMatrix*)this->dragLast;
 				if (matrixSource && matrixDest && matrixSource != matrixDest)
 				{
 					// > log
-					MatrixList::iterator	t;
-					int						j;
+					MatrixList::iterator t;
+					int j;
 					for (j = 0, t = project->matrices.begin(); t != project->matrices.end() && *t != matrixSource; ++t)
 						++j;
 					if (j == project->matrices.size())
@@ -189,73 +189,72 @@ void PsWinProjectCx::OnLeftMouseButtonUp(PsPoint point)
 					// < log
 					project->matrices.remove(matrixSource);
 					MatrixList::iterator i = project->matrices.begin();
-					bool operation_succesfull = false;
+					bool operation_successful = false;
 					for (; i != project->matrices.end(); ++i)
 					{
 						if (*i == matrixDest)
 						{
 							project->matrices.insert(i, matrixSource);
-							operation_succesfull = true;
+							operation_successful = true;
 							break;
 						}
 					}
-					if (!operation_succesfull) // Garde fou
+					if (!operation_successful) // Failsafe
 						project->matrices.push_back(matrixSource);
 					project->LogAdd(new LogSwapMatrix(*project, matrixSource, j));
 				}
 			}
 		}
-		dragLast = NULL;
-		dragBefore = NULL;
-		dragTopmost = false;
-		OnMyMouseMove(point);
-		Update();
+		this->dragLast = NULL;
+		this->dragBefore = NULL;
+		this->dragTopmost = false;
+		this->OnMyMouseMove(point);
+		this->Update();
 		PsController::Instance().UpdateWindow();
 	}
 	//	if (PsController::Instance().active)
 	//		PsController::Instance().active->SetFocus();
 }
 
-
 void PsWinProjectCx::OnMyMouseMove(PsPoint point)
 {
 	//scrollbar->GetClientRect(&s);
-	if (!bDragging)
+	if (!this->bDragging)
 	{
-		if (point.y > 0 && point.x < psWin->iWidth - scrollbar->GetWidth()
-			&& point.y < totalHSize - scrollbar->GetPos())
+		if (point.y > 0 && point.x < this->psWin->iWidth - this->scrollbar->GetWidth()
+			&& point.y < this->totalHSize - this->scrollbar->GetPos())
 		{
-			if (mouseCursor != CURSOR_FINGER)
+			if (this->mouseCursor != CURSOR_FINGER)
 			{
-				mouseCursor = CURSOR_FINGER;
-				UpdateMouseCursor();
+				this->mouseCursor = CURSOR_FINGER;
+				this->UpdateMouseCursor();
 			}
 		}
 		else
 		{
-			if (mouseCursor != CURSOR_DEFAULT)
+			if (this->mouseCursor != CURSOR_DEFAULT)
 			{
-				mouseCursor = CURSOR_DEFAULT;
-				UpdateMouseCursor();
+				this->mouseCursor = CURSOR_DEFAULT;
+				this->UpdateMouseCursor();
 			}
 		}
 	}
 	else
 	{
-		if (abs(fromPoint.y - point.y) > 2)
+		if (abs(this->fromPoint.y - point.y) > 2)
 		{
-			bDrawDragging = true;
-			mouseCursor = CURSOR_SCROLL2;
-			UpdateMouseCursor();
+			this->bDrawDragging = true;
+			this->mouseCursor = CURSOR_SCROLL2;
+			this->UpdateMouseCursor();
 		}
-		draggingPoint = point;
-		Update();
+		this->draggingPoint = point;
+		this->Update();
 	}
 }
 
 SoftwareBuffer* PsWinProjectCx::loadThumb(PsTexture* g)
 {
-	//-- transformation dans le format de manipulation
+	//-- transformation into the manipulation format
 	int bpp;
 	int size_x = g->width, size_y = g->height;
 	uint8* buffer = g->GetBufferUncompressed(bpp);
@@ -263,7 +262,7 @@ SoftwareBuffer* PsWinProjectCx::loadThumb(PsTexture* g)
 	delete[] buffer;
 	//--
 
-	//-- calcul du ratio
+	//-- calculate the ratio
 	int tw = 25, th = 20;
 	double ratio1 = size_x / tw, ratio2 = size_y / th;
 	if (ratio1 < ratio2) ratio1 = ratio2;
@@ -279,20 +278,20 @@ SoftwareBuffer* PsWinProjectCx::loadThumb(PsTexture* g)
 	}
 	//--
 
-	//-- creation de la miniature
+	//-- create the thumbnail
 	FIBITMAP* thumbnail = FreeImage_Rescale(im, tw, th, FILTER_BOX);
 	FreeImage_Unload(im);
 	im = thumbnail;
 	//--
 
-	//-- copie sur fond blanc
+	//-- copy on white background
 	thumbnail = FreeImage_CreateWhiteRGBA(tw, th);
 	FreeImage_BlendPaste(thumbnail, im, 0, 0);
 	FreeImage_Unload(im);
 	im = thumbnail;
 	//--
 
-	//-- transformation en SoftwareBuffer
+	//-- transform into SoftwareBuffer
 	SoftwareBuffer* img = new SoftwareBuffer;
 	img->Create(tw, th, 24);
 	int bytespp = FreeImage_GetLine(im) / FreeImage_GetWidth(im);
@@ -315,7 +314,7 @@ SoftwareBuffer* PsWinProjectCx::loadThumb(PsTexture* g)
 	}
 	//--
 
-	imageList[g->GetAutoGenId()] = img;
+	this->imageList[g->GetAutoGenId()] = img;
 
 	FreeImage_Unload(im);
 
@@ -324,15 +323,14 @@ SoftwareBuffer* PsWinProjectCx::loadThumb(PsTexture* g)
 
 void PsWinProjectCx::relaseThumb(PsTexture* texture)
 {
-	if (imageList.find(texture->GetAutoGenId()) != imageList.end())
+	if (this->imageList.find(texture->GetAutoGenId()) != this->imageList.end())
 	{
-		SoftwareBuffer* img = imageList[texture->GetAutoGenId()];
+		SoftwareBuffer* img = this->imageList[texture->GetAutoGenId()];
 		if (img)
 		{
 			delete img;
-			imageList[texture->GetAutoGenId()] = NULL;
+			this->imageList[texture->GetAutoGenId()] = NULL;
 		}
-		imageList.erase(texture->GetAutoGenId());
+		this->imageList.erase(texture->GetAutoGenId());
 	}
 }
-

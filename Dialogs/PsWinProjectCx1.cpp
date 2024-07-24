@@ -27,92 +27,91 @@
 
 #include <assert.h>
 
-const int	PsWinProjectCx::bloc_count_size = 22;
-const int	PsWinProjectCx::item_count_size = 29;
+const int PsWinProjectCx::bloc_count_size = 22;
+const int PsWinProjectCx::item_count_size = 29;
 
 PsWinProjectCx::PsWinProjectCx(PsWin* psWin) : psWin(psWin)
 {
-	bDragging = false;
-	selected = NULL;
-	dragLast = NULL;
-	dragBefore = NULL;
-	dragTopmost = false;
+	this->bDragging = false;
+	this->selected = NULL;
+	this->dragLast = NULL;
+	this->dragBefore = NULL;
+	this->dragTopmost = false;
 }
 
 PsWinProjectCx::~PsWinProjectCx()
 {
-	std::map<uint32, SoftwareBuffer*>::iterator i = imageList.begin();
-	for (; i != imageList.end(); ++i)
+	std::map<uint32, SoftwareBuffer*>::iterator i = this->imageList.begin();
+	for (; i != this->imageList.end(); ++i)
 	{
 		delete i->second;
 		i->second = 0;
 	}
-	imageList.clear();
-
+	this->imageList.clear();
 }
 
 void PsWinProjectCx::OnLeftMouseButtonDown(PsPoint point)
 {
-	//PsRect k;
-	//scrollbar->GetClientRect(&k);
-	fromPoint = point;
+	// PsRect k;
+	// scrollbar->GetClientRect(&k);
+	this->fromPoint = point;
 	PsProject* project = PsController::Instance().project;
 	if (!project) return;
 	if (project->bPatternsIsSelected)
 		project->bPatternsIsSelected = false;
-	if (point.y > 0 && point.x < psWin->iWidth - scrollbar->GetWidth()
-		&& point.y < totalHSize - scrollbar->GetPos())
+	if (point.y > 0 && point.x < this->psWin->iWidth - this->scrollbar->GetWidth()
+		&& point.y < this->totalHSize - this->scrollbar->GetPos())
 	{
 		if (project)
 		{
-			ypos_precalc = 0 - scrollbar->GetPos();
+			this->ypos_precalc = 0 - this->scrollbar->GetPos();
 			ImageList::reverse_iterator image = project->images.rbegin();
 			for (; image != project->images.rend(); image++)
-				OnLButtonDownIn(point, *image);
+				this->OnLButtonDownIn(point, *image);
 			MatrixList::reverse_iterator matrix = project->matrices.rbegin();
 			for (; matrix != project->matrices.rend(); matrix++)
 			{
-				if (point.y > ypos_precalc &&
-					point.y < ypos_precalc + bloc_count_size)
+				if (point.y > this->ypos_precalc &&
+					point.y < this->ypos_precalc + this->bloc_count_size)
 				{
 					if (point.x > 42)
 					{
 						project->SelectMatrix(*matrix);
-						bDrawDragging = false;
-						bDragging = true;
-						dragBefore = NULL;
+						this->bDrawDragging = false;
+						this->bDragging = true;
+						this->dragBefore = NULL;
 						PsController::Instance().UpdateWindow();
 					}
 					else if (point.x > 25)
 					{
-						if (!openCloseMap[*matrix]) openCloseMap[*matrix] = OPEN;
-						if (openCloseMap[*matrix] == OPEN) openCloseMap[*matrix] = CLOSE;
-						else openCloseMap[*matrix] = OPEN;
-						Update();
+						if (!this->openCloseMap[*matrix]) this->openCloseMap[*matrix] = OPEN;
+						if (this->openCloseMap[*matrix] == OPEN) this->openCloseMap[*matrix] = CLOSE;
+						else this->openCloseMap[*matrix] = OPEN;
+						this->Update();
 					}
 					else
 					{
 						if ((*matrix)->hide) (*matrix)->hide = false;
 						else (*matrix)->hide = true;
-						Update();
+						this->Update();
 						PsController::Instance().UpdateWindow();
 					}
 					return;
 				}
-				ypos_precalc += bloc_count_size;
-				if (openCloseMap[*matrix] != CLOSE)
+				this->ypos_precalc += this->bloc_count_size;
+				if (this->openCloseMap[*matrix] != CLOSE)
 				{
 					ImageList::reverse_iterator image = (*matrix)->images.rbegin();
 					for (; image != (*matrix)->images.rend(); image++)
-						OnLButtonDownIn(point, *image);
+						this->OnLButtonDownIn(point, *image);
 				}
 			}
 
-			// patron
+			// pattern
 			if (project->pattern)
 			{
-				if (point.y > ypos_precalc &&
-					point.y < ypos_precalc + bloc_count_size)
+				if (point.y > this->ypos_precalc &&
+					point.y < this->ypos_precalc + this->bloc_count_size)
 				{
 					PsPattern* pattern = project->pattern;
 					if (point.x < 25)
@@ -123,7 +122,7 @@ void PsWinProjectCx::OnLeftMouseButtonDown(PsPoint point)
 					else
 					{
 						/*
-						SoftwareBuffer* img = imageList[pattern->GetAutoGenId()];
+						SoftwareBuffer* img = this->imageList[pattern->GetAutoGenId()];
 						if (!img)
 						img = loadThumb(&pattern->texture);
 						int p = (32 - img->GetWidth()) / 2 + 26 + img->GetWidth() + 5;
@@ -140,19 +139,19 @@ void PsWinProjectCx::OnLeftMouseButtonDown(PsPoint point)
 						/*else
 						{
 						project->bPatternsIsSelected = true;
-						selected = NULL;
+						this->selected = NULL;
 						if (PsController::Instance().active)
 						PsController::Instance().UpdateWindow();
 						}*/
 					}
-					Update();
+					this->Update();
 					PsController::Instance().UpdateWindow();
 				}
-				ypos_precalc += item_count_size;
+				this->ypos_precalc += this->item_count_size;
 			}
 
-			// couleur de fond
-			if (point.y > ypos_precalc && point.y < ypos_precalc + bloc_count_size)
+			// background color
+			if (point.y > this->ypos_precalc && point.y < this->ypos_precalc + this->bloc_count_size)
 			{
 				if (point.x < 25)
 				{
@@ -170,38 +169,37 @@ void PsWinProjectCx::OnLeftMouseButtonDown(PsPoint point)
 						project->iColor[2] = dlg.GetColorBValue();
 					}
 				}
-				Update();
+				this->Update();
 				PsController::Instance().UpdateWindow();
 			}
-
 		}
 	}
 }
 
 void PsWinProjectCx::OnLButtonDownIn(PsPoint point, PsImage* image)
 {
-	if (point.y > ypos_precalc &&
-		point.y < ypos_precalc + item_count_size)
+	if (point.y > this->ypos_precalc &&
+		point.y < this->ypos_precalc + this->item_count_size)
 	{
 		if (point.x > 25)
 		{
 			PsProject* project = PsController::Instance().project;
 			project->SelectImage(image);
-			bDrawDragging = false;
-			bDragging = true;
-			dragBefore = NULL;
-			Update();
+			this->bDrawDragging = false;
+			this->bDragging = true;
+			this->dragBefore = NULL;
+			this->Update();
 			PsController::Instance().UpdateWindow();
-			OnMyMouseMove(point);
+			this->OnMyMouseMove(point);
 			return;
 		}
 		else
 		{
 			if (image->hide) image->hide = false;
 			else image->hide = true;
-			Update();
+			this->Update();
 			PsController::Instance().UpdateWindow();
 		}
 	}
-	ypos_precalc += item_count_size;
+	this->ypos_precalc += this->item_count_size;
 }
