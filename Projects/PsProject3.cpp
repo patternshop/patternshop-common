@@ -26,287 +26,276 @@
 #include "PsSoftRender.h"
 #include "PsWinPropertiesCx.h"
 
+extern PsWinPropertiesCx* dlgPropreties;
+
 /*
-** Déclanche l'affichage du projet dans le contexte actif, en utilisant un rendu
-** hardware(donc OpenGL).
+** Triggers the display of the project in the active context, using hardware rendering (thus OpenGL).
 */
-void	PsProject::RenderToScreen()
+void PsProject::RenderToScreen()
 {
-	int	x;
-	int	y;
+    int x;
+    int y;
 
-	if (center)
-	{
-		renderer.CenterView();
-		center = false;
-	}
+    if (this->center)
+    {
+        this->renderer.CenterView();
+        this->center = false;
+    }
 
-	renderer.GetSize(x, y);
-	renderer.SetEngine(PsRender::ENGINE_HARDWARE);
-	renderer.Render(*this, x, y);
+    this->renderer.GetSize(x, y);
+    this->renderer.SetEngine(PsRender::ENGINE_HARDWARE);
+    this->renderer.Render(*this, x, y);
 
 #ifdef _WINDOWS
-	int m_glErrorCode = glGetError();
-	if (m_glErrorCode != GL_NO_ERROR)
-	{
-		const GLubyte* estring;
-		CString mexstr;
-		estring = gluErrorString(m_glErrorCode);
-		mexstr.Format("RenderToScreen:\n\tAn OpenGL error occurred: %s\n", estring);
-		AfxMessageBox(mexstr, MB_OK | MB_ICONEXCLAMATION);
-		TRACE0(mexstr);
-	}
+    int m_glErrorCode = glGetError();
+    if (m_glErrorCode != GL_NO_ERROR)
+    {
+        const GLubyte* estring;
+        CString mexstr;
+        estring = gluErrorString(m_glErrorCode);
+        mexstr.Format("RenderToScreen:\n\tAn OpenGL error occurred: %s\n", estring);
+        AfxMessageBox(mexstr, MB_OK | MB_ICONEXCLAMATION);
+        TRACE0(mexstr);
+    }
 #endif /* _WINDOWS */
 }
 
 /*
-** Déclanche le rendu dans un fichier
+** Triggers rendering to a file
 */
-bool	PsProject::RenderToFile(const char* filename, int x, int y)
+bool PsProject::RenderToFile(const char* filename, int x, int y)
 {
-	PsController::Instance().SetProgress(-1);
+    PsController::Instance().SetProgress(-1);
 
-	renderer.SetZone((float)GetWidth(), (float)GetHeight());
+    this->renderer.SetZone((float)this->GetWidth(), (float)this->GetHeight());
 
-	InitSoftwareFile(x, y);
+    InitSoftwareFile(x, y);
 
-	PsController::Instance().SetProgress(5);
+    PsController::Instance().SetProgress(5);
 
-	renderer.SetEngine(PsRender::ENGINE_SOFTWARE);
-	renderer.Render(*this, x, y);
-	renderer.Recalc();
+    this->renderer.SetEngine(PsRender::ENGINE_SOFTWARE);
+    this->renderer.Render(*this, x, y);
+    this->renderer.Recalc();
 
-	PsController::Instance().SetProgress(90);
+    PsController::Instance().SetProgress(90);
 
-	flushSoftwareFile(filename, bHideColor);
+    flushSoftwareFile(filename, this->bHideColor);
 
-	PsController::Instance().SetProgress(-2);
+    PsController::Instance().SetProgress(-2);
 
-	return true;
+    return true;
 }
 
 /*
-** Sélectionne une image dans le projet(et la matrice qui la contient).
+** Selects an image in the project (and the matrix that contains it).
 */
-void	PsProject::SelectImage(PsImage* image)
+void PsProject::SelectImage(PsImage* image)
 {
-	this->matrix = image ? image->GetParent() : 0;
-	this->image = image;
-	this->shape = image;
+    this->matrix = image ? image->GetParent() : 0;
+    this->image = image;
+    this->shape = image;
 
-	PsController::Instance().UpdateWindow();
-	PsController::Instance().UpdateDialogProject();
+    PsController::Instance().UpdateWindow();
+    PsController::Instance().UpdateDialogProject();
 
-	if (dlgPropreties)
-	{
-		//dlgPropreties->FocusImageInformation();
-		dlgPropreties->UpdateInformation(this);
-	}
+    if (dlgPropreties)
+    {
+        //dlgPropreties->FocusImageInformation();
+        dlgPropreties->UpdateInformation(this);
+    }
 }
 
 /*
-** Sélectionne une matrice dans le projet.
+** Selects a matrix in the project.
 */
-void	PsProject::SelectMatrix(PsMatrix* matrix)
+void PsProject::SelectMatrix(PsMatrix* matrix)
 {
-	this->matrix = matrix;
-	this->image = 0;
-	this->shape = matrix;
+    this->matrix = matrix;
+    this->image = 0;
+    this->shape = matrix;
 
-	PsController::Instance().UpdateWindow();
-	PsController::Instance().UpdateDialogProject();
+    PsController::Instance().UpdateWindow();
+    PsController::Instance().UpdateDialogProject();
 
-	if (dlgPropreties)
-	{
-		//dlgPropreties->FocusMatrixInformation();
-		dlgPropreties->UpdateInformation(this);
-	}
+    if (dlgPropreties)
+    {
+        //dlgPropreties->FocusMatrixInformation();
+        dlgPropreties->UpdateInformation(this);
+    }
 }
 
 /*
-** Déplacement de l'outil "loupe"(magnify).
+** Movement of the "magnify" tool.
 */
-void		PsProject::ToolMagnifyDrag(int y, int old_x, int old_y)
+void PsProject::ToolMagnifyDrag(int y, int old_x, int old_y)
 {
-	float	zoom = prev_zoom + (y - old_y) * ZOOM_COEF;
+    float zoom = this->prev_zoom + (y - old_y) * ZOOM_COEF;
 
-	if (y > old_y)
-		PsController::Instance().SetCursor(CURSOR_MAGNIFY2);
-	else
-		PsController::Instance().SetCursor(CURSOR_MAGNIFY3);
+    if (y > old_y)
+        PsController::Instance().SetCursor(CURSOR_MAGNIFY2);
+    else
+        PsController::Instance().SetCursor(CURSOR_MAGNIFY3);
 
-	/* static float fx, fy, ox, oy;
-	if (prev_zoom == renderer.zoom)
-	{
-		renderer.Convert(old_x, old_y, fx, fy);
-		ox = renderer.scroll_x;
-		oy = renderer.scroll_y;
-	} */
+    /* static float fx, fy, ox, oy;
+    if (prev_zoom == renderer.zoom)
+    {
+        renderer.Convert(old_x, old_y, fx, fy);
+        ox = renderer.scroll_x;
+        oy = renderer.scroll_y;
+    } */
 
-	renderer.SetZoom(zoom);
+    this->renderer.SetZoom(zoom);
 
-	PsController::Instance().UpdateWindow();
-	PsController::Instance().UpdateDialogOverview();
+    PsController::Instance().UpdateWindow();
+    PsController::Instance().UpdateDialogOverview();
 }
 
 /*
-** Initialisation de l'outil "loupe".
+** Initialization of the "magnify" tool.
 */
-PsController::Tool	PsProject::ToolMagnifyStart()
+PsController::Tool PsProject::ToolMagnifyStart()
 {
-	prev_zoom = renderer.zoom;
+    this->prev_zoom = this->renderer.zoom;
 
-	return PsController::TOOL_MAGNIFY_ZOOM;
+    return PsController::TOOL_MAGNIFY_ZOOM;
 }
 
 /*
-** Déplacement de l'outil "Modify"(qui a besoin de savoir dans quel mode il est, pour
-** connaitre l'operation à effectuer parmis déplacement, rotation, redimentionnement...)
+** Movement of the "Modify" tool (which needs to know in which mode it is, to know the operation to perform among movement, rotation, resizing...)
 */
-void		PsProject::ToolModifyMove(int x, int y, int old_x, int old_y, PsController::Tool tool)
+void PsProject::ToolModifyMove(int x, int y, int old_x, int old_y, PsController::Tool tool)
 {
-	float	fx;
-	float	fy;
-	float	sx;
-	float	sy;
-	float	tx;
-	float	ty;
-	bool	constrain = PsController::Instance().GetOption(PsController::OPTION_CONSTRAIN);
-	bool	reflect = PsController::Instance().GetOption(PsController::OPTION_REFLECT);
+    float fx;
+    float fy;
+    float sx;
+    float sy;
+    float tx;
+    float ty;
+    bool constrain = PsController::Instance().GetOption(PsController::OPTION_CONSTRAIN);
+    bool reflect = PsController::Instance().GetOption(PsController::OPTION_REFLECT);
 
+    this->renderer.Convert(x, y, fx, fy);
+    this->renderer.Convert(old_x, old_y, sx, sy);
 
-	renderer.Convert(x, y, fx, fy);
-	renderer.Convert(old_x, old_y, sx, sy);
+    if (this->bPatternsIsSelected && !this->pattern->hide)
+    {
+        PsLayer* layer = this->pattern->aLayers[this->iLayerId];
 
-	if (bPatternsIsSelected && !pattern->hide)
-	{
-		PsLayer* layer = pattern->aLayers[iLayerId];
+        switch (tool)
+        {
+        case PsController::TOOL_MODIFY_ROTATE:
+        {
+            if (this->LogMustAdd())
+                this->LogAdd(new LogPatternRotate(*this));
 
-		switch (tool)
-		{
-		case PsController::TOOL_MODIFY_ROTATE:
-		{
-			if (this->LogMustAdd())
-				this->LogAdd(new LogPatternRotate(*this));
+            PsController::Instance().SetCursor((PsCursor)(CURSOR_ROTATE1 + (int)((layer->ToAngle(fx, fy) + PS_MATH_PI / 2) * 2 / PS_MATH_PI) % 4));
+            layer->rRotation.Yaw = this->prev_r + PsRotator::ToDegree(-(layer->ToAngle(fx, fy) - layer->ToAngle(sx, sy)));
+            break;
+        }
 
-			PsController::Instance().SetCursor((PsCursor)(CURSOR_ROTATE1 + (int)((layer->ToAngle(fx, fy) + PS_MATH_PI / 2) * 2 / PS_MATH_PI) % 4));
-			layer->rRotation.Yaw = prev_r + PsRotator::ToDegree(-(layer->ToAngle(fx, fy) - layer->ToAngle(sx, sy)));
-			break;
-		}
+        case PsController::TOOL_MODIFY_MOVE:
+        {
+            if (this->LogMustAdd())
+                this->LogAdd(new LogPatternTranslate(*this));
 
-		case PsController::TOOL_MODIFY_MOVE:
-		{
-			if (this->LogMustAdd())
-				this->LogAdd(new LogPatternTranslate(*this));
+            PsVector vTranslation(fx - sx, fy - sy, 0.f);
 
-			PsVector vTranslation(fx - sx, fy - sy, 0.f);
+            PsLayer* layer = this->pattern->aLayers[this->iLayerId];
 
-			PsLayer* layer = pattern->aLayers[iLayerId];
+            PsVector vEye = this->renderer.GetEyeLocation();
 
-			PsVector vEye = renderer.GetEyeLocation();
+            float fDistance = (this->prev_origin - vEye).Size();
+            float fDistanceZ0 = (this->prev_origin_z0 - vEye).Size();
 
-			float fDistance = (prev_origin - vEye).Size();
-			float fDistanceZ0 = (prev_origin_z0 - vEye).Size();
+            vTranslation = vTranslation * (fDistance / fDistanceZ0);
 
-			vTranslation = vTranslation * (fDistance / fDistanceZ0);
+            layer->vTranslation.X = this->prev_x + vTranslation.X;
+            layer->vTranslation.Y = this->prev_y + vTranslation.Y;
 
-			layer->vTranslation.X = prev_x + vTranslation.X;
-			layer->vTranslation.Y = prev_y + vTranslation.Y;
+            break;
+        }
 
-			break;
-		}
+        case PsController::TOOL_MODIFY_SIZE:
+        {
+            // FIXME : LOG !!
 
-		case PsController::TOOL_MODIFY_SIZE:
-		{
-			// FIXME : LOG !!
+            tx = (fx - sx) * cos(-this->shape->GetAngle()) - (fy - sy) * sin(-this->shape->GetAngle());
+            ty = (fx - sx) * sin(-this->shape->GetAngle()) + (fy - sy) * cos(-this->shape->GetAngle());
 
-			tx = (fx - sx) * cos(-shape->GetAngle()) - (fy - sy) * sin(-shape->GetAngle());
-			ty = (fx - sx) * sin(-shape->GetAngle()) + (fy - sy) * cos(-shape->GetAngle());
+            break;
+        }
 
-			/*
-				if (init_corner == 0)
-				layer->SetSize(prev_w - tx, prev_h - ty, -SHAPE_SIZE, -SHAPE_SIZE, prev_w, prev_h, constrain, reflect);
-			else if (init_corner == 1)
-				layer->SetSize(prev_w + tx, prev_h - ty, SHAPE_SIZE, -SHAPE_SIZE, prev_w, prev_h, constrain, reflect);
-			else if (init_corner == 2)
-				layer->SetSize(prev_w - tx, prev_h + ty, -SHAPE_SIZE, SHAPE_SIZE, prev_w, prev_h, constrain, reflect);
-			else
-				layer->SetSize(prev_w + tx, prev_h + ty, SHAPE_SIZE, SHAPE_SIZE, prev_w, prev_h, constrain, reflect);
-			*/
-			break;
-		}
+        }
+    }
+    else
+    {
 
-		}
-	}
-	else
-	{
+        if (!this->shape || this->shape->hide)
+            return;
 
-		if (!shape || shape->hide)
-			return;
+        switch (tool)
+        {
+        case PsController::TOOL_MODIFY_MOVE:
+        {
+            if (this->LogMustAdd())
+                this->LogAdd(new LogMove(*this, this->shape, this->prev_x, this->prev_y));
 
-		switch (tool)
-		{
-		case PsController::TOOL_MODIFY_MOVE:
-		{
-			if (this->LogMustAdd())
-				this->LogAdd(new LogMove(*this, shape, prev_x, prev_y));
+            this->shape->SetPosition(this->prev_x + fx - sx, this->prev_y + fy - sy, constrain);
+            break;
+        }
 
-			shape->SetPosition(prev_x + fx - sx, prev_y + fy - sy, constrain);
-			break;
-		}
+        case PsController::TOOL_MODIFY_ROTATE:
+        {
+            if (this->LogMustAdd())
+                this->LogAdd(new LogRotate(*this, this->shape, this->prev_r, reflect));
 
-		case PsController::TOOL_MODIFY_ROTATE:
-		{
-			if (this->LogMustAdd())
-				this->LogAdd(new LogRotate(*this, shape, prev_r, reflect));
+            PsController::Instance().SetCursor((PsCursor)(CURSOR_ROTATE1 + (int)((this->shape->ToAngle(fx, fy) + PS_MATH_PI / 2) * 2 / PS_MATH_PI) % 4));
 
-			PsController::Instance().SetCursor((PsCursor)(CURSOR_ROTATE1 + (int)((shape->ToAngle(fx, fy) + PS_MATH_PI / 2) * 2 / PS_MATH_PI) % 4));
+            this->shape->SetAngle(this->prev_r + this->shape->ToAngle(fx, fy) - this->shape->ToAngle(sx, sy), constrain, reflect);
+            break;
+        }
 
-			shape->SetAngle(prev_r + shape->ToAngle(fx, fy) - shape->ToAngle(sx, sy), constrain, reflect);
-			break;
-		}
+        case PsController::TOOL_MODIFY_SIZE:
+        {
+            if (this->LogMustAdd())
+                this->LogAdd(new LogResize(*this, this->shape, this->prev_x, this->prev_y, this->prev_w, this->prev_h, reflect));
 
-		case PsController::TOOL_MODIFY_SIZE:
-		{
-			if (this->LogMustAdd())
-				this->LogAdd(new LogResize(*this, shape, prev_x, prev_y, prev_w, prev_h, reflect));
+            tx = (fx - sx) * cos(-this->shape->GetAngle()) - (fy - sy) * sin(-this->shape->GetAngle());
+            ty = (fx - sx) * sin(-this->shape->GetAngle()) + (fy - sy) * cos(-this->shape->GetAngle());
 
-			tx = (fx - sx) * cos(-shape->GetAngle()) - (fy - sy) * sin(-shape->GetAngle());
-			ty = (fx - sx) * sin(-shape->GetAngle()) + (fy - sy) * cos(-shape->GetAngle());
+            if (this->init_corner == 0)
+                this->shape->SetSize(this->prev_w - tx, this->prev_h - ty, -SHAPE_SIZE, -SHAPE_SIZE, this->prev_w, this->prev_h, constrain, reflect);
+            else if (this->init_corner == 1)
+                this->shape->SetSize(this->prev_w + tx, this->prev_h - ty, SHAPE_SIZE, -SHAPE_SIZE, this->prev_w, this->prev_h, constrain, reflect);
+            else if (this->init_corner == 2)
+                this->shape->SetSize(this->prev_w - tx, this->prev_h + ty, -SHAPE_SIZE, SHAPE_SIZE, this->prev_w, this->prev_h, constrain, reflect);
+            else
+                this->shape->SetSize(this->prev_w + tx, this->prev_h + ty, SHAPE_SIZE, SHAPE_SIZE, this->prev_w, this->prev_h, constrain, reflect);
+            break;
+        }
 
-			if (init_corner == 0)
-				shape->SetSize(prev_w - tx, prev_h - ty, -SHAPE_SIZE, -SHAPE_SIZE, prev_w, prev_h, constrain, reflect);
-			else if (init_corner == 1)
-				shape->SetSize(prev_w + tx, prev_h - ty, SHAPE_SIZE, -SHAPE_SIZE, prev_w, prev_h, constrain, reflect);
-			else if (init_corner == 2)
-				shape->SetSize(prev_w - tx, prev_h + ty, -SHAPE_SIZE, SHAPE_SIZE, prev_w, prev_h, constrain, reflect);
-			else
-				shape->SetSize(prev_w + tx, prev_h + ty, SHAPE_SIZE, SHAPE_SIZE, prev_w, prev_h, constrain, reflect);
-			break;
-		}
+        case PsController::TOOL_MODIFY_TORSIO:
+        {
+            if (this->LogMustAdd())
+                this->LogAdd(new LogTorsio(*this, this->shape, this->prev_i, this->prev_j));
 
-		case PsController::TOOL_MODIFY_TORSIO:
-		{
-			if (this->LogMustAdd())
-				this->LogAdd(new LogTorsio(*this, shape, prev_i, prev_j));
+            tx = fx - sx;
+            ty = fy - sy;
 
-			tx = fx - sx;
-			ty = fy - sy;
+            if (this->init_corner == 0)
+                this->shape->SetTorsion(this->prev_i - tx * cos(this->shape->GetAngle()) - ty * sin(this->shape->GetAngle()), this->prev_j, constrain);
+            else if (this->init_corner == 1)
+                this->shape->SetTorsion(this->prev_i, this->prev_j - tx * sin(this->shape->GetAngle()) + ty * cos(this->shape->GetAngle()), constrain);
+            else if (this->init_corner == 2)
+                this->shape->SetTorsion(this->prev_i + tx * cos(this->shape->GetAngle()) + ty * sin(this->shape->GetAngle()), this->prev_j, constrain);
+            else
+                this->shape->SetTorsion(this->prev_i, this->prev_j + tx * sin(this->shape->GetAngle()) - ty * cos(this->shape->GetAngle()), constrain);
+            break;
+        }
+        }
+    }
 
-			if (init_corner == 0)
-				shape->SetTorsion(prev_i - tx * cos(shape->GetAngle()) - ty * sin(shape->GetAngle()), prev_j, constrain);
-			else if (init_corner == 1)
-				shape->SetTorsion(prev_i, prev_j - tx * sin(shape->GetAngle()) + ty * cos(shape->GetAngle()), constrain);
-			else if (init_corner == 2)
-				shape->SetTorsion(prev_i + tx * cos(shape->GetAngle()) + ty * sin(shape->GetAngle()), prev_j, constrain);
-			else
-				shape->SetTorsion(prev_i, prev_j + tx * sin(shape->GetAngle()) - ty * cos(shape->GetAngle()), constrain);
-			break;
-		}
-		}
-	}
-
-	PsController::Instance().UpdateWindow();
-	if (dlgPropreties)
-		dlgPropreties->UpdateInformation(this);
+    PsController::Instance().UpdateWindow();
+    if (dlgPropreties)
+        dlgPropreties->UpdateInformation(this);
 }
