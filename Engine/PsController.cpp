@@ -34,9 +34,9 @@
 PsController* PsController::instance = 0;
 
 /*
-** Constructeur
-** Initialement, aucune fenêtre ni aucun projet actif (active = 0, project = 0), l'outil de base
-** est l'outil de modification.
+** Constructor
+** Initially, no window or active project (active = 0, project = 0), the default tool
+** is the modification tool.
 */
 PsController::PsController() :
 #ifdef _WINDOWS
@@ -46,33 +46,33 @@ PsController::PsController() :
 	project(0)
 {
 #ifndef _MACOSX
-	cursor[CURSOR_DEFAULT] = AfxGetApp()->LoadCursor(IDC_DEFAULT);
-	cursor[CURSOR_MAGNIFY1] = AfxGetApp()->LoadCursor(IDC_MAGNIFY1);
-	cursor[CURSOR_MAGNIFY2] = AfxGetApp()->LoadCursor(IDC_MAGNIFY2);
-	cursor[CURSOR_MAGNIFY3] = AfxGetApp()->LoadCursor(IDC_MAGNIFY3);
-	cursor[CURSOR_MOVE] = AfxGetApp()->LoadCursor(IDC_MOVE);
-	cursor[CURSOR_ROTATE1] = AfxGetApp()->LoadCursor(IDC_ROTATE1);
-	cursor[CURSOR_ROTATE2] = AfxGetApp()->LoadCursor(IDC_ROTATE2);
-	cursor[CURSOR_ROTATE3] = AfxGetApp()->LoadCursor(IDC_ROTATE3);
-	cursor[CURSOR_ROTATE4] = AfxGetApp()->LoadCursor(IDC_ROTATE4);
-	cursor[CURSOR_SCROLL1] = AfxGetApp()->LoadCursor(IDC_HAND1);
-	cursor[CURSOR_SCROLL2] = AfxGetApp()->LoadCursor(IDC_HAND2);
-	cursor[CURSOR_SIZE1] = AfxGetApp()->LoadCursor(IDC_SIZE2);
-	cursor[CURSOR_SIZE2] = AfxGetApp()->LoadCursor(IDC_SIZE1);
-	cursor[CURSOR_TORSIO1] = AfxGetApp()->LoadCursor(IDC_HAND1);
-	cursor[CURSOR_TORSIO2] = AfxGetApp()->LoadCursor(IDC_HAND2);
+	this->cursor[CURSOR_DEFAULT] = AfxGetApp()->LoadCursor(IDC_DEFAULT);
+	this->cursor[CURSOR_MAGNIFY1] = AfxGetApp()->LoadCursor(IDC_MAGNIFY1);
+	this->cursor[CURSOR_MAGNIFY2] = AfxGetApp()->LoadCursor(IDC_MAGNIFY2);
+	this->cursor[CURSOR_MAGNIFY3] = AfxGetApp()->LoadCursor(IDC_MAGNIFY3);
+	this->cursor[CURSOR_MOVE] = AfxGetApp()->LoadCursor(IDC_MOVE);
+	this->cursor[CURSOR_ROTATE1] = AfxGetApp()->LoadCursor(IDC_ROTATE1);
+	this->cursor[CURSOR_ROTATE2] = AfxGetApp()->LoadCursor(IDC_ROTATE2);
+	this->cursor[CURSOR_ROTATE3] = AfxGetApp()->LoadCursor(IDC_ROTATE3);
+	this->cursor[CURSOR_ROTATE4] = AfxGetApp()->LoadCursor(IDC_ROTATE4);
+	this->cursor[CURSOR_SCROLL1] = AfxGetApp()->LoadCursor(IDC_HAND1);
+	this->cursor[CURSOR_SCROLL2] = AfxGetApp()->LoadCursor(IDC_HAND2);
+	this->cursor[CURSOR_SIZE1] = AfxGetApp()->LoadCursor(IDC_SIZE2);
+	this->cursor[CURSOR_SIZE2] = AfxGetApp()->LoadCursor(IDC_SIZE1);
+	this->cursor[CURSOR_TORSIO1] = AfxGetApp()->LoadCursor(IDC_HAND1);
+	this->cursor[CURSOR_TORSIO2] = AfxGetApp()->LoadCursor(IDC_HAND2);
 #endif
 
-	option[OPTION_AUTOMATIC] = true;
-	//	option[OPTION_BOX_MOVE] = true;
-	option[OPTION_BOX_SHOW] = true;
-	option[OPTION_CONSTRAIN] = false;
-	option[OPTION_DOCUMENT_BLEND] = true;
-	option[OPTION_DOCUMENT_SHOW] = true;
-	option[OPTION_HIGHLIGHT_SHOW] = true;
-	option[OPTION_REFLECT] = false;
+	this->option[OPTION_AUTOMATIC] = true;
+	//	this->option[OPTION_BOX_MOVE] = true;
+	this->option[OPTION_BOX_SHOW] = true;
+	this->option[OPTION_CONSTRAIN] = false;
+	this->option[OPTION_DOCUMENT_BLEND] = true;
+	this->option[OPTION_DOCUMENT_SHOW] = true;
+	this->option[OPTION_HIGHLIGHT_SHOW] = true;
+	this->option[OPTION_REFLECT] = false;
 
-	bMouseButtonIsDown = false;
+	this->bMouseButtonIsDown = false;
 }
 
 PsController::~PsController()
@@ -87,7 +87,7 @@ PsController& PsController::Instance()
 	return *instance;
 }
 
-void	PsController::Delete()
+void PsController::Delete()
 {
 	if (instance)
 	{
@@ -98,8 +98,8 @@ void	PsController::Delete()
 
 void PsController::UpdateWindow()
 {
-	if (active)
-		active->Update();
+	if (this->active)
+		this->active->Update();
 }
 
 void PsController::UpdateDialogProject()
@@ -120,112 +120,112 @@ void PsController::UpdateDialogOverview(bool bQuick)
 
 
 /*
-** Récupere l'état d'une option; dans certains cas, l'outil actif prévaut sur l'option(par exemple
-** on ne voit pas le cadre bleu ni les boites de selection quand on zoome ou qu'on scrolle le projet)
-** Le booleen "real_state", à false par défaut, récupere l'état de l'option sans prendre en compte
-** l'outil.
+** Retrieves the state of an option; in some cases, the active tool prevails over the option (for example,
+** you do not see the blue frame or the selection boxes when zooming or scrolling the project)
+** The boolean "real_state", false by default, retrieves the state of the option without taking into account
+** the tool.
 */
-bool	PsController::GetOption(Option index, bool real_state) const
+bool PsController::GetOption(Option index, bool real_state) const
 {
 	if (!real_state)
 		switch (index)
 		{
 		case OPTION_BOX_SHOW:
 		case OPTION_HIGHLIGHT_SHOW:
-			if (tool != TOOL_MAGNIFY_ZOOM && tool != TOOL_SCROLL_DRAG)
-				return option[index];
+			if (this->tool != TOOL_MAGNIFY_ZOOM && this->tool != TOOL_SCROLL_DRAG)
+				return this->option[index];
 			//else
-				//return !option[OPTION_BOX_MOVE];
+				//return !this->option[OPTION_BOX_MOVE];
 		}
 
-	return option[index];
+	return this->option[index];
 }
 
 /*
-** L'utilisateur a cliqué avec le bouton gauche(num = 0) ou droit(num = 1)
-** à la position x, y sur la fenêtre du projet.
+** The user clicked with the left button (num = 0) or right button (num = 1)
+** at position x, y on the project window.
 */
-void	PsController::MouseClick(int num, int x, int y)
+void PsController::MouseClick(int num, int x, int y)
 {
-	if (!project)
+	if (!this->project)
 		return;
 
-	bMouseButtonIsDown = true;
+	this->bMouseButtonIsDown = true;
 
-	project->LogInit();
-	prev_x = x;
-	prev_y = y;
+	this->project->LogInit();
+	this->prev_x = x;
+	this->prev_y = y;
 
-	switch (tool)
+	switch (this->tool)
 	{
 	case TOOL_MAGNIFY:
 		if (num == 0)
-			tool = project->ToolMagnifyStart();
+			this->tool = this->project->ToolMagnifyStart();
 		break;
 
 	case TOOL_MODIFY:
 		if (num == 0)
-			tool = project->ToolModifyScan(x, y, true);
+			this->tool = this->project->ToolModifyScan(x, y, true);
 		break;
 
 	case TOOL_SCROLL:
 		if (num == 0)
 		{
-			SetCursor(CURSOR_SCROLL2);
-			tool = project->ToolScrollStart();
+			this->SetCursor(CURSOR_SCROLL2);
+			this->tool = this->project->ToolScrollStart();
 		}
 		break;
 	}
 }
 
 /*
-** L'utilisateur déplace la souris à la position x, y sur la fenêtre du projet.
+** The user moves the mouse to position x, y on the project window.
 */
-void	PsController::MouseMove(int x, int y)
+void PsController::MouseMove(int x, int y)
 {
-	if (!project)
+	if (!this->project)
 		return;
 
-	switch (tool)
+	switch (this->tool)
 	{
 	case TOOL_MAGNIFY_ZOOM:
-		project->ToolMagnifyDrag(y, prev_x, prev_y);
+		this->project->ToolMagnifyDrag(y, this->prev_x, this->prev_y);
 		break;
 
 	case TOOL_MODIFY:
-		project->ToolModifyScan(x, y, false);
+		this->project->ToolModifyScan(x, y, false);
 		break;
 
 	case TOOL_MODIFY_MOVE:
 	case TOOL_MODIFY_ROTATE:
 	case TOOL_MODIFY_SIZE:
 	case TOOL_MODIFY_TORSIO:
-		project->ToolModifyMove(x, y, prev_x, prev_y, tool);
+		this->project->ToolModifyMove(x, y, this->prev_x, this->prev_y, this->tool);
 		break;
 
 	case TOOL_SCROLL_DRAG:
-		project->ToolScrollDrag(x, y, prev_x, prev_y);
+		this->project->ToolScrollDrag(x, y, this->prev_x, this->prev_y);
 		break;
 	}
 }
 
 /*
-** L'utilisateur relâche un bouton de la souris(voir paramètres de MouseClick).
+** The user releases a mouse button (see MouseClick parameters).
 */
-void	PsController::MouseRelease(int num, int x, int y)
+void PsController::MouseRelease(int num, int x, int y)
 {
-	if (!project)
+	if (!this->project)
 		return;
 
-	bMouseButtonIsDown = false;
+	this->bMouseButtonIsDown = false;
 
-	switch (tool)
+	switch (this->tool)
 	{
 	case TOOL_MAGNIFY_ZOOM:
 		if (num == 0)
 		{
-			SetCursor(CURSOR_MAGNIFY1);
-			tool = TOOL_MAGNIFY;
+			this->SetCursor(CURSOR_MAGNIFY1);
+			this->tool = TOOL_MAGNIFY;
 		}
 		break;
 
@@ -234,23 +234,23 @@ void	PsController::MouseRelease(int num, int x, int y)
 	case TOOL_MODIFY_SIZE:
 	case TOOL_MODIFY_TORSIO:
 		if (num == 0)
-			tool = TOOL_MODIFY;
+			this->tool = TOOL_MODIFY;
 		break;
 
 	case TOOL_SCROLL_DRAG:
 		if (num == 0)
 		{
-			SetCursor(CURSOR_SCROLL1);
-			tool = TOOL_SCROLL;
+			this->SetCursor(CURSOR_SCROLL1);
+			this->tool = TOOL_SCROLL;
 		}
 		break;
 	}
 }
 
 #ifdef _WINDOWS
-void	PsController::SetActive(CPatternshopView* view)
+void PsController::SetActive(CPatternshopView* view)
 {
-	if (view != this->active || view && view->project != project)
+	if (view != this->active || view && view->project != this->project)
 	{
 		if (view)
 		{
@@ -263,48 +263,48 @@ void	PsController::SetActive(CPatternshopView* view)
 			this->project = NULL;
 		}
 		dlgPropreties->FocusMatrixInformation();
-		UpdateDialogProject();
-		UpdateDialogOverview(false);
+		this->UpdateDialogProject();
+		this->UpdateDialogOverview(false);
 	}
 }
 #else /* _MACOSX */
-void	PsController::SetActive(PsProject* p)
+void PsController::SetActive(PsProject* p)
 {
 	this->project = p;
 	PsWinProject::Instance().Update();
-	if (dlgPropreties)
+	if (this->dlgPropreties)
 	{
-		dlgPropreties->UpdateInformation(NULL);
-		//dlgPropreties->FocusMatrixInformation();
+		this->dlgPropreties->UpdateInformation(NULL);
+		//this->dlgPropreties->FocusMatrixInformation();
 	}
 }
 #endif
 
 /*
-** Change le curseur courant.
+** Change the current cursor.
 */
-void	PsController::SetCursor(PsCursor num)
+void PsController::SetCursor(PsCursor num)
 {
 #ifdef _WINDOWS
-	if (active)
-		active->SetMouseCursor(cursor[num]);
+	if (this->active)
+		this->active->SetMouseCursor(this->cursor[num]);
 #else /* _MACOSX */
 	SetMacCursor(num);
 #endif
 }
 
 /*
-** Active ou désactive une option.
+** Enable or disable an option.
 */
-void	PsController::SetOption(Option index, bool value)
+void PsController::SetOption(Option index, bool value)
 {
-	option[index] = value;
+	this->option[index] = value;
 }
 
 /*
-** Change l'indicateur de progression
+** Change the progress indicator
 */
-void	PsController::SetProgress(int pos)
+void PsController::SetProgress(int pos)
 {
 #ifdef _WINDOWS
 	CMainFrame* main = (CMainFrame*)theApp.GetMainWnd();
@@ -314,34 +314,34 @@ void	PsController::SetProgress(int pos)
 }
 
 /*
-** Change l'outil courant.
+** Change the current tool.
 */
-void	PsController::SetTool(Tool tool)
+void PsController::SetTool(Tool tool)
 {
 
 	switch (tool)
 	{
 	case TOOL_MAGNIFY:
-		SetCursor(CURSOR_MAGNIFY1);
+		this->SetCursor(CURSOR_MAGNIFY1);
 		break;
 
 	case TOOL_MODIFY:
-		SetCursor(CURSOR_DEFAULT);
+		this->SetCursor(CURSOR_DEFAULT);
 		break;
 
 	case TOOL_SCROLL:
-		SetCursor(CURSOR_SCROLL1);
+		this->SetCursor(CURSOR_SCROLL1);
 		break;
 	}
 
 #ifdef _WINDOWS
-	if (active)
-		active->Update();
+	if (this->active)
+		this->active->Update();
 #endif /* _WINDOWS */
 
-	prev_tool = this->tool;
+	this->prev_tool = this->tool;
 	this->tool = tool;
 
 	if (this->tool == TOOL_MODIFY)
-		prev_tool = TOOL_MODIFY;
+		this->prev_tool = TOOL_MODIFY;
 }
