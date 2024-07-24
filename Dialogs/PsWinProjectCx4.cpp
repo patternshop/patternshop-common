@@ -31,112 +31,111 @@ void PsWinProjectCx::GenericUpdate()
 {
 	PsProject* project = PsController::Instance().project;
 
-	if (!project) scrollbar->Disable();
+	if (!project) this->scrollbar->Disable();
 
-	psWin->SetPenColor(212, 208, 200);;
-	psWin->SetBrushColor(212, 208, 200);
-	psWin->DrawRectangle(0, 0, psWin->iWidth, psWin->iHeight);
+	this->psWin->SetPenColor(212, 208, 200);
+	this->psWin->SetBrushColor(212, 208, 200);
+	this->psWin->DrawRectangle(0, 0, this->psWin->iWidth, this->psWin->iHeight);
 	if (project)
 	{
-		if (project->matrix && project->matrix != selected && !project->image)
-			selected = project->matrix;
-		if (project->image && project->image != selected)
-			selected = project->image;
-		ypos_precalc = 0 - scrollbar->GetPos();
-		bloc_count = 0;
-		item_count = 0;
-		if (bDragging)
+		if (project->matrix && project->matrix != this->selected && !project->image)
+			this->selected = project->matrix;
+		if (project->image && project->image != this->selected)
+			this->selected = project->image;
+		this->ypos_precalc = 0 - this->scrollbar->GetPos();
+		this->bloc_count = 0;
+		this->item_count = 0;
+		if (this->bDragging)
 		{
-			dragBefore = NULL;
-			dragLast = NULL;
-			dragTopmost = false;
+			this->dragBefore = NULL;
+			this->dragLast = NULL;
+			this->dragTopmost = false;
 		}
-		imageNameCount = 1; // FIXME
+		this->imageNameCount = 1; // FIXME
 		ImageList::reverse_iterator image = project->images.rbegin();
 		for (; image != project->images.rend(); image++)
 		{
-			DrawImageBloc(*image);
-			imageNameCount++;
-			item_count++;
+			this->DrawImageBloc(*image);
+			this->imageNameCount++;
+			this->item_count++;
 		}
-		matNameCount = 1; // FIXME
+		this->matNameCount = 1; // FIXME
 		MatrixList::reverse_iterator matrix = project->matrices.rbegin();
 		for (; matrix != project->matrices.rend(); matrix++)
 		{
-			DrawMatrixBloc(*matrix);
-			if (openCloseMap[*matrix] != CLOSE)
+			this->DrawMatrixBloc(*matrix);
+			if (this->openCloseMap[*matrix] != CLOSE)
 			{
-				motifNameCount = 1; // FIXME
+				this->motifNameCount = 1; // FIXME
 				ImageList::reverse_iterator image = (*matrix)->images.rbegin();
 				for (; image != (*matrix)->images.rend();)
 				{
-					DrawImageBloc(*image);
+					this->DrawImageBloc(*image);
 					image++;
 					if (image != (*matrix)->images.rend())
 					{
-						psWin->SetDashBlackPen();
-						psWin->MovePenTo(26 + 15, ypos_precalc - 1);
-						psWin->DrawLineTo(psWin->iWidth, ypos_precalc - 1);
+						this->psWin->SetDashBlackPen();
+						this->psWin->MovePenTo(26 + 15, this->ypos_precalc - 1);
+						this->psWin->DrawLineTo(this->psWin->iWidth, this->ypos_precalc - 1);
 					}
-					item_count++;
-					motifNameCount++;
+					this->item_count++;
+					this->motifNameCount++;
 				}
 			}
-			if (bDragging && !dragBefore// && selected != *matrix
-				&& draggingPoint.y < ypos_precalc + bloc_count_size
-				&& draggingPoint.y > ypos_precalc)
+			if (this->bDragging && !this->dragBefore
+				&& this->draggingPoint.y < this->ypos_precalc + this->bloc_count_size
+				&& this->draggingPoint.y > this->ypos_precalc)
 			{
-				DrawInsertionCaret();
-				dragLast = *matrix;
+				this->DrawInsertionCaret();
+				this->dragLast = *matrix;
 			}
 		}
-		int swap = ypos_precalc;
-		ypos_precalc = -scrollbar->GetPos();
-		if (bDragging && dynamic_cast<PsImage*>(selected)
-			&& draggingPoint.y < ypos_precalc + item_count_size
-			&& draggingPoint.y > ypos_precalc)
+		int swap = this->ypos_precalc;
+		this->ypos_precalc = -this->scrollbar->GetPos();
+		if (this->bDragging && dynamic_cast<PsImage*>(this->selected)
+			&& this->draggingPoint.y < this->ypos_precalc + this->item_count_size
+			&& this->draggingPoint.y > this->ypos_precalc)
 		{
-			DrawInsertionCaret();
-			dragTopmost = true;
+			this->DrawInsertionCaret();
+			this->dragTopmost = true;
 		}
-		ypos_precalc = swap;
+		this->ypos_precalc = swap;
 
-		DrawBackgroundBloc();
-		psWin->SetPenColor(0, 0, 0);
-		psWin->MovePenTo(0, 0);
-		psWin->DrawLineTo(psWin->iWidth, 0);
-		psWin->MovePenTo(0, ypos_precalc);
-		psWin->DrawLineTo(psWin->iWidth, ypos_precalc);
-		psWin->MovePenTo(25, 0);
-		psWin->DrawLineTo(25, ypos_precalc);
+		this->DrawBackgroundBloc();
+		this->psWin->SetPenColor(0, 0, 0);
+		this->psWin->MovePenTo(0, 0);
+		this->psWin->DrawLineTo(this->psWin->iWidth, 0);
+		this->psWin->MovePenTo(0, this->ypos_precalc);
+		this->psWin->DrawLineTo(this->psWin->iWidth, this->ypos_precalc);
+		this->psWin->MovePenTo(25, 0);
+		this->psWin->DrawLineTo(25, this->ypos_precalc);
 
-		totalHSize = (item_count + 1) * item_count_size + bloc_count * bloc_count_size;
-		if (project->pattern) totalHSize += item_count_size;
+		this->totalHSize = (this->item_count + 1) * this->item_count_size + this->bloc_count * this->bloc_count_size;
+		if (project->pattern) this->totalHSize += this->item_count_size;
 
-		if (totalHSize - (int)psWin->iHeight > 0)
+		if (this->totalHSize - (int)this->psWin->iHeight > 0)
 		{
-			scrollbar->Enable();
-			scrollbar->SetSize(totalHSize - psWin->iHeight);
+			this->scrollbar->Enable();
+			this->scrollbar->SetSize(this->totalHSize - this->psWin->iHeight);
 		}
-		else scrollbar->Disable();
+		else this->scrollbar->Disable();
 
 	}
-	if (bDragging && bDrawDragging)
+	if (this->bDragging && this->bDrawDragging)
 	{
 		PsRect m;
 		m.left = 0;
-		m.right = psWin->iWidth - s.right - 1;
-		m.top = draggingPoint.y - item_count_size / 2;
-		m.bottom = draggingPoint.y + item_count_size / 2;
+		m.right = this->psWin->iWidth - this->s.right - 1;
+		m.top = this->draggingPoint.y - this->item_count_size / 2;
+		m.bottom = this->draggingPoint.y + this->item_count_size / 2;
 		if (m.top < 0) m.top = 0;
 		if (m.bottom < 0) m.bottom = 0;
-		psWin->SetDashBlackPen();
-		psWin->MovePenTo(m.left, m.top);
-		psWin->DrawLineTo(m.right, m.top);
-		psWin->DrawLineTo(m.right, m.bottom);
-		psWin->DrawLineTo(m.left, m.bottom);
-		psWin->DrawLineTo(m.left, m.top);
+		this->psWin->SetDashBlackPen();
+		this->psWin->MovePenTo(m.left, m.top);
+		this->psWin->DrawLineTo(m.right, m.top);
+		this->psWin->DrawLineTo(m.right, m.bottom);
+		this->psWin->DrawLineTo(m.left, m.bottom);
+		this->psWin->DrawLineTo(m.left, m.top);
 	}
 
 }
-
