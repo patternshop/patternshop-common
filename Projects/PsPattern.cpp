@@ -19,7 +19,7 @@
 #include "tiffio.h"
 #include "FreeImage.h"
 
-float	PsPattern::minimumAlpha = 240;
+float PsPattern::minimumAlpha = 240;
 
 PsPattern::PsPattern()
 {
@@ -28,40 +28,40 @@ PsPattern::PsPattern()
 	 color[1] = -1;
 	 color[2] = -1;
 	 */
-	hide = false;
-	light_power = 0.0f;
-	light_range = 1.0f;
-	y_map_texture_id = 0;
-	y_map_texture_data = 0;
+	this->hide = false;
+	this->light_power = 0.0f;
+	this->light_range = 1.0f;
+	this->y_map_texture_id = 0;
+	this->y_map_texture_data = 0;
 }
 
 PsPattern::~PsPattern()
 {
-	if (y_map_texture_id)
+	if (this->y_map_texture_id)
 	{
-		glDeleteTextures(1, &y_map_texture_id);
-		y_map_texture_id = 0;
+		glDeleteTextures(1, &this->y_map_texture_id);
+		this->y_map_texture_id = 0;
 	}
-	if (y_map_texture_data)
+	if (this->y_map_texture_data)
 	{
-		delete[] y_map_texture_data;
-		y_map_texture_data = 0;
+		delete[] this->y_map_texture_data;
+		this->y_map_texture_data = 0;
 	}
-	for (int i = 0; i < aLayers.size(); ++i)
+	for (int i = 0; i < this->aLayers.size(); ++i)
 	{
-		delete aLayers[i];
-		aLayers[i] = 0;
+		delete this->aLayers[i];
+		this->aLayers[i] = 0;
 	}
-	aLayers.clear();
+	this->aLayers.clear();
 }
 
 /**
- * Charge le contenu du patron depuis un fichier.
+ * Load the pattern content from a file.
 */
-ErrID	PsPattern::FileLoad(FILE* file)
+ErrID PsPattern::FileLoad(FILE* file)
 {
 	uint8* buffer;
-	size_t	size;
+	size_t size;
 
 	if (fread(&size, sizeof(size), 1, file) != 1)
 		return ERROR_FILE_READ;
@@ -71,16 +71,16 @@ ErrID	PsPattern::FileLoad(FILE* file)
 	if (fread(buffer, sizeof(*buffer), size, file) != size)
 		return ERROR_FILE_READ;
 
-	if (fread(&hide, sizeof(hide), 1, file) != 1)
+	if (fread(&this->hide, sizeof(this->hide), 1, file) != 1)
 		return ERROR_FILE_READ;
 
-	if (fread(&light_power, sizeof(light_power), 1, file) != 1)
+	if (fread(&this->light_power, sizeof(this->light_power), 1, file) != 1)
 		return ERROR_FILE_READ;
 
-	if (fread(&light_range, sizeof(light_range), 1, file) != 1)
+	if (fread(&this->light_range, sizeof(this->light_range), 1, file) != 1)
 		return ERROR_FILE_READ;
 
-	if (!TextureFromBuffer(buffer))
+	if (!this->TextureFromBuffer(buffer))
 		return ERROR_FILE_READ;
 
 	size_t iLayerCount;
@@ -95,20 +95,20 @@ ErrID	PsPattern::FileLoad(FILE* file)
 			delete layer;
 			return ERROR_FILE_WRITE;
 		}
-		aLayers.push_back(layer);
+		this->aLayers.push_back(layer);
 	}
 	return ERROR_NONE;
 }
 
 /**
- * Charge le contenu d'un patron dans un fichier.
+ * Save the pattern content to a file.
 */
-ErrID	PsPattern::FileSave(FILE* file) const
+ErrID PsPattern::FileSave(FILE* file) const
 {
 	uint8* buffer;
-	size_t			size;
+	size_t size;
 
-	if (!(buffer = texture.GetBuffer(size)))
+	if (!(buffer = this->texture.GetBuffer(size)))
 		return ERROR_FILE_WRITE;
 
 	if (fwrite(&size, sizeof(size), 1, file) != 1)
@@ -117,28 +117,28 @@ ErrID	PsPattern::FileSave(FILE* file) const
 	if (fwrite(buffer, sizeof(*buffer), size, file) != size)
 		return ERROR_FILE_WRITE;
 
-	if (fwrite(&hide, sizeof(hide), 1, file) != 1)
+	if (fwrite(&this->hide, sizeof(this->hide), 1, file) != 1)
 		return ERROR_FILE_WRITE;
 
-	if (fwrite(&light_power, sizeof(light_power), 1, file) != 1)
+	if (fwrite(&this->light_power, sizeof(this->light_power), 1, file) != 1)
 		return ERROR_FILE_WRITE;
 
-	if (fwrite(&light_range, sizeof(light_range), 1, file) != 1)
+	if (fwrite(&this->light_range, sizeof(this->light_range), 1, file) != 1)
 		return ERROR_FILE_WRITE;
 
-	size = aLayers.size();
+	size = this->aLayers.size();
 	if (fwrite(&size, sizeof(size_t), 1, file) != 1)
 		return ERROR_FILE_WRITE;
 
-	for (int i = 0; i < aLayers.size(); ++i)
-		if (aLayers[i]->FileSave(file) != ERROR_NONE)
+	for (int i = 0; i < this->aLayers.size(); ++i)
+		if (this->aLayers[i]->FileSave(file) != ERROR_NONE)
 			return ERROR_FILE_WRITE;
 
 	return ERROR_NONE;
 }
 
 /**
- * Récupere le nom de ce patron (voir PsShape::GetName)
+ * Get the name of this pattern (see PsShape::GetName)
 */
 const std::string& PsPattern::GetName() const
 {
@@ -146,33 +146,23 @@ const std::string& PsPattern::GetName() const
 }
 
 /**
- * Change le nom de ce patron (voir PsShape::SetName)
+ * Set the name of this pattern (see PsShape::SetName)
 */
-void	PsPattern::SetName(const std::string& name)
+void PsPattern::SetName(const std::string& name)
 {
 	this->name = name;
 }
 
 /**
- * Défini si une couleur a été attribuée
+ * Load a texture from a buffer (should be used when loading from a file).
 */
-/*
- bool  PsPattern::ColorIsSet()
- {
-	 return color[0] != -1 &&  color[1] != -1 &&  color[2] != -1;
- }
- */
-
- /**
-  * Charge une texture depuis un buffer (doit être utilisé lors du chargement d'un fichier).
- */
-bool	PsPattern::TextureFromBuffer(uint8* buffer)
+bool PsPattern::TextureFromBuffer(uint8* buffer)
 {
-	texture.LoadFromBuffer(buffer);
-	ComputeLightMap();
+	this->texture.LoadFromBuffer(buffer);
+	this->ComputeLightMap();
 	//  if (ColorIsSet())
 	//	  SetRGB(color[0], color[1], color[2]);
-	SetLinearLight(light_power, light_range);
+	this->SetLinearLight(this->light_power, this->light_range);
 	return true;
 }
 
@@ -184,11 +174,10 @@ void BufferFlipVertical(uint8* buffer, int width, int height, int bpp)
 }
 
 /**
- * Charge une texture depuis un fichier.
+ * Load a texture from a file.
 */
-bool	PsPattern::TextureFromFile(const char* file)
+bool PsPattern::TextureFromFile(const char* file)
 {
-
 	TIFF* image;
 	uint16 photo, bps, spp;
 	uint32 width, height;
@@ -255,7 +244,7 @@ bool	PsPattern::TextureFromFile(const char* file)
 	if (spp < 4)
 		return false;
 
-	//-- Extraction de la couche RGBA
+	//-- Extraction of the RGBA layer
 	int bufferl = width * height;
 	uint8* point = buffer;
 	uint8* rgba_buffer = new uint8[width * height * 4];
@@ -273,7 +262,7 @@ bool	PsPattern::TextureFromFile(const char* file)
 		rgba_point[2] = point[2];
 #endif
 
-		//-- selection de l'alpha
+		//-- selection of the alpha
 		int alpha = -1;
 		for (int ia = 0; ia < spp - 3; ia++)
 			if (alpha == -1 || alpha < *(point + 3 + ia))
@@ -287,14 +276,14 @@ bool	PsPattern::TextureFromFile(const char* file)
 	BufferFlipVertical(rgba_buffer, width, height, 4);
 	//--
 
-	//-- Extraction de chaque couche supplémentaire  
+	//-- Extraction of each additional layer  
 	for (int cn = 0; cn < spp - 3; cn++)
 	{
 		PsLayer* layer = new PsLayer;
 
-		//-- extraction de la couche
+		//-- extraction of the layer
 		uint8* point = buffer;
-		uint8* channel = new uint8[width * height];
+		uint8* channel = new uint8[bufferl];
 		for (int ii = 0; ii < bufferl; ++ii)
 		{
 			channel[ii] = *(point + 3 + cn);
@@ -303,41 +292,41 @@ bool	PsPattern::TextureFromFile(const char* file)
 		//--
 
 		layer->Register(width, height, channel);
-		aLayers.push_back(layer);
+		this->aLayers.push_back(layer);
 	}
 	//--
 
-	if (!texture.RegisterAndSave(width, height, 4, rgba_buffer))
+	if (!this->texture.RegisterAndSave(width, height, 4, rgba_buffer))
 		return false;
 
-	ComputeLightMap();
+	this->ComputeLightMap();
 
 	return true;
 }
 
 int PsPattern::GetChannelsCount()
 {
-	return aLayers.size();
+	return this->aLayers.size();
 }
 
 /*
-** Transforme la texture pour OpenGL, en la redimentionnant à la puissance de 2 la plus proche, mais avec une
-** taille maximum. La taille de l'image originale est width*height, elle est en mode "bpp * 8" (i.e : indiquer
-** 3 pour 24 bpp, 4 pour 32 bpp), et "pixels" est le tableau des pixels qui la composent.
+** Transform the texture for OpenGL, resizing it to the nearest power of 2, but with a maximum size.
+** The original image size is width*height, it is in "bpp * 8" mode (i.e: specify 3 for 24 bpp, 4 for 32 bpp),
+** and "pixels" is the array of pixels that compose it.
 */
 bool PsPattern::RegisterLightMap(int width, int height, uint8* pixels)
 {
 	uint8* buffer;
-	int				color[2];
-	int				h;
-	int				i;
-	int				j;
-	int				n;
-	int				w;
-	int				x;
-	int				y;
-	int				bpp = 2;
-	int				max_resol = 512;
+	int color[2];
+	int h;
+	int i;
+	int j;
+	int n;
+	int w;
+	int x;
+	int y;
+	int bpp = 2;
+	int max_resol = 512;
 
 	for (h = 1; h < height && h < max_resol; )
 		h <<= 1;
@@ -373,8 +362,8 @@ bool PsPattern::RegisterLightMap(int width, int height, uint8* pixels)
 		}
 	}
 
-	glGenTextures(1, &y_map_texture_id);
-	glBindTexture(GL_TEXTURE_2D, y_map_texture_id);
+	glGenTextures(1, &this->y_map_texture_id);
+	glBindTexture(GL_TEXTURE_2D, this->y_map_texture_id);
 
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE_ALPHA, w, h, 0, GL_LUMINANCE_ALPHA, GL_UNSIGNED_BYTE, buffer);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -385,30 +374,30 @@ bool PsPattern::RegisterLightMap(int width, int height, uint8* pixels)
 	return true;
 }
 
-void	PsPattern::ComputeLightMap()
+void PsPattern::ComputeLightMap()
 {
 	int bpp = 0;
 	float Y_average = 0;
 	uint32 total = 0;
 
-	if (y_map_texture_data) delete y_map_texture_data;
-	y_map_texture_data = new uint8[texture.height * texture.width * 2];
+	if (this->y_map_texture_data) delete this->y_map_texture_data;
+	this->y_map_texture_data = new uint8[this->texture.height * this->texture.width * 2];
 
-	uint8* data = texture.GetBufferUncompressed(bpp);
+	uint8* data = this->texture.GetBufferUncompressed(bpp);
 	uint8* pixels = data;
-	uint8* ypixels = y_map_texture_data;
-	for (uint32 i = 0; i < texture.width * texture.height; ++i)
+	uint8* ypixels = this->y_map_texture_data;
+	for (uint32 i = 0; i < this->texture.width * this->texture.height; ++i)
 	{
-		ypixels[0] = 0; // on met du noir
-		if (pixels[3] < minimumAlpha)
+		ypixels[0] = 0; // set to black
+		if (pixels[3] < this->minimumAlpha)
 		{
-			ypixels[1] = 0; // alpha nul sur le pixel -> pas de traitement
+			ypixels[1] = 0; // zero alpha on the pixel -> no processing
 		}
 		else
 		{
 			float Y = 0.299f * (pixels[0] / 255.f) + 0.587f * (pixels[1] / 255.f) + 0.114f * (pixels[2] / 255.f);
 			Y = (Y > 1.f) ? 1.f : ((Y < 0.f) ? 0.f : Y);
-			ypixels[1] = (1.f - Y) * 255; // enregistrement de la luminance inversée dans la couche apha
+			ypixels[1] = (1.f - Y) * 255; // save the inverted luminance in the alpha layer
 			Y_average += Y;
 			total++;
 		}
@@ -417,163 +406,67 @@ void	PsPattern::ComputeLightMap()
 	}
 
 	Y_average /= (float)total;
-	for (uint32 i = 0; i < texture.width * texture.height * 2; i += 2)
+	for (uint32 i = 0; i < this->texture.width * this->texture.height * 2; i += 2)
 	{
-		ypixels = y_map_texture_data + i;
+		ypixels = this->y_map_texture_data + i;
 		if (ypixels[1] != 0)
 		{
-			float Y = ((float)(255 - ypixels[1]) / 255.f) - Y_average; // centrage sur la moyenne
-			if (Y < 0) // si eclaircissement
+			float Y = ((float)(255 - ypixels[1]) / 255.f) - Y_average; // centering on the average
+			if (Y < 0) // if brightening
 			{
-				ypixels[0] = 255; // on met du blanc
-				Y = -Y; // on inverse l'alpha
+				ypixels[0] = 255; // set to white
+				Y = -Y; // invert the alpha
 			}
 			Y = (Y > 1.f) ? 1.f : ((Y < 0.f) ? 0.f : Y);
 			ypixels[1] = Y * 255;
 		}
 	}
 
-	RegisterLightMap(texture.width, texture.height, y_map_texture_data);
+	this->RegisterLightMap(this->texture.width, this->texture.height, this->y_map_texture_data);
 	delete data;
 	data = 0;
 }
 
-/*
- void	PsPattern::SetRGB(uint8 R, uint8 G, uint8 B, PsPattern::MixType m)
- {
-	 int bpp = 0;
-	 int pline = 0;
-	 uint8 *data = texture.GetBufferUncompressed(bpp);
-	 uint8 *pixels = data;
-
-	 color[0] = R;
-	 color[1] = G;
-	 color[2] = B;
-	 for (uint32 j = 0; j < (uint32)texture.height; ++j)
-	 {
-		 for (uint32 i = 0; i < (uint32)texture.width; ++i)
-		 {
-			 if (!(bpp == 4) || pixels[3] > minimumAlpha)
-			 {
-				 pixels[0] = B;
-				 pixels[1] = G;
-				 pixels[2] = R;
-			 }
-			 pixels += bpp;
-		 }
-	 }
-	 texture.Register (texture.width, texture.height, bpp, data, false);
-	 delete data;
-	 data = 0;
- }
- */
-
- /*
-  void	PsPattern::SetYUV(float Y, float U, float V, PsPattern::MixType m)
-  {
-	  int bpp = 0;
-	  int pline = 0;
-	  float Y_prev = 0.f;
-	  float y_start = 0.f;
-	  if (m == Y_LIGHTER) y_start = y_first - Y_max;
-	  else y_start = y_first - (float)y_average;
-	  bool first_pixel = true;
-	  uint8 *pixels = 0;
-	  std::vector<float>::iterator y_var = y_map.begin();
-	  uint8 *data = texture.GetBufferUncompressed(bpp);
-	  for (uint32 j = 0; j < (uint32)texture.height; ++j)
-	  {
-		  pline = j * texture.width * bpp;
-		  for (uint32 i = 0; i < (uint32)texture.width; ++i)
-		  {
-			  pixels = data + pline + i * bpp;
-			  if (!(bpp == 4) || pixels[3] > minimumAlpha)
-			  {
-				  float Y_res = 0.f;
-				  if (first_pixel)
-				  {
-					  Y_res = Y + y_start;
-					  first_pixel = false;
-				  }
-				  else
-				  {
-					  Y_res = Y_prev + *y_var;
-					  y_var++;
-				  }
-				  Y_prev = Y_res;
-				  Y_res = (Y_res>1.f)?1.f:((Y_res<0.f)?0.f:Y_res);
-				  float r = (Y_res - 0.000039457070707f * V + 1.139827967171717f * U) * 255.f;
-				  float g = (Y_res - 0.394610164141414f * V - 0.580500315656566f * U) * 255.f;
-				  float b = (Y_res + 2.031999684343434f * V - 0.000481376262626f * U) * 255.f;
-				  pixels[0] = (uint8)((r>255)?255:((r<0)?0:r));
-				  pixels[1] = (uint8)((g>255)?255:((g<0)?0:g));
-				  pixels[2] = (uint8)((b>255)?255:((b<0)?0:b));
-			  }
-		  }
-	  }
-	  texture.Register(texture.width, texture.height, bpp, data, false);
-	  if (tweaked_data)
-		  delete tweaked_data;
-	  tweaked_data = data;
-  }
-  */
-
-void	PsPattern::SetLinearLight(float linear_power, float linear_range)
+void PsPattern::SetLinearLight(float linear_power, float linear_range)
 {
 	return;
 	int bpp = 4;
 	int pline = 0;
 	float linear_crop = (1.f - linear_range) / 2;
 	float linear_light = 0.f;
-	float linear_step = linear_power / texture.height;
+	float linear_step = linear_power / this->texture.height;
 	uint8* pixels = 0;
-	uint8* data = new uint8[texture.width * texture.height * bpp];
-	memcpy(data, y_map_texture_data, texture.width * texture.height * bpp);
-	for (uint32 j = 0; j < (uint32)texture.height; ++j)
+	uint8* data = new uint8[this->texture.width * this->texture.height * bpp];
+	memcpy(data, this->y_map_texture_data, this->texture.width * this->texture.height * bpp);
+	for (uint32 j = 0; j < (uint32)this->texture.height; ++j)
 	{
-		pline = j * texture.width * bpp;
-		if (j > texture.height * linear_crop
-			&& j < texture.height * (1.f - linear_crop))
+		pline = j * this->texture.width * bpp;
+		if (j > this->texture.height * linear_crop
+			&& j < this->texture.height * (1.f - linear_crop))
 			linear_light += linear_step;
-		for (uint32 i = 0; i < (uint32)texture.width; ++i)
+		for (uint32 i = 0; i < (uint32)this->texture.width; ++i)
 		{
 			pixels = data + pline + i * bpp;
-			if (!(bpp == 4) || pixels[3] > minimumAlpha)
-			{
-				/*float Y = 0.299f * (pixels[0] / 255.f) + 0.587f * (pixels[1] / 255.f) + 0.114f * (pixels[2] / 255.f);
-				Y = (Y>1.f)?1.f:((Y<0.f)?0.f:Y);
-				float V = 0.492f * (pixels[2] / 255.f - Y);
-				float U = 0.877f * (pixels[0] / 255.f - Y);
-				Y += linear_light;*/
-				//if (Y > Y_max) Y = Y_max;
-				/*Y = (Y>1.f)?1.f:((Y<0.f)?0.f:Y);
-				float r = (Y - 0.000039457070707f * V + 1.139827967171717f * U) * 255.f;
-				float g = (Y - 0.394610164141414f * V - 0.580500315656566f * U) * 255.f;
-				float b = (Y + 2.031999684343434f * V - 0.000481376262626f * U) * 255.f;
-				pixels[0] = (uint8)((r>255)?255:((r<0)?0:r));
-				pixels[1] = (uint8)((g>255)?255:((g<0)?0:g));
-				pixels[2] = (uint8)((b>255)?255:((b<0)?0:b));*/
-			}
 		}
 	}
-	texture.Register(texture.width, texture.height, bpp, data);
-	light_power = linear_power;
-	light_range = linear_range;
+	this->texture.Register(this->texture.width, this->texture.height, bpp, data);
+	this->light_power = linear_power;
+	this->light_range = linear_range;
 	delete[] data;
 }
 
 int PsPattern::GetWidth()
 {
-	return texture.width;
+	return this->texture.width;
 }
 
 int PsPattern::GetHeight()
 {
-	return texture.height;
+	return this->texture.height;
 }
 
 void PsPattern::UpdateScale(int iDstWidth, int iDstHeight)
 {
-	fScaleWidth = (float)iDstWidth / (float)GetWidth();
-	fScaleHeight = (float)iDstHeight / (float)GetHeight();
+	this->fScaleWidth = (float)iDstWidth / (float)this->GetWidth();
+	this->fScaleHeight = (float)iDstHeight / (float)this->GetHeight();
 }
