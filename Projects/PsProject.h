@@ -40,6 +40,8 @@ typedef std::list<PsMatrix*>	MatrixList;
 #define MINOR_VERSION 0
 #define CANDIDATE_VERSION 2
 
+#define PROJECT_VERSION_OLD_BETA 3213654 // 111222333
+
 //--------------------------AUTO--------------------------
 
 #define PROJECT_VERSION    (MAJOR_VERSION * 1000000 + MINOR_VERSION * 1000 + CANDIDATE_VERSION)
