@@ -31,6 +31,30 @@ class	PsMatrix;
 typedef std::list<PsAction*>	LogList;
 typedef std::list<PsMatrix*>	MatrixList;
 
+// Project parameters
+#define ZOOM_COEF        0.02f
+#define LOG_SIZE         50
+
+// File format version
+#define MAJOR_VERSION 1
+#define MINOR_VERSION 0
+#define CANDIDATE_VERSION 2
+
+//--------------------------AUTO--------------------------
+
+#define PROJECT_VERSION    (MAJOR_VERSION * 1000000 + MINOR_VERSION * 1000 + CANDIDATE_VERSION)
+
+#define BIG_ENDIAN_FILE 1
+#define LITTLE_ENDIAN_FILE 0
+
+#ifdef __BIG_ENDIAN__
+#define ACCEPTED_ENDIAN_FILE BIG_ENDIAN_FILE
+#else
+#define ACCEPTED_ENDIAN_FILE LITTLE_ENDIAN_FILE
+#endif
+
+//--------------------------AUTO (END)----------------------
+
 /*
 ** Cette classe représente un projet, donc principalement une liste de shapes (qui elles-même contiennent
 ** des images), une liste de patrons, et un document qui est symbolisé par la classe PsRender (la seule chose
