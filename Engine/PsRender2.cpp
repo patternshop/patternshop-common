@@ -33,245 +33,10 @@
 #include "PsMaths.h"
 #include "PsTypes.h"
 
-/*
- ** Dessine une boite de sélection autour d'une matrice(uniquement hardware).
- */
-void		PsRender::DrawBox(const PsMatrix& matrix)
-{
-	float	corner[4][2];
-	float	r;
-	float	g;
-	float	b;
-	int		i;
-
-	matrix.GetColor(r, g, b);
-
-	matrix.ToAbsolute(-SHAPE_SIZE, -SHAPE_SIZE, corner[0][0], corner[0][1]);
-	matrix.ToAbsolute(SHAPE_SIZE, -SHAPE_SIZE, corner[1][0], corner[1][1]);
-	matrix.ToAbsolute(SHAPE_SIZE, SHAPE_SIZE, corner[2][0], corner[2][1]);
-	matrix.ToAbsolute(-SHAPE_SIZE, SHAPE_SIZE, corner[3][0], corner[3][1]);
-
-	if (PsController::Instance().GetOption(PsController::OPTION_HIGHLIGHT_SHOW))
-	{
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glColor4f(r, g, b, 0.25f);
-
-		glBegin(GL_QUADS);
-		glVertex2f(corner[0][0], corner[0][1]);
-		glVertex2f(corner[1][0], corner[1][1]);
-		glVertex2f(corner[2][0], corner[2][1]);
-		glVertex2f(corner[3][0], corner[3][1]);
-		glEnd();
-
-		glDisable(GL_BLEND);
-	}
-
-	if (matrix.div_is_active)
-	{
-		float p[4];
-		float v[4];
-		v[0] = (corner[1][0] - corner[0][0]) / (float)matrix.div_x;
-		v[1] = (corner[1][1] - corner[0][1]) / (float)matrix.div_x;
-		v[2] = (corner[2][0] - corner[3][0]) / (float)matrix.div_x;
-		v[3] = (corner[2][1] - corner[3][1]) / (float)matrix.div_x;
-		for (i = 0; i < matrix.div_x; ++i)
-		{
-			p[0] = corner[0][0] + v[0] * (i + 1.f);
-			p[1] = corner[0][1] + v[1] * (i + 1.f);
-			p[2] = corner[3][0] + v[2] * (i + 1.f);
-			p[3] = corner[3][1] + v[3] * (i + 1.f);
-			glBegin(GL_LINE_LOOP);
-			glVertex2f(p[0], p[1]);
-			glVertex2f(p[2], p[3]);
-			glEnd();
-		}
-		v[0] = (corner[3][0] - corner[0][0]) / (float)matrix.div_y;
-		v[1] = (corner[3][1] - corner[0][1]) / (float)matrix.div_y;
-		v[2] = (corner[2][0] - corner[1][0]) / (float)matrix.div_y;
-		v[3] = (corner[2][1] - corner[1][1]) / (float)matrix.div_y;
-		for (i = 0; i < matrix.div_y; ++i)
-		{
-			p[0] = corner[0][0] + v[0] * (i + 1.f);
-			p[1] = corner[0][1] + v[1] * (i + 1.f);
-			p[2] = corner[1][0] + v[2] * (i + 1.f);
-			p[3] = corner[1][1] + v[3] * (i + 1.f);
-			glBegin(GL_LINE_LOOP);
-			glVertex2f(p[0], p[1]);
-			glVertex2f(p[2], p[3]);
-			glEnd();
-		}
-	}
-
-	glColor3f(r, g, b);
-
-	glBegin(GL_LINE_LOOP);
-	glVertex2f(corner[0][0], corner[0][1]);
-	glVertex2f(corner[1][0], corner[1][1]);
-	glVertex2f(corner[2][0], corner[2][1]);
-	glVertex2f(corner[3][0], corner[3][1]);
-	glEnd();
-
-	glColor4f(1.f, 1.f, 1.f, 1.f);
-
-}
-
-/*
- ** Dessine les contours du document(uniquement hardware).
- */
-void	PsRender::DrawDocument()
-{
-	if (PsController::Instance().GetOption(PsController::OPTION_DOCUMENT_BLEND))
-	{
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glColor4f(0.75f, 0.75f, 0.75f, 0.75f);
-	}
-	else
-		glColor3f(0.75f, 0.75f, 0.75f);
-
-	glBegin(GL_QUADS);
-	glVertex2f(0, y1);
-	glVertex2f(0, y2);
-	glVertex2f(x1, y2);
-	glVertex2f(x1, y1);
-
-	glVertex2f(x2, y1);
-	glVertex2f(x2, y2);
-	glVertex2f((float)doc_x, y2);
-	glVertex2f((float)doc_x, y1);
-
-	glVertex2f(0, 0);
-	glVertex2f((float)doc_x, 0);
-	glVertex2f((float)doc_x, y2);
-	glVertex2f(0, y2);
-
-	glVertex2f(0, y1);
-	glVertex2f((float)doc_x, y1);
-	glVertex2f((float)doc_x, (float)doc_y);
-	glVertex2f(0, (float)doc_y);
-	glEnd();
-
-	glDisable(GL_BLEND);
-	glColor3f(0.25f, 0.25f, 0.25f);
-
-	glBegin(GL_LINE_LOOP);
-	glVertex2f(0.0f, 0.0f);
-	glVertex2f((float)doc_x, 0.0f);
-	glVertex2f((float)doc_x, (float)doc_y);
-	glVertex2f(0.0f, (float)doc_y);
-	glEnd();
-}
-
-/*
- ** Dessine un patron, soit en mode normal("derrière" la scène, et en positif), soit en
- ** mode masque("devant" la scène, en négatif).
- */
-void	PsRender::DrawPattern(PsPattern& pattern/*, bool mask*/)
-{
-
-	if (engine == ENGINE_HARDWARE)
-	{
-		glColor4f(1, 1, 1, 1);
-		glEnable(GL_TEXTURE_2D);
-		glEnable(GL_BLEND);
-
-		// arrière plan
-		glBlendFunc(GL_ONE_MINUS_SRC_ALPHA, GL_SRC_ALPHA);
-		glBindTexture(GL_TEXTURE_2D, pattern.texture.GetID());
-		glBegin(GL_QUADS);
-		glTexCoord2f(0, 1);
-		glVertex2f(0, 0);
-		glTexCoord2f(1, 1);
-		glVertex2f((float)doc_x, 0);
-		glTexCoord2f(1, 0);
-		glVertex2f((float)doc_x, (float)doc_y);
-		glTexCoord2f(0, 0);
-		glVertex2f(0, (float)doc_y);
-		glEnd();
-
-		// ombre  
-		glColor4f(0, 0, 0, 1);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glBindTexture(GL_TEXTURE_2D, pattern.y_map_texture_id);
-		glBegin(GL_QUADS);
-		glTexCoord2f(0, 1);
-		glVertex2f(0, 0);
-		glTexCoord2f(1, 1);
-		glVertex2f((float)doc_x, 0);
-		glTexCoord2f(1, 0);
-		glVertex2f((float)doc_x, (float)doc_y);
-		glTexCoord2f(0, 0);
-		glVertex2f(0, (float)doc_y);
-		glEnd();
-
-		glDisable(GL_TEXTURE_2D);
-		glDisable(GL_BLEND);
-	}
-	else
-	{
-		PasteSoftwareFile(pattern);
-	}
-}
-
-/*
- ** Dessine une image à la position absolue x, y. Le booléen "precalc" indique si il faut ou non
- ** calculer les coordonnées des coins de l'image(à ajouter à x et y), vu qu'ils restent les mêmes
- ** pour une image, il est inutile de les recalculer à chaque fois qu'elle est affichée, seuls x et y
- ** changent.
- */
-void	PsRender::DrawShape(PsImage& image, float x, float y, bool bFirst, bool bLast)
-{
-	if (image.hide)
-		return;
-
-	if (bFirst)
-	{
-		image.ToAbsolute(-SHAPE_SIZE, -SHAPE_SIZE, image.corner[0][0], image.corner[0][1]);
-		image.ToAbsolute(SHAPE_SIZE, -SHAPE_SIZE, image.corner[1][0], image.corner[1][1]);
-		image.ToAbsolute(SHAPE_SIZE, SHAPE_SIZE, image.corner[2][0], image.corner[2][1]);
-		image.ToAbsolute(-SHAPE_SIZE, SHAPE_SIZE, image.corner[3][0], image.corner[3][1]);
-	}
-
-	if (engine == ENGINE_HARDWARE)
-	{
-
-		if (bFirst)
-		{
-			glEnable(GL_TEXTURE_2D);
-			glEnable(GL_BLEND);
-			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-			glBindTexture(GL_TEXTURE_2D, image.texture.GetID());
-		}
-
-		glBegin(GL_QUADS);
-		glTexCoord2f(0, 1);
-		glVertex2f(x + image.corner[0][0], y + image.corner[0][1]);
-		glTexCoord2f(1, 1);
-		glVertex2f(x + image.corner[1][0], y + image.corner[1][1]);
-		glTexCoord2f(1, 0);
-		glVertex2f(x + image.corner[2][0], y + image.corner[2][1]);
-		glTexCoord2f(0, 0);
-		glVertex2f(x + image.corner[3][0], y + image.corner[3][1]);
-		glEnd();
-
-		if (bLast)
-		{
-			glDisable(GL_TEXTURE_2D);
-			glDisable(GL_BLEND);
-		}
-
-	}
-	else
-	{
-		PasteSoftwareFile(image, (int)x, (int)y);
-	}
-
-}
 
 bool PsRender::IsInside(int x, int y) const
 {
-	return x >= x1 && x <= x2 && y >= y2 && y <= y1;
+	return x >= this->x1 && x <= this->x2 && y >= this->y2 && y <= this->y1;
 }
 
 bool PsRender::IsInside(const PsImage& image, int x, int y) const
@@ -287,8 +52,9 @@ bool PsRender::IsInside(const PsImage& image, int x, int y) const
 	return false;
 }
 
+
 /*
- ** Permet d'obtenir les dimensions orthonormée d'une matrice
+ ** Gets the orthonormal dimensions of a matrix
  */
 void  PsRender::GetMatrixWindow(PsMatrix& matrix, double& left, double& right, double& bottom, double& top)
 {
@@ -314,3 +80,297 @@ void  PsRender::GetMatrixWindow(PsMatrix& matrix, double& left, double& right, d
 		if (corner[i][1] < top)
 			top = corner[i][1];
 }
+
+
+/*
+ ** Draws the content of a matrix (the matrix itself is not representable, except possibly
+ ** a colored frame to indicate the central matrix), and repeats this display across the screen to
+ ** draw a complete network. In the end, this function only calls DrawShape for each image,
+ ** as many times as necessary.
+ */
+void  PsRender::DrawShape(PsMatrix& matrix)
+{
+	if (matrix.hide)
+		return;
+
+	//-- size of the smallest side of the matrix
+	double minSize = matrix.w;
+	if (minSize > matrix.h)
+		minSize = matrix.h;
+	//--
+
+	//-- size of the diagonal of the rendering area
+	double l, r, b, t;
+	GetMatrixWindow(matrix, l, r, b, t);
+	if (this->x2 > r) r = this->x2;
+	if (this->y1 > b) b = this->y1;
+	if (this->x1 < l) l = this->x1;
+	if (this->y2 < t) t = this->y2;
+	double dw = (r - l);
+	double dh = (b - t);
+	double powDiag = sqrt(pow(dw, 2) + pow(dh, 2));
+	//--
+
+	//-- double the min (FIXME, it's quick and dirty)
+	double quickDup = round((powDiag / minSize) * 2);
+	double quickDupMax = 300;
+	if (quickDup > quickDupMax)
+	{
+		//warning ?
+		quickDup = quickDupMax;
+	}
+	//--
+
+	int iMaximum = DoubleToInt(quickDup);
+
+	float cos_r = cos(matrix.r);
+	float sin_r = sin(matrix.r);
+	float i2 = matrix.i;
+	float j2 = matrix.j;
+	float mh = matrix.h;
+	float mw = matrix.w;
+
+	glColor4f(1.f, 1.f, 1.f, 1.f);
+	ImageList::const_iterator image;
+	for (image = matrix.images.begin(); image != matrix.images.end(); ++image)
+	{
+		bool bFirst = true;
+		for (int y = -iMaximum; y < iMaximum; ++y)
+		{
+			float yi2 = y * i2;
+			float ymh = y * mh;
+			for (int x = -iMaximum; x <= iMaximum; ++x)
+			{
+				float xj2 = x * j2;
+				float xmw = x * mw;
+				float tx = (xmw + yi2) * cos_r - (ymh + xj2) * sin_r;
+				float ty = (xmw + yi2) * sin_r + (ymh + xj2) * cos_r;
+				DrawShape(**image, tx, ty, bFirst, false);
+				if (bFirst) bFirst = false;
+			}
+		}
+		glDisable(GL_TEXTURE_2D);
+		glDisable(GL_BLEND);
+	}
+}
+
+/*
+ ** Returns the buffer in which the software rendering was done (for now, it's a capture
+ ** of the hardware rendering, which in addition to being a bad solution in terms of quality, prevents
+ ** capturing an area larger than the screen).
+ */
+uint8* PsRender::GetBuffer(int x, int y) const
+{
+	uint8* buffer = new uint8[x * y * 4];
+	uint8	pixel;
+	int				i;
+	int				j;
+
+	glFlush();
+	glReadPixels(0, 0, x, y, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
+
+	for (i = 0, j = x * y * 4; i < j; i += 4)
+	{
+		pixel = buffer[i + 0];
+		buffer[i + 0] = buffer[i + 2];
+		buffer[i + 2] = pixel;
+	}
+
+	return buffer;
+}
+
+/*
+ ** Gets the document size.
+ */
+void	PsRender::GetDocSize(int& x, int& y) const
+{
+	x = this->doc_x;
+	y = this->doc_y;
+}
+
+/*
+ ** Gets the current scrolling values.
+ */
+void	PsRender::GetScroll(float& x, float& y) const
+{
+	x = this->scroll_x;
+	y = this->scroll_y;
+}
+
+/*
+ ** Gets the size of the view area.
+ */
+void	PsRender::GetSize(int& x, int& y) const
+{
+	x = this->size_x;
+	y = this->size_y;
+}
+
+/*
+ ** Recalculates the coordinates of the window edges from the document's point of view, based on
+ ** scrolling, zoom, and window size.
+ */
+void		PsRender::Recalc()
+{
+	float	zx = this->size_x * this->zoom / 2;
+	float	zy = this->size_y * this->zoom / 2;
+
+	this->x1 = this->scroll_x - zx;
+	this->x2 = this->scroll_x + zx;
+	this->y1 = this->scroll_y + zy;
+	this->y2 = this->scroll_y - zy;
+}
+
+void PsRender::PrepareSurface(PsProject& project, int x, int y)
+{
+	float fMaxSize = this->doc_x > this->doc_y ? this->doc_x : this->doc_y;
+
+	float fMaxWidth, hMaxHeight, fD1;
+	fMaxWidth = fMaxSize;
+	hMaxHeight = fMaxSize;
+	fD1 = hMaxHeight / 4.f;
+
+	if (this->engine == ENGINE_HARDWARE)
+	{
+
+		glViewport(0, 0, x, y);
+		glPushMatrix();
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		glOrtho(this->x1, this->x2, this->y1, this->y2, -10000, 10000);
+		glMatrixMode(GL_MODELVIEW);
+		glLoadIdentity();
+		glPopMatrix();
+
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	}
+}
+
+
+void PsRender::DrawMatrices(PsProject& project)
+{
+	MatrixList::const_iterator i;
+	int n;
+
+	for (n = 0, i = project.matrices.begin(); i != project.matrices.end(); ++i)
+	{
+		if (this->engine == ENGINE_SOFTWARE)
+			PsController::Instance().SetProgress((int)(20 + 60 * n++ / project.matrices.size()));
+		this->DrawShape(**i);
+	}
+}
+
+void PsRender::DrawImages(PsProject& project)
+{
+	glColor4f(1.f, 1.f, 1.f, 1.f);
+	glEnable(GL_TEXTURE_2D);
+	glEnable(GL_BLEND);
+	ImageList::const_iterator j;
+	for (j = project.images.begin(); j != project.images.end(); ++j)
+		this->DrawShape(**j);
+	glDisable(GL_TEXTURE_2D);
+	glDisable(GL_BLEND);
+}
+
+void PsRender::DrawMatricesGizmos(PsProject& project)
+{
+	MatrixList::const_iterator i;
+
+	for (i = project.matrices.begin(); i != project.matrices.end(); ++i)
+	{
+		PsMatrix& matrix = **i;
+		if (!matrix.hide)
+		{
+			this->DrawBox(matrix);
+			glColor4f(1.f, 1.f, 1.f, 0.8f);
+			glEnable(GL_TEXTURE_2D);
+			glEnable(GL_BLEND);
+			ImageList::const_iterator image;
+			for (image = matrix.images.begin(); image != matrix.images.end(); ++image)
+				this->DrawShape(**image);
+			glDisable(GL_TEXTURE_2D);
+			glDisable(GL_BLEND);
+		}
+	}
+}
+
+void PsRender::DrawPatternGizmo(PsPattern& pattern, int iIndex)
+{
+	PsLayer* layer = pattern.aLayers[iIndex];
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	//-- layer grid
+	layer->UpdateGizmoProjection(*this);
+	PsVector* vCorners = layer->vProjected;
+	glColor4f(0.0f, 0.0f, 0.2f, 0.5f);
+	float p[4];
+	float v[4];
+	float div_x = 8, div_y = 8;
+	v[0] = (vCorners[1].X - vCorners[0].X) / (float)div_x;
+	v[1] = (vCorners[1].Y - vCorners[0].Y) / (float)div_x;
+	v[2] = (vCorners[2].X - vCorners[3].X) / (float)div_x;
+	v[3] = (vCorners[2].Y - vCorners[3].Y) / (float)div_x;
+	for (int i = 0; i <= div_x; ++i)
+	{
+		p[0] = vCorners[0].X + v[0] * i;
+		p[1] = vCorners[0].Y + v[1] * i;
+		p[2] = vCorners[3].X + v[2] * i;
+		p[3] = vCorners[3].Y + v[3] * i;
+		glBegin(GL_LINE_LOOP);
+		glVertex2f(p[0], p[1]);
+		glVertex2f(p[2], p[3]);
+		glEnd();
+	}
+	v[0] = (vCorners[3].X - vCorners[0].X) / (float)div_y;
+	v[1] = (vCorners[3].Y - vCorners[0].Y) / (float)div_y;
+	v[2] = (vCorners[2].X - vCorners[1].X) / (float)div_y;
+	v[3] = (vCorners[2].Y - vCorners[1].Y) / (float)div_y;
+	for (int i = 0; i <= div_y; ++i)
+	{
+		p[0] = vCorners[0].X + v[0] * i;
+		p[1] = vCorners[0].Y + v[1] * i;
+		p[2] = vCorners[1].X + v[2] * i;
+		p[3] = vCorners[1].Y + v[3] * i;
+		glBegin(GL_LINE_LOOP);
+		glVertex2f(p[0], p[1]);
+		glVertex2f(p[2], p[3]);
+		glEnd();
+	}
+	//--
+
+	//-- gizmo background
+	layer->UpdateProjection(*this);
+	vCorners = layer->vProjectedGizmo;
+	glColor4f(0.0f, 0.8f, 0.0f, 0.2f);
+	glBegin(GL_QUADS);
+	glVertex2f(vCorners[0].X, vCorners[0].Y);
+	glVertex2f(vCorners[1].X, vCorners[1].Y);
+	glVertex2f(vCorners[2].X, vCorners[2].Y);
+	glVertex2f(vCorners[3].X, vCorners[3].Y);
+	glEnd();
+	glColor4f(0.0f, 0.8f, 0.0f, 1.f);
+	glBegin(GL_LINE_LOOP);
+	glVertex2f(vCorners[0].X, vCorners[0].Y);
+	glVertex2f(vCorners[1].X, vCorners[1].Y);
+	glVertex2f(vCorners[2].X, vCorners[2].Y);
+	glVertex2f(vCorners[3].X, vCorners[3].Y);
+	glEnd();
+	//--
+
+	//-- gizmo handles
+	for (int i = 0; i < 4; ++i)
+	{
+		glBegin(GL_LINE_LOOP);
+		glVertex2f(vCorners[i].X - SHAPE_SIZE_RESIZE * this->zoom, vCorners[i].Y - SHAPE_SIZE_RESIZE * this->zoom);
+		glVertex2f(vCorners[i].X - SHAPE_SIZE_RESIZE * this->zoom, vCorners[i].Y + SHAPE_SIZE_RESIZE * this->zoom);
+		glVertex2f(vCorners[i].X + SHAPE_SIZE_RESIZE * this->zoom, vCorners[i].Y + SHAPE_SIZE_RESIZE * this->zoom);
+		glVertex2f(vCorners[i].X + SHAPE_SIZE_RESIZE * this->zoom, vCorners[i].Y - SHAPE_SIZE_RESIZE * this->zoom);
+		glEnd();
+	}
+	//--
+
+	glDisable(GL_BLEND);
+}
+
