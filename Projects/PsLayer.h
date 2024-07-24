@@ -28,7 +28,7 @@
 #include "PsMatrix.h"
 #include "PsMaths.h"
 
-class	PsProject;
+class	PsProjectController;
 class	PsRender;
 
 
@@ -38,7 +38,7 @@ class	PsRender;
 */
 class	PsLayer
 {
-	friend class	PsProject;
+	friend class	PsProjectController;
 	friend class	PsRender;
 
 public:

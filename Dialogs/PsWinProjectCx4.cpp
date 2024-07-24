@@ -29,7 +29,7 @@
 
 void PsWinProjectCx::GenericUpdate()
 {
-	PsProject* project = PsController::Instance().project;
+	PsProjectController* project = PsController::Instance().project;
 
 	if (!project) this->scrollbar->Disable();
 

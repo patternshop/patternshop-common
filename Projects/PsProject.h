@@ -14,9 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Patternshop.  If not, see <http://www.gnu.org/licenses/>
 */
-#ifndef PS_PROJECT_H__
-
-#define PS_PROJECT_H__
+#pragma once
 
 #include <list>
 #include <math.h>
@@ -35,41 +33,19 @@ typedef std::list<PsMatrix*>	MatrixList;
 #define ZOOM_COEF        0.02f
 #define LOG_SIZE         50
 
-// File format version
-#define MAJOR_VERSION 1
-#define MINOR_VERSION 0
-#define CANDIDATE_VERSION 2
-
-#define PROJECT_VERSION_OLD_BETA 3213654 // 111222333
-
-//--------------------------AUTO--------------------------
-
-#define PROJECT_VERSION    (MAJOR_VERSION * 1000000 + MINOR_VERSION * 1000 + CANDIDATE_VERSION)
-
-#define BIG_ENDIAN_FILE 1
-#define LITTLE_ENDIAN_FILE 0
-
-#ifdef __BIG_ENDIAN__
-#define ACCEPTED_ENDIAN_FILE BIG_ENDIAN_FILE
-#else
-#define ACCEPTED_ENDIAN_FILE LITTLE_ENDIAN_FILE
-#endif
-
-//--------------------------AUTO (END)----------------------
-
 /*
 ** Cette classe représente un projet, donc principalement une liste de shapes (qui elles-même contiennent
 ** des images), une liste de patrons, et un document qui est symbolisé par la classe PsRender (la seule chose
 ** utile à propos du document est sa taille, et elle est contenue dans PsRender qui en a besoin pour
 ** l'affichage).
  */
-class	PsProject
+class	PsProjectController
 {
 	friend class		PsRender;
 
 public:
-	PsProject();
-	~PsProject();
+	PsProjectController();
+	~PsProjectController();
 
 public:
 	ErrID				CloneImage();
@@ -174,4 +150,3 @@ private:
 	PsVector			prev_origin_z0;
 };
 
-#endif /* PS_PROJECT_H__ */

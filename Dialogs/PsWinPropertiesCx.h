@@ -21,7 +21,7 @@
 class PsWinPropertiesCx 
 {
 public:
-	virtual void UpdateInformation(PsProject*) = 0;
+	virtual void UpdateInformation(PsProjectController*) = 0;
 	virtual void FocusImageInformation() = 0;
 	virtual void FocusMatrixInformation() = 0;
 };

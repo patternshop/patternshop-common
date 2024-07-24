@@ -30,7 +30,7 @@
 ** Scan the work area to determine which cursor to display when using the "modify" tool.
 ** If the boolean "set" is true, the user has clicked, so we change mode in addition to possibly changing the cursor.
 */
-PsController::Tool PsProject::ToolModifyScan(int x, int y, bool set)
+PsController::Tool PsProjectController::ToolModifyScan(int x, int y, bool set)
 {
 	float fx;
 	float fy;
@@ -249,7 +249,7 @@ PsController::Tool PsProject::ToolModifyScan(int x, int y, bool set)
 /*
 ** Movement of the "drag" tool.
 */
-void PsProject::ToolScrollDrag(int x, int y, int prev_x, int prev_y)
+void PsProjectController::ToolScrollDrag(int x, int y, int prev_x, int prev_y)
 {
 	this->renderer.SetScroll(this->prev_scrollx + (prev_x - x) * this->renderer.zoom, this->prev_scrolly + (prev_y - y) * this->renderer.zoom);
 	PsController::Instance().UpdateWindow();
@@ -259,7 +259,7 @@ void PsProject::ToolScrollDrag(int x, int y, int prev_x, int prev_y)
 /*
 ** Initialization of the "drag" tool.
 */
-PsController::Tool PsProject::ToolScrollStart()
+PsController::Tool PsProjectController::ToolScrollStart()
 {
 	this->renderer.GetScroll(this->prev_scrollx, this->prev_scrolly);
 	return PsController::TOOL_SCROLL_DRAG;
@@ -268,7 +268,7 @@ PsController::Tool PsProject::ToolScrollStart()
 /*
 ** Returns the width of the document in pixels.
 */
-int PsProject::GetWidth()
+int PsProjectController::GetWidth()
 {
 	return this->renderer.doc_x;
 }
@@ -276,7 +276,7 @@ int PsProject::GetWidth()
 /*
 ** Returns the height of the document in pixels.
 */
-int PsProject::GetHeight()
+int PsProjectController::GetHeight()
 {
 	return this->renderer.doc_y;
 }
@@ -284,7 +284,7 @@ int PsProject::GetHeight()
 /*
 ** Returns the number of pixels per inch in the document.
 */
-int PsProject::GetDpi()
+int PsProjectController::GetDpi()
 {
 	return this->renderer.dpi;
 }

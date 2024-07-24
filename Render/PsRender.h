@@ -29,14 +29,14 @@
 #define RENDERER_ZOOM_INIT	1.1f
 #define	RENDERER_BACKGROUND	(1 / 16.0f)
 
-class	PsProject;
+class	PsProjectController;
 
 /*
 ** La classe PsRender s'occupe du rendu hardware et software du projet.
 */
 class	PsRender
 {
-	friend class PsProject;
+	friend class PsProjectController;
 
 	/*
 	** Enumérations
@@ -62,10 +62,10 @@ public:
 	void			CenterView();
 	void			Convert(int, int, float&, float&) const;
 
-	void			Render(PsProject&, int, int);
+	void			Render(PsProjectController&, int, int);
 
-	void			MonoLayerRendering(PsProject&, int, int);
-	void			MultiLayerRendering(PsProject&, int, int);
+	void			MonoLayerRendering(PsProjectController&, int, int);
+	void			MultiLayerRendering(PsProjectController&, int, int);
 
 	uint8* GetBuffer(int, int) const;
 	void			GetDocSize(int&, int&) const;
@@ -80,33 +80,33 @@ public:
 	void			SetZone(float, float);
 	void			SetZoom(float);
 
-	void			PrepareSurface(PsProject&, int, int);
+	void			PrepareSurface(PsProjectController&, int, int);
 
 	bool			IsInside(const PsImage&, int, int) const;
 	inline bool		IsInside(int, int) const;
 
 	void			GetMatrixWindow(PsMatrix&, double&, double&, double&, double&);
 
-	void			DrawStandardGizmos(PsProject&);
+	void			DrawStandardGizmos(PsProjectController&);
 	void			DrawPatternGizmo(PsPattern&, int);
 	void			DrawBox(const PsImage&);
 	void			DrawBox(const PsMatrix&);
 	void			DrawBoxHandle(const PsMatrix&);
-	void			DrawMatricesGizmos(PsProject&);
-	void			DrawGizmos(PsProject&);
+	void			DrawMatricesGizmos(PsProjectController&);
+	void			DrawGizmos(PsProjectController&);
 
 	void			DrawDocument();
-	void			DrawBack(const PsProject&, float, float);
+	void			DrawBack(const PsProjectController&, float, float);
 	void			DrawPattern(PsPattern&/*, bool*/);
 	void			DrawShape(PsImage&, float x = 0, float y = 0, bool first = true, bool last = true);
 	void			DrawShape(PsMatrix&);
-	void			DrawMatrices(PsProject&);
-	void			DrawImages(PsProject&);
+	void			DrawMatrices(PsProjectController&);
+	void			DrawImages(PsProjectController&);
 	void			DrawLayerTexture(GLuint);
 
 	PsVector		GetEyeLocation();
-	GLuint			CreateDocumentTexture(PsProject&);
-	void			UpdateLayerTexture(PsProject&, PsLayer*, GLuint);
+	GLuint			CreateDocumentTexture(PsProjectController&);
+	void			UpdateLayerTexture(PsProjectController&, PsLayer*, GLuint);
 
 
 	/*

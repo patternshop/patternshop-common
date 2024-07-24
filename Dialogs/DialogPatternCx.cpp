@@ -31,7 +31,7 @@ void DialogPatternCx::Update()
 void DialogPatternCx::SetQuality(int iQuality)
 {
 	if (!PsController::Instance().project) return;
-	PsProject& project = *(PsController::Instance().project);
+	PsProjectController& project = *(PsController::Instance().project);
 	if (!project.pattern) return;
 	project.renderer.iLayerTextureSize = FloatToInt(pow(2.f, 8.f + (float)iQuality));
 	for (int i = 0; i < project.pattern->GetChannelsCount(); ++i)
@@ -81,7 +81,7 @@ void DialogPatternCx::OnButtonDown(int iX, int iY)
 		return;
 	}
 
-	PsProject& project = *(PsController::Instance().project);
+	PsProjectController& project = *(PsController::Instance().project);
 	if (iX > this->dst_x1 && iX < this->dst_x2 && iY < this->dst_y2 && iY > this->dst_y1)
 	{
 		float r1 = (float)project.pattern->GetWidth() / (float)(this->dst_x2 - this->dst_x1);
@@ -115,7 +115,7 @@ void DialogPatternCx::UpdateMiniImage(int iWindowWidth, int iWindowHeight)
 	if (!PsController::Instance().project) return;
 	if (!PsController::Instance().project->pattern) return;
 
-	PsProject& project = *(PsController::Instance().project);
+	PsProjectController& project = *(PsController::Instance().project);
 	PsRender& renderer = PsController::Instance().project->renderer;
 
 	//-- calculation of target coordinates 

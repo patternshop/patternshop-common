@@ -29,7 +29,7 @@
 
 void PsWinProjectCx::DrawBackgroundBloc()
 {
-	PsProject* project = PsController::Instance().project;
+	PsProjectController* project = PsController::Instance().project;
 
 	if (project)
 	{

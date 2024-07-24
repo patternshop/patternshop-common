@@ -31,7 +31,7 @@ extern PsWinPropertiesCx* dlgPropreties;
 /*
 ** Triggers the display of the project in the active context, using hardware rendering (thus OpenGL).
 */
-void PsProject::RenderToScreen()
+void PsProjectController::RenderToScreen()
 {
     int x;
     int y;
@@ -63,7 +63,7 @@ void PsProject::RenderToScreen()
 /*
 ** Triggers rendering to a file
 */
-bool PsProject::RenderToFile(const char* filename, int x, int y)
+bool PsProjectController::RenderToFile(const char* filename, int x, int y)
 {
     PsController::Instance().SetProgress(-1);
 
@@ -89,7 +89,7 @@ bool PsProject::RenderToFile(const char* filename, int x, int y)
 /*
 ** Selects an image in the project (and the matrix that contains it).
 */
-void PsProject::SelectImage(PsImage* image)
+void PsProjectController::SelectImage(PsImage* image)
 {
     this->matrix = image ? image->GetParent() : 0;
     this->image = image;
@@ -108,7 +108,7 @@ void PsProject::SelectImage(PsImage* image)
 /*
 ** Selects a matrix in the project.
 */
-void PsProject::SelectMatrix(PsMatrix* matrix)
+void PsProjectController::SelectMatrix(PsMatrix* matrix)
 {
     this->matrix = matrix;
     this->image = 0;
@@ -127,7 +127,7 @@ void PsProject::SelectMatrix(PsMatrix* matrix)
 /*
 ** Movement of the "magnify" tool.
 */
-void PsProject::ToolMagnifyDrag(int y, int old_x, int old_y)
+void PsProjectController::ToolMagnifyDrag(int y, int old_x, int old_y)
 {
     float zoom = this->prev_zoom + (y - old_y) * ZOOM_COEF;
 
@@ -153,7 +153,7 @@ void PsProject::ToolMagnifyDrag(int y, int old_x, int old_y)
 /*
 ** Initialization of the "magnify" tool.
 */
-PsController::Tool PsProject::ToolMagnifyStart()
+PsController::Tool PsProjectController::ToolMagnifyStart()
 {
     this->prev_zoom = this->renderer.zoom;
 
@@ -163,7 +163,7 @@ PsController::Tool PsProject::ToolMagnifyStart()
 /*
 ** Movement of the "Modify" tool (which needs to know in which mode it is, to know the operation to perform among movement, rotation, resizing...)
 */
-void PsProject::ToolModifyMove(int x, int y, int old_x, int old_y, PsController::Tool tool)
+void PsProjectController::ToolModifyMove(int x, int y, int old_x, int old_y, PsController::Tool tool)
 {
     float fx;
     float fy;

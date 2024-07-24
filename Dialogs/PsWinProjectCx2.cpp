@@ -29,7 +29,7 @@
 
 void PsWinProjectCx::OnLeftMouseButtonUp(PsPoint point)
 {
-	PsProject* project = PsController::Instance().project;
+	PsProjectController* project = PsController::Instance().project;
 	if (!project) return;
 	if (this->bDragging)
 	{

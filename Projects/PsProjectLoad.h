@@ -23,10 +23,10 @@
  */
 class	PsProjectLoad
 {
-	friend class PsProject;
+	friend class PsProjectController;
 
 public:
-	PsProjectLoad(PsProject& project);
+	PsProjectLoad(PsProjectController& project);
 	~PsProjectLoad();
 
 public:
@@ -38,6 +38,6 @@ public:
 	ErrID loadPattern(PsPattern& pattern) const;
 
 protected:
-	PsProject& project;
+	PsProjectController& project;
 	FILE* file;
 };

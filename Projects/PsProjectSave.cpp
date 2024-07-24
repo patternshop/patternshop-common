@@ -16,7 +16,7 @@
 */
 #include "PsProjectSave.h"
 
-PsProjectSave::PsProjectSave(PsProject& project) : project(project), file(NULL)
+PsProjectSave::PsProjectSave(PsProjectController& project) : project(project), file(NULL)
 {
 }
 

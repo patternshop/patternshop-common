@@ -25,7 +25,7 @@ class	CPatternshopView;
 class PsMacView;
 #endif
 
-class	PsProject;
+class	PsProjectController;
 
 #define CONTROLLER_COUNT_CURSOR	17		// Nombre de curseurs définis
 #define CONTROLLER_COUNT_OPTION	8		// Nombre d'options disponibles
@@ -111,7 +111,7 @@ public:
 	void					SetTool(Tool);
 
 	Tool					tool, prev_tool;					// Outil actuellement sélectionné
-	PsProject*				project;
+	PsProjectController*				project;
 
 public:
 	PsController();

@@ -31,7 +31,7 @@
 ** Resets a project by clearing everything it contains. Eventually, this function
 ** could become unnecessary and simply be copied into the destructor of "PsProject".
 */
-void PsProject::LogFlush()
+void PsProjectController::LogFlush()
 {
     LogList::iterator t;
     MatrixList::iterator i;
@@ -61,7 +61,7 @@ void PsProject::LogFlush()
 /*
 ** Inserts a new element into the log
 */
-void PsProject::LogAdd(PsAction* log)
+void PsProjectController::LogAdd(PsAction* log)
 {
     LogList::iterator t;
 
@@ -86,7 +86,7 @@ void PsProject::LogAdd(PsAction* log)
 /*
 ** Checks if an action can be redone
 */
-bool PsProject::LogCanRedo() const
+bool PsProjectController::LogCanRedo() const
 {
     return !this->log_redo.empty();
 }
@@ -94,7 +94,7 @@ bool PsProject::LogCanRedo() const
 /*
 ** Checks if an action can be undone
 */
-bool PsProject::LogCanUndo() const
+bool PsProjectController::LogCanUndo() const
 {
     return !this->log_undo.empty();
 }
@@ -102,7 +102,7 @@ bool PsProject::LogCanUndo() const
 /*
 ** Initializes a new action (marks the end of the previous action)
 */
-void PsProject::LogInit()
+void PsProjectController::LogInit()
 {
     this->log_insert = true;
 }
@@ -110,7 +110,7 @@ void PsProject::LogInit()
 /*
 ** Returns the number of elements in the undo list
 */
-int PsProject::LogUndoCount()
+int PsProjectController::LogUndoCount()
 {
     return this->log_undo.size();
 }
@@ -118,7 +118,7 @@ int PsProject::LogUndoCount()
 /*
 ** Returns the name of the last "redoable" action recorded
 */
-const char* PsProject::LogRedoLastName() const
+const char* PsProjectController::LogRedoLastName() const
 {
     return(*this->log_redo.rbegin())->Name();
 }
@@ -126,7 +126,7 @@ const char* PsProject::LogRedoLastName() const
 /*
 ** Returns the name of the last "undoable" action recorded
 */
-const char* PsProject::LogUndoLastName() const
+const char* PsProjectController::LogUndoLastName() const
 {
     return(*this->log_undo.rbegin())->Name();
 }
@@ -134,7 +134,7 @@ const char* PsProject::LogUndoLastName() const
 /*
 ** Checks if the action is new and should be recorded (and resets the flag if necessary)
 */
-bool PsProject::LogMustAdd() const
+bool PsProjectController::LogMustAdd() const
 {
     return this->log_insert;
 }
@@ -142,7 +142,7 @@ bool PsProject::LogMustAdd() const
 /*
 ** Reproduces the next action
 */
-void PsProject::LogRedo()
+void PsProjectController::LogRedo()
 {
     PsAction* redo;
     PsAction* undo;
@@ -172,7 +172,7 @@ void PsProject::LogRedo()
 /*
 ** Undoes the last action
 */
-void PsProject::LogUndo()
+void PsProjectController::LogUndo()
 {
     PsAction* redo;
     PsAction* undo;
@@ -201,7 +201,7 @@ void PsProject::LogUndo()
 /*
 ** Changes the color of the active matrix, if there is one.
 */
-ErrID PsProject::MatrixColor()
+ErrID PsProjectController::MatrixColor()
 {
     if (!this->matrix)
         return ERROR_MATRIX_SELECT;
@@ -214,7 +214,7 @@ ErrID PsProject::MatrixColor()
 /*
 ** Resets the transformations of the active matrix, if there is one.
 */
-ErrID PsProject::MatrixReset()
+ErrID PsProjectController::MatrixReset()
 {
     if (!this->matrix)
         return ERROR_MATRIX_SELECT;

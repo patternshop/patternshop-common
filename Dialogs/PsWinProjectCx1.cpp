@@ -55,7 +55,7 @@ void PsWinProjectCx::OnLeftMouseButtonDown(PsPoint point)
 	// PsRect k;
 	// scrollbar->GetClientRect(&k);
 	this->fromPoint = point;
-	PsProject* project = PsController::Instance().project;
+	PsProjectController* project = PsController::Instance().project;
 	if (!project) return;
 	if (project->bPatternsIsSelected)
 		project->bPatternsIsSelected = false;
@@ -183,7 +183,7 @@ void PsWinProjectCx::OnLButtonDownIn(PsPoint point, PsImage* image)
 	{
 		if (point.x > 25)
 		{
-			PsProject* project = PsController::Instance().project;
+			PsProjectController* project = PsController::Instance().project;
 			project->SelectImage(image);
 			this->bDrawDragging = false;
 			this->bDragging = true;

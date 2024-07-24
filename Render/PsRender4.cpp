@@ -37,7 +37,7 @@
  ** Retrieve the repeated pattern over the entire document in a
  ** texture of size 'fTextureSize'.
  */
-GLuint PsRender::CreateDocumentTexture(PsProject& project)
+GLuint PsRender::CreateDocumentTexture(PsProjectController& project)
 {
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -62,7 +62,7 @@ PsVector PsRender::GetEyeLocation()
 	return PsVector(this->doc_x / 2.f, this->doc_y / 2.f, this->doc_y * 2.415f);
 }
 
-void PsRender::MultiLayerRendering(PsProject& project, int x, int y)
+void PsRender::MultiLayerRendering(PsProjectController& project, int x, int y)
 {
 	// pre-conditions
 	if (!project.pattern) return;
@@ -121,7 +121,7 @@ void PsRender::MultiLayerRendering(PsProject& project, int x, int y)
 /**
  * Triggers a render, hardware or software, according to the chosen mode.
 */
-void PsRender::Render(PsProject& project, int x, int y)
+void PsRender::Render(PsProjectController& project, int x, int y)
 {
 
 	if (this->engine == ENGINE_HARDWARE)

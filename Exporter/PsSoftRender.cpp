@@ -35,7 +35,7 @@ void	DrawBackSoftwareFile()
 {
 	//-- sélection de la couleur de fond
 	uint8 color[4];
-	PsProject* project = PsController::Instance().project;
+	PsProjectController* project = PsController::Instance().project;
 	if (!project->bHideColor)
 	{
 		color[0] = project->iColor[0];
@@ -361,7 +361,7 @@ void flushSoftwareFile(const char* filename, bool warning_alpha)
 */
 FIBITMAP* DrawSoftwareMapping(PsLayer* layer, FIBITMAP* src_img)
 {
-	PsProject* project = PsController::Instance().project;
+	PsProjectController* project = PsController::Instance().project;
 	PsRender& renderer = PsController::Instance().project->renderer;
 
 	int iWidth = FreeImage_GetWidth(src_img);
@@ -409,7 +409,7 @@ FIBITMAP* DrawSoftwareMapping(PsLayer* layer, FIBITMAP* src_img)
 void DrawLayerSoftwareFile(int iIndex)
 {
 	//-- récupération des paramètres du projet
-	PsProject* project = PsController::Instance().project;
+	PsProjectController* project = PsController::Instance().project;
 	if (!project) return;
 	if (!project->pattern) return;
 	if (project->pattern->aLayers.size() <= iIndex) return;

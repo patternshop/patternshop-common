@@ -33,7 +33,7 @@
 #include "PsMaths.h"
 #include "PsTypes.h"
 
-void PsRender::DrawStandardGizmos(PsProject& project)
+void PsRender::DrawStandardGizmos(PsProjectController& project)
 {
 	this->DrawMatricesGizmos(project);
 
@@ -53,7 +53,7 @@ void PsRender::DrawStandardGizmos(PsProject& project)
 		this->DrawBoxHandle(*project.matrix);
 }
 
-void PsRender::DrawGizmos(PsProject& project)
+void PsRender::DrawGizmos(PsProjectController& project)
 {
 	if (project.bPatternsIsSelected && project.pattern && !project.pattern->hide)
 	{
@@ -65,7 +65,7 @@ void PsRender::DrawGizmos(PsProject& project)
 	}
 }
 
-void PsRender::MonoLayerRendering(PsProject& project, int x, int y)
+void PsRender::MonoLayerRendering(PsProjectController& project, int x, int y)
 {
 	this->PrepareSurface(project, x, y);
 
@@ -99,7 +99,7 @@ void PsRender::DrawLayerTexture(GLuint layer)
 	glDisable(GL_BLEND);
 }
 
-void PsRender::UpdateLayerTexture(PsProject& project, PsLayer* layer, GLuint iDocTexture)
+void PsRender::UpdateLayerTexture(PsProjectController& project, PsLayer* layer, GLuint iDocTexture)
 {
 	PsPattern* pattern = project.pattern;
 

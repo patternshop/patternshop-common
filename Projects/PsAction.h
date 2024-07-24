@@ -23,7 +23,7 @@
 class	PsAction
 {
 	public:
-		/**/					PsAction (PsProject&, PsShape*);
+		/**/					PsAction (PsProjectController&, PsShape*);
 		virtual					~PsAction();
 
 		virtual PsAction*		Execute() = 0;
@@ -34,7 +34,7 @@ class	PsAction
 		PsMatrix*				GetMatrix (MatrixList::iterator&) const;
 		PsShape*				GetShape() const;
 
-		PsProject&				project;
+		PsProjectController&				project;
 		int						matrix;
 		int						image;
 };
@@ -42,7 +42,7 @@ class	PsAction
 class	LogDelImage : public PsAction
 {
 	public:
-		/**/				LogDelImage (PsProject&, PsImage*, bool);
+		/**/				LogDelImage (PsProjectController&, PsImage*, bool);
 		/**/				~LogDelImage();
 
 		virtual PsAction*	Execute();
@@ -64,7 +64,7 @@ class	LogDelImage : public PsAction
 class	LogDelMatrix : public PsAction
 {
 	public:
-		/**/				LogDelMatrix (PsProject&, PsMatrix*, bool);
+		/**/				LogDelMatrix (PsProjectController&, PsMatrix*, bool);
 
 		virtual PsAction*	Execute();
 		virtual const char*	Name() const;
@@ -87,7 +87,7 @@ class	LogDelMatrix : public PsAction
 class	LogMove : public PsAction
 {
 	public:
-		/**/				LogMove (PsProject&, PsShape*, float, float);
+		/**/				LogMove (PsProjectController&, PsShape*, float, float);
 
 		virtual PsAction*	Execute();
 		virtual const char*	Name() const;
@@ -100,7 +100,7 @@ class	LogMove : public PsAction
 class	LogNewImage : public PsAction
 {
 	public:
-		/**/				LogNewImage (PsProject&, PsImage*, bool);
+		/**/				LogNewImage (PsProjectController&, PsImage*, bool);
 
 		virtual PsAction*	Execute();
 		virtual const char*	Name() const;
@@ -112,7 +112,7 @@ class	LogNewImage : public PsAction
 class	LogNewMatrix : public PsAction
 {
 	public:
-		/**/				LogNewMatrix (PsProject&, PsMatrix*, bool);
+		/**/				LogNewMatrix (PsProjectController&, PsMatrix*, bool);
 
 		virtual PsAction*	Execute();
 		virtual const char*	Name() const;
@@ -124,7 +124,7 @@ class	LogNewMatrix : public PsAction
 class	LogReplace : public PsAction
 {
 	public:
-		/**/				LogReplace (PsProject&, PsImage*);
+		/**/				LogReplace (PsProjectController&, PsImage*);
 		/**/				~LogReplace();
 
 		virtual PsAction*	Execute();
@@ -138,8 +138,8 @@ class	LogReplace : public PsAction
 class	LogResize : public PsAction
 {
 	public:
-		/**/				LogResize (PsProject&, PsShape*, float, float, float, float);
-		/**/				LogResize (PsProject&, PsShape*, float, float, float, float, bool);
+		/**/				LogResize (PsProjectController&, PsShape*, float, float, float, float);
+		/**/				LogResize (PsProjectController&, PsShape*, float, float, float, float, bool);
 
 		virtual PsAction*	Execute();
 		virtual const char*	Name() const;
@@ -155,8 +155,8 @@ class	LogResize : public PsAction
 class	LogRotate : public PsAction
 {
 	public:
-		/**/				LogRotate (PsProject&, PsShape*, float);
-		/**/				LogRotate (PsProject&, PsShape*, float, bool);
+		/**/				LogRotate (PsProjectController&, PsShape*, float);
+		/**/				LogRotate (PsProjectController&, PsShape*, float, bool);
 
 		virtual PsAction*	Execute();
 		virtual const char*	Name() const;
@@ -169,7 +169,7 @@ class	LogRotate : public PsAction
 class	LogSwapImage : public PsAction
 {
 	public:
-		/**/				LogSwapImage (PsProject&, PsShape*, PsMatrix*, PsMatrix*, int);
+		/**/				LogSwapImage (PsProjectController&, PsShape*, PsMatrix*, PsMatrix*, int);
 
 		virtual PsAction*	Execute();
 		virtual const char*	Name() const;
@@ -183,7 +183,7 @@ class	LogSwapImage : public PsAction
 class	LogSwapMatrix : public PsAction
 {
 	public:
-		/**/				LogSwapMatrix (PsProject&, PsShape*, int);
+		/**/				LogSwapMatrix (PsProjectController&, PsShape*, int);
 
 		virtual PsAction*	Execute();
 		virtual const char*	Name() const;
@@ -195,7 +195,7 @@ class	LogSwapMatrix : public PsAction
 class	LogTorsio : public PsAction
 {
 	public:
-		/**/				LogTorsio (PsProject&, PsShape*, float, float);
+		/**/				LogTorsio (PsProjectController&, PsShape*, float, float);
 
 		virtual PsAction*	Execute();
 		virtual const char*	Name() const;
@@ -208,7 +208,7 @@ class	LogTorsio : public PsAction
 class	LogPatternAction : public PsAction
 {
 	public:
-		/**/				LogPatternAction (PsProject&);
+		/**/				LogPatternAction (PsProjectController&);
 
 		virtual PsAction*	Execute() = 0;
 		virtual const char*	Name() const = 0;
@@ -223,7 +223,7 @@ class	LogPatternAction : public PsAction
 class	LogPatternRotate : public LogPatternAction
 {
 	public:
-		/**/				LogPatternRotate (PsProject&);
+		/**/				LogPatternRotate (PsProjectController&);
 
 		virtual PsAction*	Execute();
 		virtual const char*	Name() const;
@@ -235,7 +235,7 @@ class	LogPatternRotate : public LogPatternAction
 class	LogPatternTranslate : public LogPatternAction
 {
 	public:
-		/**/				LogPatternTranslate (PsProject&);
+		/**/				LogPatternTranslate (PsProjectController&);
 
 		virtual PsAction*	Execute();
 		virtual const char*	Name() const;
@@ -247,7 +247,7 @@ class	LogPatternTranslate : public LogPatternAction
 class	LogPatternScale : public LogPatternAction
 {
 	public:
-		/**/				LogPatternScale (PsProject&);
+		/**/				LogPatternScale (PsProjectController&);
 
 		virtual PsAction*	Execute();
 		virtual const char*	Name() const;

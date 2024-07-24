@@ -18,7 +18,7 @@
 #include "PsAction.h"
 #include <assert.h>
 
-PsAction::PsAction(PsProject& project, PsShape* shape) :
+PsAction::PsAction(PsProjectController& project, PsShape* shape) :
 	project(project)
 {
 	MatrixList::iterator	tm;
@@ -130,7 +130,7 @@ PsShape* PsAction::GetShape() const
 	return 0;
 }
 
-LogDelImage::LogDelImage(PsProject& project, PsImage* image, bool create) :
+LogDelImage::LogDelImage(PsProjectController& project, PsImage* image, bool create) :
 	PsAction(project, image),
 	create(create)
 {
@@ -201,7 +201,7 @@ const char* LogDelImage::Name() const
 	}
 }
 
-LogDelMatrix::LogDelMatrix(PsProject& project,
+LogDelMatrix::LogDelMatrix(PsProjectController& project,
 	PsMatrix* matrix,
 	bool create)
 	: PsAction(project,
@@ -262,7 +262,7 @@ const char* LogDelMatrix::Name() const
 	}
 }
 
-LogMove::LogMove(PsProject& project, PsShape* shape, float x, float y) :
+LogMove::LogMove(PsProjectController& project, PsShape* shape, float x, float y) :
 	PsAction(project, shape),
 	x(x),
 	y(y)
@@ -294,7 +294,7 @@ const char* LogMove::Name() const
 	return GetAction(ACTION_MOVE);
 }
 
-LogNewImage::LogNewImage(PsProject& project, PsImage* image, bool create) :
+LogNewImage::LogNewImage(PsProjectController& project, PsImage* image, bool create) :
 	PsAction(project, image),
 	create(create)
 {
@@ -348,7 +348,7 @@ const char* LogNewImage::Name() const
 	}
 }
 
-LogNewMatrix::LogNewMatrix(PsProject& project, PsMatrix* matrix, bool create) :
+LogNewMatrix::LogNewMatrix(PsProjectController& project, PsMatrix* matrix, bool create) :
 	PsAction(project, matrix),
 	create(create)
 {
@@ -387,7 +387,7 @@ const char* LogNewMatrix::Name() const
 	}
 }
 
-LogReplace::LogReplace(PsProject& project, PsImage* image) :
+LogReplace::LogReplace(PsProjectController& project, PsImage* image) :
 	PsAction(project, image)
 {
 	uint8* buffer;
@@ -429,7 +429,7 @@ const char* LogReplace::Name() const
 	return GetAction(ACTION_REPLACE);
 }
 
-LogResize::LogResize(PsProject& project,
+LogResize::LogResize(PsProjectController& project,
 	PsShape* shape,
 	float x,
 	float y,
@@ -445,7 +445,7 @@ LogResize::LogResize(PsProject& project,
 	reflect = PsController::Instance().GetOption(PsController::OPTION_REFLECT);
 }
 
-LogResize::LogResize(PsProject& project, PsShape* shape, float x, float y, float w, float h, bool reflect) :
+LogResize::LogResize(PsProjectController& project, PsShape* shape, float x, float y, float w, float h, bool reflect) :
 	PsAction(project, shape),
 	h(h),
 	w(w),
@@ -481,14 +481,14 @@ const char* LogResize::Name() const
 	return GetAction(ACTION_RESIZE);
 }
 
-LogRotate::LogRotate(PsProject& project, PsShape* shape, float r) :
+LogRotate::LogRotate(PsProjectController& project, PsShape* shape, float r) :
 	PsAction(project, shape),
 	r(r)
 {
 	reflect = PsController::Instance().GetOption(PsController::OPTION_REFLECT);
 }
 
-LogRotate::LogRotate(PsProject& project, PsShape* shape, float r, bool reflect) :
+LogRotate::LogRotate(PsProjectController& project, PsShape* shape, float r, bool reflect) :
 	PsAction(project, shape),
 	r(r),
 	reflect(reflect)
@@ -519,7 +519,7 @@ const char* LogRotate::Name() const
 	return GetAction(ACTION_ROTATE);
 }
 
-LogSwapImage::LogSwapImage(PsProject& project, PsShape* shape, PsMatrix* from, PsMatrix* to, int swap) :
+LogSwapImage::LogSwapImage(PsProjectController& project, PsShape* shape, PsMatrix* from, PsMatrix* to, int swap) :
 	PsAction(project, shape),
 	swap(swap)
 {
@@ -595,7 +595,7 @@ const char* LogSwapImage::Name() const
 	return GetAction(ACTION_SWAP_IMAGE);
 }
 
-LogSwapMatrix::LogSwapMatrix(PsProject& project, PsShape* shape, int swap) :
+LogSwapMatrix::LogSwapMatrix(PsProjectController& project, PsShape* shape, int swap) :
 	PsAction(project, shape),
 	swap(swap)
 {
@@ -629,7 +629,7 @@ const char* LogSwapMatrix::Name() const
 	return GetAction(ACTION_SWAP_IMAGE);
 }
 
-LogTorsio::LogTorsio(PsProject& project, PsShape* shape, float i, float j) :
+LogTorsio::LogTorsio(PsProjectController& project, PsShape* shape, float i, float j) :
 	PsAction(project, shape),
 	i(i),
 	j(j)
@@ -657,7 +657,7 @@ const char* LogTorsio::Name() const
 	return GetAction(ACTION_TORSIO);
 }
 
-LogPatternAction::LogPatternAction(PsProject& project) :
+LogPatternAction::LogPatternAction(PsProjectController& project) :
 	PsAction(project, NULL)
 {
 	assert(project.pattern);
@@ -672,7 +672,7 @@ PsLayer* LogPatternAction::GetCurrentLayer()
 	return project.pattern->aLayers[iSelectedLayer];
 }
 
-LogPatternRotate::LogPatternRotate(PsProject& project) :
+LogPatternRotate::LogPatternRotate(PsProjectController& project) :
 	LogPatternAction(project)
 {
 	rRotation = GetCurrentLayer()->rRotation;
@@ -690,7 +690,7 @@ const char* LogPatternRotate::Name() const
 	return GetAction(ACTION_PATTERN_ROTATE);
 }
 
-LogPatternTranslate::LogPatternTranslate(PsProject& project) :
+LogPatternTranslate::LogPatternTranslate(PsProjectController& project) :
 	LogPatternAction(project)
 {
 	vTranslation = GetCurrentLayer()->vTranslation;
@@ -708,7 +708,7 @@ const char* LogPatternTranslate::Name() const
 	return GetAction(ACTION_PATTERN_TRANSLATE);
 }
 
-LogPatternScale::LogPatternScale(PsProject& project) :
+LogPatternScale::LogPatternScale(PsProjectController& project) :
 	LogPatternAction(project)
 {
 	fScale = GetCurrentLayer()->fScale;

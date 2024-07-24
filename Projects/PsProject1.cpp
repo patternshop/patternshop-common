@@ -29,7 +29,7 @@
 /*
 ** Initially, no pattern, matrix, image, etc. is selected.
 */
-PsProject::PsProject() :
+PsProjectController::PsProjectController() :
 	pattern(0),
 	matrix(0),
 	image(0),
@@ -46,7 +46,7 @@ PsProject::PsProject() :
 	this->bPatternsIsSelected = false;
 }
 
-PsProject::~PsProject()
+PsProjectController::~PsProjectController()
 {
 	this->LogFlush();
 }
@@ -54,7 +54,7 @@ PsProject::~PsProject()
 /*
 ** Duplicates the currently selected image
 */
-ErrID PsProject::CloneImage()
+ErrID PsProjectController::CloneImage()
 {
 	uint8* buffer1;
 	uint8* buffer2;
@@ -86,7 +86,7 @@ ErrID PsProject::CloneImage()
 	else
 	{
 		this->images.push_back(image);
-		image->SetPosition(PROJECT_VERSION / 2.0f, this->GetHeight() / 2.0f);
+		image->SetPosition(this->GetWidth() / 2.0f, this->GetHeight() / 2.0f);
 	}
 
 	this->LogAdd(new LogNewImage(*this, image, true));
@@ -98,7 +98,7 @@ ErrID PsProject::CloneImage()
 /*
 ** Duplicates the currently selected matrix
 */
-ErrID PsProject::CloneMatrix()
+ErrID PsProjectController::CloneMatrix()
 {
 	uint8* buffer1;
 	uint8* buffer2;
@@ -150,7 +150,7 @@ ErrID PsProject::CloneMatrix()
 /*
 ** Replaces the currently selected image
 */
-ErrID PsProject::ReplaceImage(const char* file)
+ErrID PsProjectController::ReplaceImage(const char* file)
 {
 	if (!this->image)
 		return ERROR_IMAGE_SELECT;
@@ -166,7 +166,7 @@ ErrID PsProject::ReplaceImage(const char* file)
 /*
 ** Deletes the selected image from the matrix that contains it.
 */
-ErrID PsProject::DelImage()
+ErrID PsProjectController::DelImage()
 {
 	ImageList::iterator ti;
 	MatrixList::iterator tm;
@@ -193,7 +193,7 @@ ErrID PsProject::DelImage()
 /*
 ** Deletes the selected matrix and selects another one if any remain.
 */
-ErrID PsProject::DelMatrix()
+ErrID PsProjectController::DelMatrix()
 {
 	ImageList::iterator t;
 
@@ -216,7 +216,7 @@ ErrID PsProject::DelMatrix()
 /*
 ** Deletes the selected pattern and selects another one if any remain.
 */
-ErrID PsProject::DelPattern()
+ErrID PsProjectController::DelPattern()
 {
 	if (!this->pattern)
 		return ERROR_PATTERN_SELECT;
@@ -230,7 +230,7 @@ ErrID PsProject::DelPattern()
 /*
 ** Imports a new image outside of a matrix.
 */
-ErrID PsProject::NewImage(const char* file)
+ErrID PsProjectController::NewImage(const char* file)
 {
 	PsImage* image;
 
@@ -252,7 +252,7 @@ ErrID PsProject::NewImage(const char* file)
 /*
 ** Imports a new image into the current matrix, if there is one.
 */
-ErrID PsProject::NewMotif(const char* file)
+ErrID PsProjectController::NewMotif(const char* file)
 {
 	PsImage* image;
 	float x;
@@ -287,7 +287,7 @@ ErrID PsProject::NewMotif(const char* file)
 ** of that of the document, but this is completely arbitrary (yes, a quarter and not an eighth,
 ** the remark of PsImage::TextureFromBuffer also applies here).
 */
-ErrID PsProject::NewMatrix()
+ErrID PsProjectController::NewMatrix()
 {
 	this->matrix = new PsMatrix();
 	this->image = 0;
@@ -306,7 +306,7 @@ ErrID PsProject::NewMatrix()
 /*
 ** Creates a new pattern in the document.
 */
-ErrID PsProject::NewPattern(const char* file)
+ErrID PsProjectController::NewPattern(const char* file)
 {
 	if (this->pattern)
 		delete this->pattern;

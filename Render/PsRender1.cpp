@@ -112,7 +112,7 @@ void PsRender::Convert(int x, int y, float& fx, float& fy) const
 /*
  ** Draws the background, with the grid (hardware only).
  */
-void PsRender::DrawBack(const PsProject& p, float x, float y)
+void PsRender::DrawBack(const PsProjectController& p, float x, float y)
 {
 
 	if (p.bHideColor)

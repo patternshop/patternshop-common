@@ -221,7 +221,7 @@ void		PsRender::Recalc()
 	this->y2 = this->scroll_y - zy;
 }
 
-void PsRender::PrepareSurface(PsProject& project, int x, int y)
+void PsRender::PrepareSurface(PsProjectController& project, int x, int y)
 {
 	float fMaxSize = this->doc_x > this->doc_y ? this->doc_x : this->doc_y;
 
@@ -247,7 +247,7 @@ void PsRender::PrepareSurface(PsProject& project, int x, int y)
 }
 
 
-void PsRender::DrawMatrices(PsProject& project)
+void PsRender::DrawMatrices(PsProjectController& project)
 {
 	MatrixList::const_iterator i;
 	int n;
@@ -260,7 +260,7 @@ void PsRender::DrawMatrices(PsProject& project)
 	}
 }
 
-void PsRender::DrawImages(PsProject& project)
+void PsRender::DrawImages(PsProjectController& project)
 {
 	glColor4f(1.f, 1.f, 1.f, 1.f);
 	glEnable(GL_TEXTURE_2D);
@@ -272,7 +272,7 @@ void PsRender::DrawImages(PsProject& project)
 	glDisable(GL_BLEND);
 }
 
-void PsRender::DrawMatricesGizmos(PsProject& project)
+void PsRender::DrawMatricesGizmos(PsProjectController& project)
 {
 	MatrixList::const_iterator i;
 

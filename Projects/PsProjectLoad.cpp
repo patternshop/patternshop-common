@@ -14,9 +14,10 @@
  * You should have received a copy of the GNU General Public License
  * along with Patternshop.  If not, see <http://www.gnu.org/licenses/>
 */
+#include "PsProjectSave.h"
 #include "PsProjectLoad.h"
 
-PsProjectLoad::PsProjectLoad(PsProject& project) : project(project), file(NULL)
+PsProjectLoad::PsProjectLoad(PsProjectController& project) : project(project), file(NULL)
 {
 }
 

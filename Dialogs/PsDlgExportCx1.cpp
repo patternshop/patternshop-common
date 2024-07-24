@@ -28,7 +28,7 @@ double PsDlgExportCx::right;
 double PsDlgExportCx::bottom;
 double PsDlgExportCx::top;
 float PsDlgExportCx::corner[4][2];
-PsProject* PsDlgExportCx::project;
+PsProjectController* PsDlgExportCx::project;
 float PsDlgExportCx::r_backup;
 int PsDlgExportCx::h;
 int PsDlgExportCx::w;
