@@ -19,13 +19,13 @@
 
 DialogPatternCx::DialogPatternCx()
 {
-	bUpdated = false;
-	m_RenduImage.Create(1, 1, 24);
+	this->bUpdated = false;
+	this->m_RenduImage.Create(1, 1, 24);
 }
 
 void DialogPatternCx::Update()
 {
-	bUpdated = false;
+	this->bUpdated = false;
 }
 
 void DialogPatternCx::SetQuality(int iQuality)
@@ -69,7 +69,7 @@ void DialogPatternCx::OnShowWindow(bool bShow)
 				PsController::Instance().UpdateWindow();
 			}
 		}
-		Update();
+		this->Update();
 	}
 }
 
@@ -77,19 +77,19 @@ void DialogPatternCx::OnButtonDown(int iX, int iY)
 {
 	if (!PsController::Instance().project || !PsController::Instance().project->pattern)
 	{
-		OnShowWindow(false);
+		this->OnShowWindow(false);
 		return;
 	}
 
 	PsProject& project = *(PsController::Instance().project);
-	if (iX > dst_x1 && iX < dst_x2 && iY < dst_y2 && iY > dst_y1)
+	if (iX > this->dst_x1 && iX < this->dst_x2 && iY < this->dst_y2 && iY > this->dst_y1)
 	{
-		float r1 = (float)project.pattern->GetWidth() / (float)(dst_x2 - dst_x1);
-		float r2 = (float)project.pattern->GetHeight() / (float)(dst_y2 - dst_y1);
+		float r1 = (float)project.pattern->GetWidth() / (float)(this->dst_x2 - this->dst_x1);
+		float r2 = (float)project.pattern->GetHeight() / (float)(this->dst_y2 - this->dst_y1);
 		int iTargetSelected = -1;
 		uint8 cMax = 150;
-		int x = FloatToInt((iX - dst_x1) * r1);
-		int y = FloatToInt((iY - dst_y1) * r2);
+		int x = FloatToInt((iX - this->dst_x1) * r1);
+		int y = FloatToInt((iY - this->dst_y1) * r2);
 		int p = x + y * project.pattern->texture.width;
 		for (int i = 0; i < project.pattern->GetChannelsCount(); ++i)
 		{
@@ -105,7 +105,7 @@ void DialogPatternCx::OnButtonDown(int iX, int iY)
 			project.bPatternsIsSelected = true;
 			project.iLayerId = iTargetSelected;
 			PsController::Instance().UpdateWindow();
-			Update();
+			this->Update();
 		}
 	}
 }
@@ -118,28 +118,28 @@ void DialogPatternCx::UpdateMiniImage(int iWindowWidth, int iWindowHeight)
 	PsProject& project = *(PsController::Instance().project);
 	PsRender& renderer = PsController::Instance().project->renderer;
 
-	//-- calcul des cordonnées cible 
+	//-- calculation of target coordinates 
 	int max_width = iWindowWidth, max_height = iWindowHeight;
 	float r1 = (float)project.GetWidth() / (float)max_width;
 	float r2 = (float)project.GetHeight() / (float)max_height;
 	if (r2 > r1) r1 = r2;
-	dst_width = project.GetWidth() / r1;
-	dst_height = project.GetHeight() / r1;
-	int w_border = (iWindowWidth - dst_width) / 2;
-	int h_border = 10;//(300 - dst_height) / 2;
+	this->dst_width = project.GetWidth() / r1;
+	this->dst_height = project.GetHeight() / r1;
+	int w_border = (iWindowWidth - this->dst_width) / 2;
+	int h_border = 10; //(300 - dst_height) / 2;
 	//--
 
-	//-- mise à jour des données
-	dst_x1 = w_border, dst_y1 = h_border;
-	dst_x2 = dst_x1 + dst_width, dst_y2 = dst_y1 + dst_height;
+	//-- update data
+	this->dst_x1 = w_border, this->dst_y1 = h_border;
+	this->dst_x2 = this->dst_x1 + this->dst_width, this->dst_y2 = this->dst_y1 + this->dst_height;
 	//--
 
-	m_RenduImage.Destroy();
-	m_RenduImage.Create(dst_width, dst_height, 32);
+	this->m_RenduImage.Destroy();
+	this->m_RenduImage.Create(this->dst_width, this->dst_height, 32);
 
-	//-- centrage de la vue sur la matrice
+	//-- centering the view on the matrix
 	glPushMatrix();
-	glViewport(0, 0, dst_width, dst_height);
+	glViewport(0, 0, this->dst_width, this->dst_height);
 	glPushMatrix();
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -152,7 +152,7 @@ void DialogPatternCx::UpdateMiniImage(int iWindowWidth, int iWindowHeight)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 #ifdef _WINDOWS
-	//- fond gris
+	//- gray background
 	glColor4f(212.f / 255.f, 208.f / 255.f, 200.f / 255.f, 1.f);
 	glBegin(GL_QUADS);
 	glVertex2f(0, project.GetHeight());
@@ -163,7 +163,7 @@ void DialogPatternCx::UpdateMiniImage(int iWindowWidth, int iWindowHeight)
 	//--
 #endif /* _WINDOWS */
 
-	//-- dessin des zones
+	//-- drawing zones
 	for (int i = 0; i < project.pattern->GetChannelsCount(); ++i)
 	{
 		if (i != project.iLayerId) glColor4f(0.75f, 0.75f, 1.00f, 0.8f);
@@ -189,9 +189,9 @@ void DialogPatternCx::UpdateMiniImage(int iWindowWidth, int iWindowHeight)
 	//--
 
 #ifdef _WINDOWS
-	hardwareRenderer.CopyToSoftBuffer(m_RenduImage);
-#else / * _MACOSX */
-	hardwareRenderer.CopyToSoftBuffer(m_RenduImage, true);
+	hardwareRenderer.CopyToSoftBuffer(this->m_RenduImage);
+#else /* _MACOSX */
+	hardwareRenderer.CopyToSoftBuffer(this->m_RenduImage, true);
 #endif /* _WINDOWS */
 
 }
