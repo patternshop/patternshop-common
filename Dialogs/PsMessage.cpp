@@ -148,14 +148,14 @@ static const ErrITEM englishErrMsg[] =
 
    { ERROR_IMAGE_LOAD, "Unable to load the image." },
    { ERROR_IMAGE_MATRIX, "You should create a pattern before adding an image." },
-   { ERROR_IMAGE_SELECT, "To perform the requested action\nyou have first to select an image in the project." },
+   { ERROR_IMAGE_SELECT, "To perform the requested action\nyou have first to select an image in the project_controller." },
 
-   { ERROR_MATRIX_SELECT, "To perform the requested action\nyou have first to select a pattern in the project." },
+   { ERROR_MATRIX_SELECT, "To perform the requested action\nyou have first to select a pattern in the project_controller." },
    { ERROR_MATRIX_NO_EXPORTABLE, "To export the pattern you have to remove its torsio." },
 
    { ERROR_PATTERN_LOAD, "Unable to load the template." },
-   { ERROR_PATTERN_SELECT, "To perform the requested action\nyou have first to select a template in the project." },
-   { ERROR_PATTERN_SELECT, "To perform the requested action\nyou have first to select a project." },
+   { ERROR_PATTERN_SELECT, "To perform the requested action\nyou have first to select a template in the project_controller." },
+   { ERROR_PATTERN_SELECT, "To perform the requested action\nyou have first to select a project_controller." },
 
    { ERROR_VIDEOCARD, "Unable to create a pixel buffer.\nYou should probably update your video card driver." },
 
@@ -169,7 +169,7 @@ static const ErrITEM englishErrMsg[] =
 static const QuestITEM englishQuestMsg[] =
 {
    { QUESTION_DELETE_IMAGE, "You are going to delete an image.\nDo you want to continue  ?" },
-   { QUESTION_DELETE_MATRIX, "Delete a pattern from the project\nalso remove contained images.\nDo you want to continue  ?" },
+   { QUESTION_DELETE_MATRIX, "Delete a pattern from the project_controller\nalso remove contained images.\nDo you want to continue  ?" },
    { QUESTION_EXPORT_ROTATION, "To export the pattern, a rotation have to be done.\nDo you want to continue ?" },
    { QUESTION_LOOSE_ALPHA, "This file format doesn't manage\nthe transparency.\nDo you want to continue ?" },
    { QUESTION_RESET_CONFIG_FILE, "The configuration file will be\nrestored to default values after restart.\nDo you want to continue ?" },

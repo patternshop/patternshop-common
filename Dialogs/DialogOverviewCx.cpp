@@ -33,7 +33,7 @@ void DialogOverviewCx::Update()
 
 PsRect DialogOverviewCx::GetSelectionRectangle(int iWindowWidth, int iWindowHeight)
 {
-	PsRender& renderer = PsController::Instance().project->renderer;
+	PsRender& renderer = PsController::Instance().project_controller->renderer;
 
 	float size_x = renderer.size_x;
 	float size_y = renderer.size_y;
@@ -70,9 +70,9 @@ PsRect DialogOverviewCx::GetSelectionRectangle(int iWindowWidth, int iWindowHeig
 
 void DialogOverviewCx::OnLeftMouseButtonDown(PsPoint point)
 {
-	if (PsController::Instance().project)
+	if (PsController::Instance().project_controller)
 	{
-		PsRender& renderer = PsController::Instance().project->renderer;
+		PsRender& renderer = PsController::Instance().project_controller->renderer;
 		int x = FloatToInt((this->window_buffer2.GetWidth() - this->r_size_x) / 2);
 		int y = FloatToInt((this->window_buffer2.GetHeight() - this->r_size_y) / 2);
 		if (this->bDragging || !this->zooming &&
@@ -136,7 +136,7 @@ void DialogOverviewCx::CleanBackground()
 
 void DialogOverviewCx::FastUpdate()
 {
-	if (!PsController::Instance().project)
+	if (!PsController::Instance().project_controller)
 	{
 		this->psWin->SetTarget(&this->window_buffer);
 		this->CleanBackground();
@@ -148,11 +148,11 @@ void DialogOverviewCx::FastUpdate()
 
 	this->psWin->DrawSoftwareBuffer(this->window_buffer2, 0, 0);
 
-	if (PsController::Instance().project)
+	if (PsController::Instance().project_controller)
 	{
 		this->DrawRedSelection();
 
-		PsRender& renderer = PsController::Instance().project->renderer;
+		PsRender& renderer = PsController::Instance().project_controller->renderer;
 
 		// zoom bar
 		this->psWin->SetPenColor(0, 0, 0);

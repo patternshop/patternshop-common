@@ -29,13 +29,13 @@
 
 void PsWinProjectCx::DrawBackgroundBloc()
 {
-	PsProjectController* project = PsController::Instance().project;
+	PsProjectController* project_controller = PsController::Instance().project_controller;
 
-	if (project)
+	if (project_controller)
 	{
-		if (project->pattern)
+		if (project_controller->pattern)
 		{
-			PsPattern* pattern = project->pattern;
+			PsPattern* pattern = project_controller->pattern;
 			// pattern
 			if (this->ypos_precalc + this->item_count_size > 0)
 			{
@@ -49,7 +49,7 @@ void PsWinProjectCx::DrawBackgroundBloc()
 					img = this->loadThumb(&(pattern->texture));
 				int p = (32 - img->GetWidth()) / 2 + 26;
 				int u = (this->item_count_size - img->GetHeight()) / 2 + this->ypos_precalc;
-				/*if (project->bPatternsIsSelected)
+				/*if (project_controller->bPatternsIsSelected)
 				{
 				SetBrushColor(10, 36, 106);
 				SetPenColor(10, 36, 106);
@@ -71,7 +71,7 @@ void PsWinProjectCx::DrawBackgroundBloc()
 		// uniform color
 		if (this->ypos_precalc + this->item_count_size > 0)
 		{
-			if (!project->bHideColor) this->viewImage.BitBlt((*this->psWin), 4, this->ypos_precalc + 4);
+			if (!project_controller->bHideColor) this->viewImage.BitBlt((*this->psWin), 4, this->ypos_precalc + 4);
 			else this->boxImage.BitBlt((*this->psWin), 4, this->ypos_precalc + 4);
 			this->psWin->SetBrushColor(212, 208, 200);
 			this->psWin->SetPenColor(255, 255, 255);
@@ -79,7 +79,7 @@ void PsWinProjectCx::DrawBackgroundBloc()
 			int p = 15 + 26;
 			int u = this->ypos_precalc;
 
-			this->psWin->SetBrushColor(project->iColor[0], project->iColor[1], project->iColor[2]);
+			this->psWin->SetBrushColor(project_controller->iColor[0], project_controller->iColor[1], project_controller->iColor[2]);
 			this->psWin->SetPenColor(0, 0, 0);
 			this->psWin->DrawRectangle(35, this->ypos_precalc + 5, 70, this->ypos_precalc + this->item_count_size - 5);
 

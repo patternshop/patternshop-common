@@ -37,7 +37,7 @@
  ** Retrieve the repeated pattern over the entire document in a
  ** texture of size 'fTextureSize'.
  */
-GLuint PsRender::CreateDocumentTexture(PsProjectController& project)
+GLuint PsRender::CreateDocumentTexture(PsProjectController& project_controller)
 {
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -46,35 +46,35 @@ GLuint PsRender::CreateDocumentTexture(PsProjectController& project)
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	this->DrawMatrices(project);
+	this->DrawMatrices(project_controller);
 	GLuint iTextureBloc;
 	hardwareRenderer.CopyToHardBuffer(iTextureBloc, this->iLayerTextureSize, this->iLayerTextureSize);
-	this->PrepareSurface(project, this->size_x, this->size_y);
+	this->PrepareSurface(project_controller, this->size_x, this->size_y);
 	return iTextureBloc;
 }
 
 /*
  ** Returns the eye position used in MultiLayerRendering mode (see PsPattern)
- ** to project the different layers (see PsLayer).
+ ** to project_controller the different layers (see PsLayer).
  */
 PsVector PsRender::GetEyeLocation()
 {
 	return PsVector(this->doc_x / 2.f, this->doc_y / 2.f, this->doc_y * 2.415f);
 }
 
-void PsRender::MultiLayerRendering(PsProjectController& project, int x, int y)
+void PsRender::MultiLayerRendering(PsProjectController& project_controller, int x, int y)
 {
 	// pre-conditions
-	if (!project.pattern) return;
+	if (!project_controller.pattern) return;
 
 	//-- retrieve parameters
-	PsPattern* pattern = project.pattern;
+	PsPattern* pattern = project_controller.pattern;
 	int iCount = pattern->GetChannelsCount();
 	//--
 
 	//iCount = 1; // FIXME
 
-	this->PrepareSurface(project, x, y);
+	this->PrepareSurface(project_controller, x, y);
 
 	if (iCount > 0)
 	{
@@ -85,17 +85,17 @@ void PsRender::MultiLayerRendering(PsProjectController& project, int x, int y)
 			this->active->SetPixelBufferContext();
 #endif
 
-			GLuint iDocTexture = this->CreateDocumentTexture(project);
+			GLuint iDocTexture = this->CreateDocumentTexture(project_controller);
 			for (int i = 0; i < iCount; ++i)
 			{
-				this->UpdateLayerTexture(project, pattern->aLayers[i], iDocTexture);
+				this->UpdateLayerTexture(project_controller, pattern->aLayers[i], iDocTexture);
 			}
 
 #ifdef _MACOSX
 			this->active->RestorePreviousContext();
 #endif
 
-			this->DrawBack(project, (float)x, (float)y);
+			this->DrawBack(project_controller, (float)x, (float)y);
 			for (int i = 0; i < iCount; ++i)
 			{
 				this->DrawLayerTexture(pattern->aLayers[i]->iFinalTextureId);
@@ -115,13 +115,13 @@ void PsRender::MultiLayerRendering(PsProjectController& project, int x, int y)
 		//--
 	}
 
-	this->DrawPattern(*project.pattern);
+	this->DrawPattern(*project_controller.pattern);
 }
 
 /**
  * Triggers a render, hardware or software, according to the chosen mode.
 */
-void PsRender::Render(PsProjectController& project, int x, int y)
+void PsRender::Render(PsProjectController& project_controller, int x, int y)
 {
 
 	if (this->engine == ENGINE_HARDWARE)
@@ -129,17 +129,17 @@ void PsRender::Render(PsProjectController& project, int x, int y)
 		glPushMatrix();
 	}
 
-	if (!project.pattern
-		|| project.pattern->hide)
+	if (!project_controller.pattern
+		|| project_controller.pattern->hide)
 	{
-		this->MonoLayerRendering(project, x, y);
+		this->MonoLayerRendering(project_controller, x, y);
 	}
 	else
 	{
-		this->MultiLayerRendering(project, x, y);
+		this->MultiLayerRendering(project_controller, x, y);
 	}
 
-	this->DrawImages(project);
+	this->DrawImages(project_controller);
 
 	if (this->engine == ENGINE_HARDWARE)
 	{
@@ -150,7 +150,7 @@ void PsRender::Render(PsProjectController& project, int x, int y)
 
 		if (PsController::Instance().GetOption(PsController::OPTION_BOX_SHOW))
 		{
-			this->DrawGizmos(project);
+			this->DrawGizmos(project_controller);
 		}
 		glPopMatrix();
 	}
@@ -164,8 +164,8 @@ void PsRender::SetDocSize(int x, int y)
 	this->doc_x = x;
 	this->doc_y = y;
 
-	if (PsController::Instance().project && PsController::Instance().project->pattern)
-		PsController::Instance().project->pattern->UpdateScale(this->doc_x, this->doc_y);
+	if (PsController::Instance().project_controller && PsController::Instance().project_controller->pattern)
+		PsController::Instance().project_controller->pattern->UpdateScale(this->doc_x, this->doc_y);
 }
 
 /*

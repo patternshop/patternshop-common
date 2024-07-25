@@ -35,12 +35,12 @@ void	DrawBackSoftwareFile()
 {
 	//-- sélection de la couleur de fond
 	uint8 color[4];
-	PsProjectController* project = PsController::Instance().project;
-	if (!project->bHideColor)
+	PsProjectController* project_controller = PsController::Instance().project_controller;
+	if (!project_controller->bHideColor)
 	{
-		color[0] = project->iColor[0];
-		color[1] = project->iColor[1];
-		color[2] = project->iColor[2];
+		color[0] = project_controller->iColor[0];
+		color[1] = project_controller->iColor[1];
+		color[2] = project_controller->iColor[2];
 		color[3] = 255;
 	}
 	else
@@ -82,7 +82,7 @@ void InitSoftwareFile(int sx, int sy)
 
 	bigImage = FreeImage_Allocate(sx, sy, 32);
 
-	unsigned int pixelsPerMeter = round((double)PsController::Instance().project->GetDpi() / 0.0254);
+	unsigned int pixelsPerMeter = round((double)PsController::Instance().project_controller->GetDpi() / 0.0254);
 
 	FreeImage_SetDotsPerMeterX(bigImage, pixelsPerMeter);
 	FreeImage_SetDotsPerMeterY(bigImage, pixelsPerMeter);
@@ -216,7 +216,7 @@ void PasteSoftwareFile(PsImage& image, int x, int y)
 	//-- finalement, copie
 	float a, b;
 	image.GetPosition(a, b);
-	PsRender& renderer = PsController::Instance().project->renderer;
+	PsRender& renderer = PsController::Instance().project_controller->renderer;
 	FreeImage_BlendPaste(bigImage, im, (int)(x + a) - renderer.x1 - FreeImage_GetWidth(im) / 2, (int)(y + b) - renderer.y2 - FreeImage_GetHeight(im) / 2);
 	//--
 
@@ -361,8 +361,8 @@ void flushSoftwareFile(const char* filename, bool warning_alpha)
 */
 FIBITMAP* DrawSoftwareMapping(PsLayer* layer, FIBITMAP* src_img)
 {
-	PsProjectController* project = PsController::Instance().project;
-	PsRender& renderer = PsController::Instance().project->renderer;
+	PsProjectController* project_controller = PsController::Instance().project_controller;
+	PsRender& renderer = PsController::Instance().project_controller->renderer;
 
 	int iWidth = FreeImage_GetWidth(src_img);
 	int iHeight = FreeImage_GetHeight(src_img);
@@ -373,9 +373,9 @@ FIBITMAP* DrawSoftwareMapping(PsLayer* layer, FIBITMAP* src_img)
 	int iOldLayerTextureSize = renderer.iLayerTextureSize;
 	renderer.iLayerTextureSize = iTextureSize;
 	renderer.engine = PsRender::ENGINE_HARDWARE;
-	GLuint iDocTexture = renderer.CreateDocumentTexture(*project);
+	GLuint iDocTexture = renderer.CreateDocumentTexture(*project_controller);
 	renderer.engine = PsRender::ENGINE_SOFTWARE;
-	renderer.UpdateLayerTexture(*project, layer, iDocTexture);
+	renderer.UpdateLayerTexture(*project_controller, layer, iDocTexture);
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, layer->iFinalTextureId);
 	glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, result_data);
@@ -409,13 +409,13 @@ FIBITMAP* DrawSoftwareMapping(PsLayer* layer, FIBITMAP* src_img)
 void DrawLayerSoftwareFile(int iIndex)
 {
 	//-- récupération des paramètres du projet
-	PsProjectController* project = PsController::Instance().project;
-	if (!project) return;
-	if (!project->pattern) return;
-	if (project->pattern->aLayers.size() <= iIndex) return;
-	PsLayer* layer = project->pattern->aLayers[iIndex];
-	PsRender& renderer = PsController::Instance().project->renderer;
-	PsPattern* pattern = project->pattern;
+	PsProjectController* project_controller = PsController::Instance().project_controller;
+	if (!project_controller) return;
+	if (!project_controller->pattern) return;
+	if (project_controller->pattern->aLayers.size() <= iIndex) return;
+	PsLayer* layer = project_controller->pattern->aLayers[iIndex];
+	PsRender& renderer = PsController::Instance().project_controller->renderer;
+	PsPattern* pattern = project_controller->pattern;
 	//--
 
 	int iWidth = FreeImage_GetWidth(bigImage);
@@ -430,7 +430,7 @@ void DrawLayerSoftwareFile(int iIndex)
 	/* FIXME : OpenGL HACK
 	FIBITMAP *bigImageBackup = bigImage;
 	bigImage = buffer;
-	renderer.DrawMatrices(*project);
+	renderer.DrawMatrices(*project_controller);
 	bigImage = bigImageBackup;
 	*/
 	//--

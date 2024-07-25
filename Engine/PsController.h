@@ -111,7 +111,7 @@ public:
 	void					SetTool(Tool);
 
 	Tool					tool, prev_tool;					// Outil actuellement sélectionné
-	PsProjectController*				project;
+	PsProjectController*	project_controller;
 
 public:
 	PsController();

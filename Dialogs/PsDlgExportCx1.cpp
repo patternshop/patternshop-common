@@ -28,23 +28,23 @@ double PsDlgExportCx::right;
 double PsDlgExportCx::bottom;
 double PsDlgExportCx::top;
 float PsDlgExportCx::corner[4][2];
-PsProjectController* PsDlgExportCx::project;
+PsProjectController* PsDlgExportCx::project_controller;
 float PsDlgExportCx::r_backup;
 int PsDlgExportCx::h;
 int PsDlgExportCx::w;
 
 bool PsDlgExportCx::Initialize()
 {
-	if (!PsController::Instance().project)
+	if (!PsController::Instance().project_controller)
 		return false;
 
-	//-- retrieving the project
-	this->project = PsController::Instance().project;
-	assert(this->project);
-	assert(this->project->matrix);
-	assert(this->project->matrix->i == 0);
-	assert(this->project->matrix->j == 0);
-	this->dpi = this->project->renderer.dpi;
+	//-- retrieving the project_controller
+	this->project_controller = PsController::Instance().project_controller;
+	assert(this->project_controller);
+	assert(this->project_controller->matrix);
+	assert(this->project_controller->matrix->i == 0);
+	assert(this->project_controller->matrix->j == 0);
+	this->dpi = this->project_controller->renderer.dpi;
 	this->z = 100;
 	//--
 
@@ -66,7 +66,7 @@ bool PsDlgExportCx::Initialize()
 
 	//-- restoring the rendering
 	this->RestoreRotation();
-	this->project->renderer.Recalc();
+	this->project_controller->renderer.Recalc();
 	PsController::Instance().UpdateWindow();
 	//--
 
@@ -74,11 +74,11 @@ bool PsDlgExportCx::Initialize()
 }
 bool PsDlgExportCx::CheckRotation()
 {
-	int Angle = (int)round(project->matrix->r * 180.f / PS_MATH_PI);
-	if (project->matrix->w != project->matrix->h)
+	int Angle = (int)round(project_controller->matrix->r * 180.f / PS_MATH_PI);
+	if (project_controller->matrix->w != project_controller->matrix->h)
 		if (Angle % 90 != 0)
 			return false;
-	if (project->matrix->w == project->matrix->h)
+	if (project_controller->matrix->w == project_controller->matrix->h)
 		if (Angle % 45 != 0)
 			return false;
 	return true;
@@ -89,9 +89,9 @@ bool PsDlgExportCx::CheckRotation()
 */
 void PsDlgExportCx::TweakRotation()
 {
-	r_backup = project->matrix->r;
+	r_backup = project_controller->matrix->r;
 	if (!CheckRotation())
-		project->matrix->SetAngle(0, false, true);
+		project_controller->matrix->SetAngle(0, false, true);
 }
 
 /*
@@ -99,15 +99,15 @@ void PsDlgExportCx::TweakRotation()
 */
 void PsDlgExportCx::RestoreRotation()
 {
-	project->matrix->SetAngle(r_backup, false, true);
+	project_controller->matrix->SetAngle(r_backup, false, true);
 }
 
 void PsDlgExportCx::GetMatrixWindow()
 {
-	project->matrix->ToAbsolute(-SHAPE_SIZE, -SHAPE_SIZE, corner[0][0], corner[0][1]);
-	project->matrix->ToAbsolute(SHAPE_SIZE, -SHAPE_SIZE, corner[1][0], corner[1][1]);
-	project->matrix->ToAbsolute(SHAPE_SIZE, SHAPE_SIZE, corner[2][0], corner[2][1]);
-	project->matrix->ToAbsolute(-SHAPE_SIZE, SHAPE_SIZE, corner[3][0], corner[3][1]);
+	project_controller->matrix->ToAbsolute(-SHAPE_SIZE, -SHAPE_SIZE, corner[0][0], corner[0][1]);
+	project_controller->matrix->ToAbsolute(SHAPE_SIZE, -SHAPE_SIZE, corner[1][0], corner[1][1]);
+	project_controller->matrix->ToAbsolute(SHAPE_SIZE, SHAPE_SIZE, corner[2][0], corner[2][1]);
+	project_controller->matrix->ToAbsolute(-SHAPE_SIZE, SHAPE_SIZE, corner[3][0], corner[3][1]);
 	left = corner[0][0];
 	for (int i = 0; i < 4; ++i)
 		if (corner[i][0] < left)
@@ -128,19 +128,19 @@ void PsDlgExportCx::GetMatrixWindow()
 
 GLuint PsDlgExportCx::CreateExportTexture(int iMaxSize)
 {
-	project = PsController::Instance().project;
+	project_controller = PsController::Instance().project_controller;
 	SoftwareBuffer exportImage;
 
-	if (!project)
+	if (!project_controller)
 		return -1;
 
-	if (!project->matrix && project->matrices.size() > 0)
-		project->matrix = *(project->matrices.begin());
+	if (!project_controller->matrix && project_controller->matrices.size() > 0)
+		project_controller->matrix = *(project_controller->matrices.begin());
 
-	if (!project->matrix)
+	if (!project_controller->matrix)
 		return -1;
 
-	PsRender& renderer = project->renderer;
+	PsRender& renderer = project_controller->renderer;
 
 	//-- r�cup�ration des coins de la matrice
 	TweakRotation();
@@ -179,15 +179,15 @@ GLuint PsDlgExportCx::CreateExportTexture(int iMaxSize)
 	//-- rendu dans la texture
 	GLuint texture;
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	renderer.DrawBack(*project, exportImage.GetWidth(), exportImage.GetHeight());
-	renderer.DrawShape(*(project->matrix));
+	renderer.DrawBack(*project_controller, exportImage.GetWidth(), exportImage.GetHeight());
+	renderer.DrawShape(*(project_controller->matrix));
 	hardwareRenderer.CopyToHardBuffer(texture, iWidth, iHeight);
 
 	glPopMatrix();
 
 	//-- r�tablisement du rendu
 	RestoreRotation();
-	project->renderer.Recalc();
+	project_controller->renderer.Recalc();
 	PsController::Instance().UpdateWindow();
 	//--
 
@@ -204,7 +204,7 @@ void PsDlgExportCx::CreateExportImage()
 	exportImage.Create((int)((this->right - this->left) * maxScale), (int)((this->bottom - this->top) * maxScale), 24);
 	//--
 
-	PsRender& renderer = this->project->renderer;
+	PsRender& renderer = this->project_controller->renderer;
 
 	glPushMatrix();
 
@@ -225,8 +225,8 @@ void PsDlgExportCx::CreateExportImage()
 
 	//-- rendering into the backbuffer
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	renderer.DrawBack(*this->project, exportImage.GetWidth(), exportImage.GetHeight());
-	renderer.DrawShape(*(this->project->matrix));
+	renderer.DrawBack(*this->project_controller, exportImage.GetWidth(), exportImage.GetHeight());
+	renderer.DrawShape(*(this->project_controller->matrix));
 	hardwareRenderer.CopyToSoftBuffer(exportImage);
 
 	glPopMatrix();
@@ -248,7 +248,7 @@ void PsDlgExportCx::CreatePreviewImage()
 	previewImage.Create((this->right - this->left) * maxScale * 3, (this->bottom - this->top) * maxScale * 3, 24);
 	//--
 
-	PsRender& renderer = this->project->renderer;
+	PsRender& renderer = this->project_controller->renderer;
 
 	//-- start
 	glPushMatrix();
@@ -271,8 +271,8 @@ void PsDlgExportCx::CreatePreviewImage()
 
 	//-- rendering into the backbuffer
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	renderer.DrawBack(*this->project, previewImage.GetWidth(), previewImage.GetHeight());
-	renderer.DrawShape(*(this->project->matrix));
+	renderer.DrawBack(*this->project_controller, previewImage.GetWidth(), previewImage.GetHeight());
+	renderer.DrawShape(*(this->project_controller->matrix));
 	hardwareRenderer.CopyToSoftBuffer(previewImage);
 	//--
 
@@ -291,16 +291,16 @@ void PsDlgExportCx::OnValidation(const char* filename)
 	//--
 
 	//-- zooming the matrix
-	float w_backup = this->project->matrix->w;
-	float h_backup = this->project->matrix->h;
-	this->project->matrix->SetSize(this->project->matrix->w * this->z / 100.f, this->project->matrix->h * this->z / 100.f, 0, 0, 0, 0, false, true);
+	float w_backup = this->project_controller->matrix->w;
+	float h_backup = this->project_controller->matrix->h;
+	this->project_controller->matrix->SetSize(this->project_controller->matrix->w * this->z / 100.f, this->project_controller->matrix->h * this->z / 100.f, 0, 0, 0, 0, false, true);
 	//--
 
 	//-- windowing
 	this->GetMatrixWindow();
 	//--
 
-	PsRender& renderer = this->project->renderer;
+	PsRender& renderer = this->project_controller->renderer;
 
 	//-- centering the view on the matrix
 	renderer.x1 = this->left;
@@ -321,15 +321,15 @@ void PsDlgExportCx::OnValidation(const char* filename)
 	PsController::Instance().SetProgress(10);
 
 	renderer.SetEngine(PsRender::ENGINE_SOFTWARE);
-	renderer.DrawShape(*(this->project->matrix));
+	renderer.DrawShape(*(this->project_controller->matrix));
 
 	PsController::Instance().SetProgress(40);
-	flushSoftwareFile(filename, this->project->bHideColor);
+	flushSoftwareFile(filename, this->project_controller->bHideColor);
 
 	this->RestoreRotation();
 
 	//-- restoring the original size
-	this->project->matrix->SetSize(w_backup, h_backup, 0, 0, 0, 0, false, true);
+	this->project_controller->matrix->SetSize(w_backup, h_backup, 0, 0, 0, 0, false, true);
 	//--
 
 	//-- restoring the dpi

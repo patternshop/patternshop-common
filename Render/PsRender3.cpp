@@ -33,49 +33,49 @@
 #include "PsMaths.h"
 #include "PsTypes.h"
 
-void PsRender::DrawStandardGizmos(PsProjectController& project)
+void PsRender::DrawStandardGizmos(PsProjectController& project_controller)
 {
-	this->DrawMatricesGizmos(project);
+	this->DrawMatricesGizmos(project_controller);
 
-	if (project.image && !project.image->hide && !project.matrix)
+	if (project_controller.image && !project_controller.image->hide && !project_controller.matrix)
 	{
 		glColor4f(1.f, 1.f, 1.f, 0.8f);
-		this->DrawShape(*project.image);
+		this->DrawShape(*project_controller.image);
 	}
 
-	if (project.image && !project.image->hide &&
-		(!project.matrix || !project.matrix->hide))
+	if (project_controller.image && !project_controller.image->hide &&
+		(!project_controller.matrix || !project_controller.matrix->hide))
 	{
-		this->DrawBox(*project.image);
+		this->DrawBox(*project_controller.image);
 	}
 
-	if (project.matrix && !project.matrix->hide)
-		this->DrawBoxHandle(*project.matrix);
+	if (project_controller.matrix && !project_controller.matrix->hide)
+		this->DrawBoxHandle(*project_controller.matrix);
 }
 
-void PsRender::DrawGizmos(PsProjectController& project)
+void PsRender::DrawGizmos(PsProjectController& project_controller)
 {
-	if (project.bPatternsIsSelected && project.pattern && !project.pattern->hide)
+	if (project_controller.bPatternsIsSelected && project_controller.pattern && !project_controller.pattern->hide)
 	{
-		this->DrawPatternGizmo(*project.pattern, project.iLayerId);
+		this->DrawPatternGizmo(*project_controller.pattern, project_controller.iLayerId);
 	}
 	else
 	{
-		this->DrawStandardGizmos(project);
+		this->DrawStandardGizmos(project_controller);
 	}
 }
 
-void PsRender::MonoLayerRendering(PsProjectController& project, int x, int y)
+void PsRender::MonoLayerRendering(PsProjectController& project_controller, int x, int y)
 {
-	this->PrepareSurface(project, x, y);
+	this->PrepareSurface(project_controller, x, y);
 
 	if (this->engine == ENGINE_HARDWARE)
-		this->DrawBack(project, (float)x, (float)y);
+		this->DrawBack(project_controller, (float)x, (float)y);
 
-	this->DrawMatrices(project);
+	this->DrawMatrices(project_controller);
 
-	if (project.pattern && !project.pattern->hide)
-		this->DrawPattern(*project.pattern/*, true*/);
+	if (project_controller.pattern && !project_controller.pattern->hide)
+		this->DrawPattern(*project_controller.pattern/*, true*/);
 }
 
 void PsRender::DrawLayerTexture(GLuint layer)
@@ -99,9 +99,9 @@ void PsRender::DrawLayerTexture(GLuint layer)
 	glDisable(GL_BLEND);
 }
 
-void PsRender::UpdateLayerTexture(PsProjectController& project, PsLayer* layer, GLuint iDocTexture)
+void PsRender::UpdateLayerTexture(PsProjectController& project_controller, PsLayer* layer, GLuint iDocTexture)
 {
-	PsPattern* pattern = project.pattern;
+	PsPattern* pattern = project_controller.pattern;
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -161,5 +161,5 @@ void PsRender::UpdateLayerTexture(PsProjectController& project, PsLayer* layer, 
 	//--
 
 	hardwareRenderer.CopyToHardBuffer(layer->iFinalTextureId, this->iLayerTextureSize, this->iLayerTextureSize, layer->iFinalTextureId == NULL);
-	this->PrepareSurface(project, this->size_x, this->size_y);
+	this->PrepareSurface(project_controller, this->size_x, this->size_y);
 }

@@ -22,6 +22,7 @@
 #include "PsMessage.h"
 #include "PsController.h"
 #include "PsMatrix.h"
+#include "PsProject.h"
 
 class	PsAction;
 class	PsMatrix;
@@ -33,11 +34,6 @@ typedef std::list<PsMatrix*>	MatrixList;
 #define ZOOM_COEF        0.02f
 #define LOG_SIZE         50
 
-class	PsProject
-{
-
-};
-
 /*
 ** Cette classe représente un projet, donc principalement une liste de shapes (qui elles-même contiennent
 ** des images), une liste de patrons, et un document qui est symbolisé par la classe PsRender (la seule chose
@@ -46,6 +42,7 @@ class	PsProject
  */
 class	PsProjectController
 {
+	friend class		PsProject;
 	friend class		PsRender;
 
 public:
@@ -113,13 +110,16 @@ public:
 	};
 
 public:
+	//PsProject&		project_controller;
+
+public:
 	PsPattern*		pattern;
 	MatrixList		matrices;
 	ImageList		images;
 
 public:
-	int					iColor[3];
-	bool				bHideColor;
+	int				iColor[3];
+	bool			bHideColor;
 
 public:
 	PsImage*		image;

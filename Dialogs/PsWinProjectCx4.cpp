@@ -29,19 +29,19 @@
 
 void PsWinProjectCx::GenericUpdate()
 {
-	PsProjectController* project = PsController::Instance().project;
+	PsProjectController* project_controller = PsController::Instance().project_controller;
 
-	if (!project) this->scrollbar->Disable();
+	if (!project_controller) this->scrollbar->Disable();
 
 	this->psWin->SetPenColor(212, 208, 200);
 	this->psWin->SetBrushColor(212, 208, 200);
 	this->psWin->DrawRectangle(0, 0, this->psWin->iWidth, this->psWin->iHeight);
-	if (project)
+	if (project_controller)
 	{
-		if (project->matrix && project->matrix != this->selected && !project->image)
-			this->selected = project->matrix;
-		if (project->image && project->image != this->selected)
-			this->selected = project->image;
+		if (project_controller->matrix && project_controller->matrix != this->selected && !project_controller->image)
+			this->selected = project_controller->matrix;
+		if (project_controller->image && project_controller->image != this->selected)
+			this->selected = project_controller->image;
 		this->ypos_precalc = 0 - this->scrollbar->GetPos();
 		this->bloc_count = 0;
 		this->item_count = 0;
@@ -52,16 +52,16 @@ void PsWinProjectCx::GenericUpdate()
 			this->dragTopmost = false;
 		}
 		this->imageNameCount = 1; // FIXME
-		ImageList::reverse_iterator image = project->images.rbegin();
-		for (; image != project->images.rend(); image++)
+		ImageList::reverse_iterator image = project_controller->images.rbegin();
+		for (; image != project_controller->images.rend(); image++)
 		{
 			this->DrawImageBloc(*image);
 			this->imageNameCount++;
 			this->item_count++;
 		}
 		this->matNameCount = 1; // FIXME
-		MatrixList::reverse_iterator matrix = project->matrices.rbegin();
-		for (; matrix != project->matrices.rend(); matrix++)
+		MatrixList::reverse_iterator matrix = project_controller->matrices.rbegin();
+		for (; matrix != project_controller->matrices.rend(); matrix++)
 		{
 			this->DrawMatrixBloc(*matrix);
 			if (this->openCloseMap[*matrix] != CLOSE)
@@ -111,7 +111,7 @@ void PsWinProjectCx::GenericUpdate()
 		this->psWin->DrawLineTo(25, this->ypos_precalc);
 
 		this->totalHSize = (this->item_count + 1) * this->item_count_size + this->bloc_count * this->bloc_count_size;
-		if (project->pattern) this->totalHSize += this->item_count_size;
+		if (project_controller->pattern) this->totalHSize += this->item_count_size;
 
 		if (this->totalHSize - (int)this->psWin->iHeight > 0)
 		{

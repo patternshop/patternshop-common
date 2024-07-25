@@ -221,7 +221,7 @@ void		PsRender::Recalc()
 	this->y2 = this->scroll_y - zy;
 }
 
-void PsRender::PrepareSurface(PsProjectController& project, int x, int y)
+void PsRender::PrepareSurface(PsProjectController& project_controller, int x, int y)
 {
 	float fMaxSize = this->doc_x > this->doc_y ? this->doc_x : this->doc_y;
 
@@ -247,36 +247,36 @@ void PsRender::PrepareSurface(PsProjectController& project, int x, int y)
 }
 
 
-void PsRender::DrawMatrices(PsProjectController& project)
+void PsRender::DrawMatrices(PsProjectController& project_controller)
 {
 	MatrixList::const_iterator i;
 	int n;
 
-	for (n = 0, i = project.matrices.begin(); i != project.matrices.end(); ++i)
+	for (n = 0, i = project_controller.matrices.begin(); i != project_controller.matrices.end(); ++i)
 	{
 		if (this->engine == ENGINE_SOFTWARE)
-			PsController::Instance().SetProgress((int)(20 + 60 * n++ / project.matrices.size()));
+			PsController::Instance().SetProgress((int)(20 + 60 * n++ / project_controller.matrices.size()));
 		this->DrawShape(**i);
 	}
 }
 
-void PsRender::DrawImages(PsProjectController& project)
+void PsRender::DrawImages(PsProjectController& project_controller)
 {
 	glColor4f(1.f, 1.f, 1.f, 1.f);
 	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_BLEND);
 	ImageList::const_iterator j;
-	for (j = project.images.begin(); j != project.images.end(); ++j)
+	for (j = project_controller.images.begin(); j != project_controller.images.end(); ++j)
 		this->DrawShape(**j);
 	glDisable(GL_TEXTURE_2D);
 	glDisable(GL_BLEND);
 }
 
-void PsRender::DrawMatricesGizmos(PsProjectController& project)
+void PsRender::DrawMatricesGizmos(PsProjectController& project_controller)
 {
 	MatrixList::const_iterator i;
 
-	for (i = project.matrices.begin(); i != project.matrices.end(); ++i)
+	for (i = project_controller.matrices.begin(); i != project_controller.matrices.end(); ++i)
 	{
 		PsMatrix& matrix = **i;
 		if (!matrix.hide)

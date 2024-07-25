@@ -46,7 +46,7 @@ public:
 	double z;
 
 protected:
-	static PsProjectController* project;
+	static PsProjectController* project_controller;
 	static float r_backup;
 	static double left, right, bottom, top;
 	static float	corner[4][2];

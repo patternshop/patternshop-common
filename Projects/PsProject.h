@@ -16,28 +16,24 @@
 */
 #pragma once
 
-#include "PsProjectController.h"
+#include <list>
+#include <math.h>
+#include "PsRender.h"
+#include "PsMessage.h"
+#include "PsController.h"
+#include "PsMatrix.h"
 
-/*
-** This class loads a project_controller.
- */
-class	PsProjectLoad
+class	PsAction;
+class	PsMatrix;
+
+typedef std::list<PsAction*>	LogList;
+typedef std::list<PsMatrix*>	MatrixList;
+
+// Project parameters
+#define ZOOM_COEF        0.02f
+#define LOG_SIZE         50
+
+class	PsProject
 {
-	friend class PsProjectController;
 
-public:
-	PsProjectLoad(PsProjectController& project_controller);
-	~PsProjectLoad();
-
-public:
-	ErrID loadProject(const char* path);
-	ErrID loadShape(PsShape& shape) const;
-	ErrID loadImage(PsImage& image) const;
-	ErrID loadMatrix(PsMatrix& matrix) const;
-	ErrID loadLayer(PsLayer& layer) const;
-	ErrID loadPattern(PsPattern& pattern) const;
-
-protected:
-	PsProjectController& project_controller;
-	FILE* file;
 };

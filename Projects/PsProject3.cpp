@@ -29,7 +29,7 @@
 extern PsWinPropertiesCx* dlgPropreties;
 
 /*
-** Triggers the display of the project in the active context, using hardware rendering (thus OpenGL).
+** Triggers the display of the project_controller in the active context, using hardware rendering (thus OpenGL).
 */
 void PsProjectController::RenderToScreen()
 {
@@ -87,7 +87,7 @@ bool PsProjectController::RenderToFile(const char* filename, int x, int y)
 }
 
 /*
-** Selects an image in the project (and the matrix that contains it).
+** Selects an image in the project_controller (and the matrix that contains it).
 */
 void PsProjectController::SelectImage(PsImage* image)
 {
@@ -106,7 +106,7 @@ void PsProjectController::SelectImage(PsImage* image)
 }
 
 /*
-** Selects a matrix in the project.
+** Selects a matrix in the project_controller.
 */
 void PsProjectController::SelectMatrix(PsMatrix* matrix)
 {

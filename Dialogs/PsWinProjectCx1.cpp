@@ -55,28 +55,28 @@ void PsWinProjectCx::OnLeftMouseButtonDown(PsPoint point)
 	// PsRect k;
 	// scrollbar->GetClientRect(&k);
 	this->fromPoint = point;
-	PsProjectController* project = PsController::Instance().project;
-	if (!project) return;
-	if (project->bPatternsIsSelected)
-		project->bPatternsIsSelected = false;
+	PsProjectController* project_controller = PsController::Instance().project_controller;
+	if (!project_controller) return;
+	if (project_controller->bPatternsIsSelected)
+		project_controller->bPatternsIsSelected = false;
 	if (point.y > 0 && point.x < this->psWin->iWidth - this->scrollbar->GetWidth()
 		&& point.y < this->totalHSize - this->scrollbar->GetPos())
 	{
-		if (project)
+		if (project_controller)
 		{
 			this->ypos_precalc = 0 - this->scrollbar->GetPos();
-			ImageList::reverse_iterator image = project->images.rbegin();
-			for (; image != project->images.rend(); image++)
+			ImageList::reverse_iterator image = project_controller->images.rbegin();
+			for (; image != project_controller->images.rend(); image++)
 				this->OnLButtonDownIn(point, *image);
-			MatrixList::reverse_iterator matrix = project->matrices.rbegin();
-			for (; matrix != project->matrices.rend(); matrix++)
+			MatrixList::reverse_iterator matrix = project_controller->matrices.rbegin();
+			for (; matrix != project_controller->matrices.rend(); matrix++)
 			{
 				if (point.y > this->ypos_precalc &&
 					point.y < this->ypos_precalc + this->bloc_count_size)
 				{
 					if (point.x > 42)
 					{
-						project->SelectMatrix(*matrix);
+						project_controller->SelectMatrix(*matrix);
 						this->bDrawDragging = false;
 						this->bDragging = true;
 						this->dragBefore = NULL;
@@ -108,12 +108,12 @@ void PsWinProjectCx::OnLeftMouseButtonDown(PsPoint point)
 			}
 
 			// pattern
-			if (project->pattern)
+			if (project_controller->pattern)
 			{
 				if (point.y > this->ypos_precalc &&
 					point.y < this->ypos_precalc + this->bloc_count_size)
 				{
-					PsPattern* pattern = project->pattern;
+					PsPattern* pattern = project_controller->pattern;
 					if (point.x < 25)
 					{
 						if (pattern->hide) pattern->hide = false;
@@ -138,7 +138,7 @@ void PsWinProjectCx::OnLeftMouseButtonDown(PsPoint point)
 						*/
 						/*else
 						{
-						project->bPatternsIsSelected = true;
+						project_controller->bPatternsIsSelected = true;
 						this->selected = NULL;
 						if (PsController::Instance().active)
 						PsController::Instance().UpdateWindow();
@@ -155,18 +155,18 @@ void PsWinProjectCx::OnLeftMouseButtonDown(PsPoint point)
 			{
 				if (point.x < 25)
 				{
-					if (project->bHideColor) project->bHideColor = false;
-					else project->bHideColor = true;
+					if (project_controller->bHideColor) project_controller->bHideColor = false;
+					else project_controller->bHideColor = true;
 				}
 				else
 				{
 					PsDlgColor dlg;
-					dlg.SetColor(project->iColor[0], project->iColor[1], project->iColor[2]);
+					dlg.SetColor(project_controller->iColor[0], project_controller->iColor[1], project_controller->iColor[2]);
 					if (dlg.ShowModal())
 					{
-						project->iColor[0] = dlg.GetColorRValue();
-						project->iColor[1] = dlg.GetColorGValue();
-						project->iColor[2] = dlg.GetColorBValue();
+						project_controller->iColor[0] = dlg.GetColorRValue();
+						project_controller->iColor[1] = dlg.GetColorGValue();
+						project_controller->iColor[2] = dlg.GetColorBValue();
 					}
 				}
 				this->Update();
@@ -183,8 +183,8 @@ void PsWinProjectCx::OnLButtonDownIn(PsPoint point, PsImage* image)
 	{
 		if (point.x > 25)
 		{
-			PsProjectController* project = PsController::Instance().project;
-			project->SelectImage(image);
+			PsProjectController* project_controller = PsController::Instance().project_controller;
+			project_controller->SelectImage(image);
 			this->bDrawDragging = false;
 			this->bDragging = true;
 			this->dragBefore = NULL;

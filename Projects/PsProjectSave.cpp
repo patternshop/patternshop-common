@@ -16,7 +16,7 @@
 */
 #include "PsProjectSave.h"
 
-PsProjectSave::PsProjectSave(PsProjectController& project) : project(project), file(NULL)
+PsProjectSave::PsProjectSave(PsProjectController& project_controller) : project_controller(project_controller), file(NULL)
 {
 }
 
@@ -25,7 +25,7 @@ PsProjectSave::~PsProjectSave()
 }
 
 /*
-** Saves a project to a file
+** Saves a project_controller to a file
 */
 ErrID PsProjectSave::saveProject(const char* path)
 {
@@ -43,23 +43,23 @@ ErrID PsProjectSave::saveProject(const char* path)
 	n = PROJECT_VERSION;
 	fwrite(&n, sizeof(size_t), 1, this->file);
 
-	this->project.renderer.GetDocSize(x, y);
+	this->project_controller.renderer.GetDocSize(x, y);
 	fwrite(&x, sizeof(int), 1, this->file);
 	fwrite(&y, sizeof(int), 1, this->file);
 
-	n = this->project.images.size();
+	n = this->project_controller.images.size();
 
 	if (fwrite(&n, sizeof(size_t), 1, this->file) != 1)
 		return ERROR_FILE_WRITE;
 
-	for (ImageList::const_iterator i = this->project.images.begin(); i != this->project.images.end(); ++i)
+	for (ImageList::const_iterator i = this->project_controller.images.begin(); i != this->project_controller.images.end(); ++i)
 		if ((err = this->saveImage(**i)) != ERROR_NONE)
 			return err;
 
-	n = this->project.matrices.size();
+	n = this->project_controller.matrices.size();
 	fwrite(&n, sizeof(size_t), 1, this->file);
 
-	for (MatrixList::const_iterator i = this->project.matrices.begin(); i != this->project.matrices.end(); ++i)
+	for (MatrixList::const_iterator i = this->project_controller.matrices.begin(); i != this->project_controller.matrices.end(); ++i)
 		if ((err = this->saveMatrix(**i)) != ERROR_NONE)
 		{
 			fclose(this->file);
@@ -67,23 +67,23 @@ ErrID PsProjectSave::saveProject(const char* path)
 		}
 
 	bool pattern_exist = false;
-	if (this->project.pattern) pattern_exist = true;
+	if (this->project_controller.pattern) pattern_exist = true;
 	fwrite(&pattern_exist, sizeof(pattern_exist), 1, this->file);
 	if (pattern_exist)
 	{
-		if ((err = this->savePattern(*(this->project.pattern))) != ERROR_NONE)
+		if ((err = this->savePattern(*(this->project_controller.pattern))) != ERROR_NONE)
 		{
 			fclose(this->file);
 			return err;
 		}
 	}
 
-	fwrite(&this->project.bHideColor, sizeof(this->project.bHideColor), 1, this->file);
-	fwrite(&this->project.iColor, sizeof(this->project.iColor), 1, this->file);
+	fwrite(&this->project_controller.bHideColor, sizeof(this->project_controller.bHideColor), 1, this->file);
+	fwrite(&this->project_controller.iColor, sizeof(this->project_controller.iColor), 1, this->file);
 
 	fclose(this->file);
 
-	this->project.bNeedSave = false;
+	this->project_controller.bNeedSave = false;
 
 	return ERROR_NONE;
 }

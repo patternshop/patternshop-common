@@ -30,13 +30,13 @@ void DialogPatternCx::Update()
 
 void DialogPatternCx::SetQuality(int iQuality)
 {
-	if (!PsController::Instance().project) return;
-	PsProjectController& project = *(PsController::Instance().project);
-	if (!project.pattern) return;
-	project.renderer.iLayerTextureSize = FloatToInt(pow(2.f, 8.f + (float)iQuality));
-	for (int i = 0; i < project.pattern->GetChannelsCount(); ++i)
+	if (!PsController::Instance().project_controller) return;
+	PsProjectController& project_controller = *(PsController::Instance().project_controller);
+	if (!project_controller.pattern) return;
+	project_controller.renderer.iLayerTextureSize = FloatToInt(pow(2.f, 8.f + (float)iQuality));
+	for (int i = 0; i < project_controller.pattern->GetChannelsCount(); ++i)
 	{
-		PsLayer* layer = project.pattern->aLayers[i];
+		PsLayer* layer = project_controller.pattern->aLayers[i];
 		if (layer->iFinalTextureId)
 		{
 			glDeleteTextures(1, &layer->iFinalTextureId);
@@ -48,24 +48,24 @@ void DialogPatternCx::SetQuality(int iQuality)
 
 void DialogPatternCx::OnShowWindow(bool bShow)
 {
-	if (!bShow || !PsController::Instance().project || !PsController::Instance().project->pattern)
+	if (!bShow || !PsController::Instance().project_controller || !PsController::Instance().project_controller->pattern)
 	{
-		if (PsController::Instance().project)
+		if (PsController::Instance().project_controller)
 		{
-			if (PsController::Instance().project->bPatternsIsSelected)
+			if (PsController::Instance().project_controller->bPatternsIsSelected)
 			{
-				PsController::Instance().project->bPatternsIsSelected = false;
+				PsController::Instance().project_controller->bPatternsIsSelected = false;
 				PsController::Instance().UpdateWindow();
 			}
 		}
 	}
 	else
 	{
-		if (PsController::Instance().project)
+		if (PsController::Instance().project_controller)
 		{
-			if (!PsController::Instance().project->bPatternsIsSelected)
+			if (!PsController::Instance().project_controller->bPatternsIsSelected)
 			{
-				PsController::Instance().project->bPatternsIsSelected = true;
+				PsController::Instance().project_controller->bPatternsIsSelected = true;
 				PsController::Instance().UpdateWindow();
 			}
 		}
@@ -75,25 +75,25 @@ void DialogPatternCx::OnShowWindow(bool bShow)
 
 void DialogPatternCx::OnButtonDown(int iX, int iY)
 {
-	if (!PsController::Instance().project || !PsController::Instance().project->pattern)
+	if (!PsController::Instance().project_controller || !PsController::Instance().project_controller->pattern)
 	{
 		this->OnShowWindow(false);
 		return;
 	}
 
-	PsProjectController& project = *(PsController::Instance().project);
+	PsProjectController& project_controller = *(PsController::Instance().project_controller);
 	if (iX > this->dst_x1 && iX < this->dst_x2 && iY < this->dst_y2 && iY > this->dst_y1)
 	{
-		float r1 = (float)project.pattern->GetWidth() / (float)(this->dst_x2 - this->dst_x1);
-		float r2 = (float)project.pattern->GetHeight() / (float)(this->dst_y2 - this->dst_y1);
+		float r1 = (float)project_controller.pattern->GetWidth() / (float)(this->dst_x2 - this->dst_x1);
+		float r2 = (float)project_controller.pattern->GetHeight() / (float)(this->dst_y2 - this->dst_y1);
 		int iTargetSelected = -1;
 		uint8 cMax = 150;
 		int x = FloatToInt((iX - this->dst_x1) * r1);
 		int y = FloatToInt((iY - this->dst_y1) * r2);
-		int p = x + y * project.pattern->texture.width;
-		for (int i = 0; i < project.pattern->GetChannelsCount(); ++i)
+		int p = x + y * project_controller.pattern->texture.width;
+		for (int i = 0; i < project_controller.pattern->GetChannelsCount(); ++i)
 		{
-			uint32 c = project.pattern->aLayers[i]->ucData[p];
+			uint32 c = project_controller.pattern->aLayers[i]->ucData[p];
 			if (c >= cMax)
 			{
 				cMax = c;
@@ -102,8 +102,8 @@ void DialogPatternCx::OnButtonDown(int iX, int iY)
 		}
 		if (iTargetSelected != -1)
 		{
-			project.bPatternsIsSelected = true;
-			project.iLayerId = iTargetSelected;
+			project_controller.bPatternsIsSelected = true;
+			project_controller.iLayerId = iTargetSelected;
 			PsController::Instance().UpdateWindow();
 			this->Update();
 		}
@@ -112,19 +112,19 @@ void DialogPatternCx::OnButtonDown(int iX, int iY)
 
 void DialogPatternCx::UpdateMiniImage(int iWindowWidth, int iWindowHeight)
 {
-	if (!PsController::Instance().project) return;
-	if (!PsController::Instance().project->pattern) return;
+	if (!PsController::Instance().project_controller) return;
+	if (!PsController::Instance().project_controller->pattern) return;
 
-	PsProjectController& project = *(PsController::Instance().project);
-	PsRender& renderer = PsController::Instance().project->renderer;
+	PsProjectController& project_controller = *(PsController::Instance().project_controller);
+	PsRender& renderer = PsController::Instance().project_controller->renderer;
 
 	//-- calculation of target coordinates 
 	int max_width = iWindowWidth, max_height = iWindowHeight;
-	float r1 = (float)project.GetWidth() / (float)max_width;
-	float r2 = (float)project.GetHeight() / (float)max_height;
+	float r1 = (float)project_controller.GetWidth() / (float)max_width;
+	float r2 = (float)project_controller.GetHeight() / (float)max_height;
 	if (r2 > r1) r1 = r2;
-	this->dst_width = project.GetWidth() / r1;
-	this->dst_height = project.GetHeight() / r1;
+	this->dst_width = project_controller.GetWidth() / r1;
+	this->dst_height = project_controller.GetHeight() / r1;
 	int w_border = (iWindowWidth - this->dst_width) / 2;
 	int h_border = 10; //(300 - dst_height) / 2;
 	//--
@@ -143,7 +143,7 @@ void DialogPatternCx::UpdateMiniImage(int iWindowWidth, int iWindowHeight)
 	glPushMatrix();
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	glOrtho(0, project.GetWidth(), project.GetHeight(), 0, -1, 1);
+	glOrtho(0, project_controller.GetWidth(), project_controller.GetHeight(), 0, -1, 1);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	glPopMatrix();
@@ -155,30 +155,30 @@ void DialogPatternCx::UpdateMiniImage(int iWindowWidth, int iWindowHeight)
 	//- gray background
 	glColor4f(212.f / 255.f, 208.f / 255.f, 200.f / 255.f, 1.f);
 	glBegin(GL_QUADS);
-	glVertex2f(0, project.GetHeight());
-	glVertex2f(project.GetWidth(), project.GetHeight());
-	glVertex2f(project.GetWidth(), 0);
+	glVertex2f(0, project_controller.GetHeight());
+	glVertex2f(project_controller.GetWidth(), project_controller.GetHeight());
+	glVertex2f(project_controller.GetWidth(), 0);
 	glVertex2f(0, 0);
 	glEnd();
 	//--
 #endif /* _WINDOWS */
 
 	//-- drawing zones
-	for (int i = 0; i < project.pattern->GetChannelsCount(); ++i)
+	for (int i = 0; i < project_controller.pattern->GetChannelsCount(); ++i)
 	{
-		if (i != project.iLayerId) glColor4f(0.75f, 0.75f, 1.00f, 0.8f);
+		if (i != project_controller.iLayerId) glColor4f(0.75f, 0.75f, 1.00f, 0.8f);
 		else glColor4f(0.f, 0.f, 0.6f, 0.8f);
 		glEnable(GL_TEXTURE_2D);
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glBindTexture(GL_TEXTURE_2D, project.pattern->aLayers[i]->iMaskTextureId);
+		glBindTexture(GL_TEXTURE_2D, project_controller.pattern->aLayers[i]->iMaskTextureId);
 		glBegin(GL_QUADS);
 		glTexCoord2f(0, 1);
-		glVertex2f(0, project.GetHeight());
+		glVertex2f(0, project_controller.GetHeight());
 		glTexCoord2f(1, 1);
-		glVertex2f(project.GetWidth(), project.GetHeight());
+		glVertex2f(project_controller.GetWidth(), project_controller.GetHeight());
 		glTexCoord2f(1, 0);
-		glVertex2f(project.GetWidth(), 0);
+		glVertex2f(project_controller.GetWidth(), 0);
 		glTexCoord2f(0, 0);
 		glVertex2f(0, 0);
 		glEnd();

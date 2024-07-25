@@ -17,7 +17,7 @@
 #include "PsProjectSave.h"
 #include "PsProjectLoad.h"
 
-PsProjectLoad::PsProjectLoad(PsProjectController& project) : project(project), file(NULL)
+PsProjectLoad::PsProjectLoad(PsProjectController& project_controller) : project_controller(project_controller), file(NULL)
 {
 }
 
@@ -26,7 +26,7 @@ PsProjectLoad::~PsProjectLoad()
 }
 
 /**
- * Loads the project from a file. The constant macro "PROJECT_VERSION" is used to check the version
+ * Loads the project_controller from a file. The constant macro "PROJECT_VERSION" is used to check the version
  * of the save and thus serves as a magic number.
  */
 ErrID PsProjectLoad::loadProject(const char* path)
@@ -42,7 +42,7 @@ ErrID PsProjectLoad::loadProject(const char* path)
 
 	PsController::Instance().SetProgress(-1);
 
-	this->project.LogFlush();
+	this->project_controller.LogFlush();
 
 	fread(&n, sizeof(size_t), 1, this->file);
 
@@ -62,7 +62,7 @@ ErrID PsProjectLoad::loadProject(const char* path)
 
 	fread(&x, sizeof(x), 1, this->file);
 	fread(&y, sizeof(y), 1, this->file);
-	this->project.renderer.SetDocSize(x, y);
+	this->project_controller.renderer.SetDocSize(x, y);
 
 	PsController::Instance().SetProgress(10);
 
@@ -75,9 +75,9 @@ ErrID PsProjectLoad::loadProject(const char* path)
 		}
 		while (n--)
 		{
-			this->project.images.push_back((this->project.image = new PsImage(NULL)));
+			this->project_controller.images.push_back((this->project_controller.image = new PsImage(NULL)));
 
-			if ((err = this->loadImage(*(this->project.image))) != ERROR_NONE)
+			if ((err = this->loadImage(*(this->project_controller.image))) != ERROR_NONE)
 			{
 				PsController::Instance().SetProgress(-2);
 				return err;
@@ -91,7 +91,7 @@ ErrID PsProjectLoad::loadProject(const char* path)
 	{
 		PsController::Instance().SetProgress(10 + 90 * i / n);
 		matrix = new PsMatrix();
-		this->project.matrices.push_back(matrix);
+		this->project_controller.matrices.push_back(matrix);
 
 		if ((err = this->loadMatrix(*matrix)) != ERROR_NONE)
 		{
@@ -104,21 +104,21 @@ ErrID PsProjectLoad::loadProject(const char* path)
 	fread(&pattern_exist, sizeof(pattern_exist), 1, this->file);
 	if (pattern_exist)
 	{
-		this->project.pattern = new PsPattern();
-		if ((err = this->loadPattern(*this->project.pattern)) != ERROR_NONE)
+		this->project_controller.pattern = new PsPattern();
+		if ((err = this->loadPattern(*this->project_controller.pattern)) != ERROR_NONE)
 		{
 			PsController::Instance().SetProgress(-2);
 			return err;
 		}
-		this->project.pattern->UpdateScale(this->project.GetWidth(), this->project.GetHeight());
+		this->project_controller.pattern->UpdateScale(this->project_controller.GetWidth(), this->project_controller.GetHeight());
 	}
 
-	fread(&this->project.bHideColor, sizeof(this->project.bHideColor), 1, this->file);
-	fread(&this->project.iColor, sizeof(this->project.iColor), 1, this->file);
+	fread(&this->project_controller.bHideColor, sizeof(this->project_controller.bHideColor), 1, this->file);
+	fread(&this->project_controller.iColor, sizeof(this->project_controller.iColor), 1, this->file);
 
 	fclose(this->file);
 
-	this->project.center = true;
+	this->project_controller.center = true;
 
 	PsController::Instance().SetProgress(-2);
 
@@ -206,6 +206,7 @@ ErrID PsProjectLoad::loadMatrix(PsMatrix& matrix) const
 */
 ErrID PsProjectLoad::loadLayer(PsLayer& layer) const
 {
+	size_t size;
 
 	if (fread(&layer.iWidth, sizeof(layer.iWidth), 1, this->file) != 1)
 		return ERROR_FILE_READ;
@@ -213,8 +214,9 @@ ErrID PsProjectLoad::loadLayer(PsLayer& layer) const
 	if (fread(&layer.iHeight, sizeof(layer.iHeight), 1, this->file) != 1)
 		return ERROR_FILE_READ;
 
-	layer.ucData = new uint8[layer.iWidth * layer.iHeight];
-	if (fread(layer.ucData, sizeof(*layer.ucData), layer.iWidth * layer.iHeight, this->file) != layer.iWidth * layer.iHeight)
+	size = layer.iWidth * layer.iHeight;
+	layer.ucData = new uint8[size];
+	if (fread(layer.ucData, sizeof(*layer.ucData), size, this->file) != size)
 		return ERROR_FILE_READ;
 
 	if (layer.Register(layer.iWidth, layer.iHeight, layer.ucData) != ERROR_NONE)

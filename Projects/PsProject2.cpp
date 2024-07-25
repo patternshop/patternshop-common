@@ -28,7 +28,7 @@
 
 
 /*
-** Resets a project by clearing everything it contains. Eventually, this function
+** Resets a project_controller by clearing everything it contains. Eventually, this function
 ** could become unnecessary and simply be copied into the destructor of "PsProject".
 */
 void PsProjectController::LogFlush()

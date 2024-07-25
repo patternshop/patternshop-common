@@ -34,7 +34,7 @@ class	PsAction
 		PsMatrix*				GetMatrix (MatrixList::iterator&) const;
 		PsShape*				GetShape() const;
 
-		PsProjectController&				project;
+		PsProjectController&	project_controller;
 		int						matrix;
 		int						image;
 };

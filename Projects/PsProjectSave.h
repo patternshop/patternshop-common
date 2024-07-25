@@ -41,14 +41,14 @@
 //--------------------------AUTO (END)----------------------
 
 /*
-** This class saves a project.
+** This class saves a project_controller.
  */
 class	PsProjectSave
 {
 	friend class PsProjectController;
 
 public:
-	PsProjectSave(PsProjectController& project);
+	PsProjectSave(PsProjectController& project_controller);
 	~PsProjectSave();
 
 public:
@@ -60,6 +60,6 @@ public:
 	ErrID savePattern(PsPattern& pattern) const;
 
 protected:
-	PsProjectController& project;
+	PsProjectController& project_controller;
 	FILE* file;
 };

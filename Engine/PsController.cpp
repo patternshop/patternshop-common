@@ -35,7 +35,7 @@ PsController* PsController::instance = 0;
 
 /*
 ** Constructor
-** Initially, no window or active project (active = 0, project = 0), the default tool
+** Initially, no window or active project_controller (active = 0, project_controller = 0), the default tool
 ** is the modification tool.
 */
 PsController::PsController() :
@@ -43,7 +43,7 @@ PsController::PsController() :
 	active(0),
 #endif /* _WINDOWS */
 	tool(TOOL_MODIFY),
-	project(0)
+	project_controller(0)
 {
 #ifndef _MACOSX
 	this->cursor[CURSOR_DEFAULT] = AfxGetApp()->LoadCursor(IDC_DEFAULT);
@@ -121,7 +121,7 @@ void PsController::UpdateDialogOverview(bool bQuick)
 
 /*
 ** Retrieves the state of an option; in some cases, the active tool prevails over the option (for example,
-** you do not see the blue frame or the selection boxes when zooming or scrolling the project)
+** you do not see the blue frame or the selection boxes when zooming or scrolling the project_controller)
 ** The boolean "real_state", false by default, retrieves the state of the option without taking into account
 ** the tool.
 */
@@ -143,16 +143,16 @@ bool PsController::GetOption(Option index, bool real_state) const
 
 /*
 ** The user clicked with the left button (num = 0) or right button (num = 1)
-** at position x, y on the project window.
+** at position x, y on the project_controller window.
 */
 void PsController::MouseClick(int num, int x, int y)
 {
-	if (!this->project)
+	if (!this->project_controller)
 		return;
 
 	this->bMouseButtonIsDown = true;
 
-	this->project->LogInit();
+	this->project_controller->LogInit();
 	this->prev_x = x;
 	this->prev_y = y;
 
@@ -160,51 +160,51 @@ void PsController::MouseClick(int num, int x, int y)
 	{
 	case TOOL_MAGNIFY:
 		if (num == 0)
-			this->tool = this->project->ToolMagnifyStart();
+			this->tool = this->project_controller->ToolMagnifyStart();
 		break;
 
 	case TOOL_MODIFY:
 		if (num == 0)
-			this->tool = this->project->ToolModifyScan(x, y, true);
+			this->tool = this->project_controller->ToolModifyScan(x, y, true);
 		break;
 
 	case TOOL_SCROLL:
 		if (num == 0)
 		{
 			this->SetCursor(CURSOR_SCROLL2);
-			this->tool = this->project->ToolScrollStart();
+			this->tool = this->project_controller->ToolScrollStart();
 		}
 		break;
 	}
 }
 
 /*
-** The user moves the mouse to position x, y on the project window.
+** The user moves the mouse to position x, y on the project_controller window.
 */
 void PsController::MouseMove(int x, int y)
 {
-	if (!this->project)
+	if (!this->project_controller)
 		return;
 
 	switch (this->tool)
 	{
 	case TOOL_MAGNIFY_ZOOM:
-		this->project->ToolMagnifyDrag(y, this->prev_x, this->prev_y);
+		this->project_controller->ToolMagnifyDrag(y, this->prev_x, this->prev_y);
 		break;
 
 	case TOOL_MODIFY:
-		this->project->ToolModifyScan(x, y, false);
+		this->project_controller->ToolModifyScan(x, y, false);
 		break;
 
 	case TOOL_MODIFY_MOVE:
 	case TOOL_MODIFY_ROTATE:
 	case TOOL_MODIFY_SIZE:
 	case TOOL_MODIFY_TORSIO:
-		this->project->ToolModifyMove(x, y, this->prev_x, this->prev_y, this->tool);
+		this->project_controller->ToolModifyMove(x, y, this->prev_x, this->prev_y, this->tool);
 		break;
 
 	case TOOL_SCROLL_DRAG:
-		this->project->ToolScrollDrag(x, y, this->prev_x, this->prev_y);
+		this->project_controller->ToolScrollDrag(x, y, this->prev_x, this->prev_y);
 		break;
 	}
 }
@@ -214,7 +214,7 @@ void PsController::MouseMove(int x, int y)
 */
 void PsController::MouseRelease(int num, int x, int y)
 {
-	if (!this->project)
+	if (!this->project_controller)
 		return;
 
 	this->bMouseButtonIsDown = false;
@@ -250,17 +250,17 @@ void PsController::MouseRelease(int num, int x, int y)
 #ifdef _WINDOWS
 void PsController::SetActive(CPatternshopView* view)
 {
-	if (view != this->active || view && view->project != this->project)
+	if (view != this->active || view && view->project_controller != this->project_controller)
 	{
 		if (view)
 		{
 			this->active = view;
-			this->project = view->project;
+			this->project_controller = view->project_controller;
 		}
 		else
 		{
 			this->active = NULL;
-			this->project = NULL;
+			this->project_controller = NULL;
 		}
 		dlgPropreties->FocusMatrixInformation();
 		this->UpdateDialogProject();
@@ -270,7 +270,7 @@ void PsController::SetActive(CPatternshopView* view)
 #else /* _MACOSX */
 void PsController::SetActive(PsProject* p)
 {
-	this->project = p;
+	this->project_controller = p;
 	PsWinProject::Instance().Update();
 	if (this->dlgPropreties)
 	{

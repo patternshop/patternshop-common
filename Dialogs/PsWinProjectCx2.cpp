@@ -29,8 +29,8 @@
 
 void PsWinProjectCx::OnLeftMouseButtonUp(PsPoint point)
 {
-	PsProjectController* project = PsController::Instance().project;
-	if (!project) return;
+	PsProjectController* project_controller = PsController::Instance().project_controller;
+	if (!project_controller) return;
 	if (this->bDragging)
 	{
 		this->bDragging = false;
@@ -55,16 +55,16 @@ void PsWinProjectCx::OnLeftMouseButtonUp(PsPoint point)
 					}
 					else
 					{
-						for (j = 0, t = project->images.begin(); t != project->images.end() && *t != imageSource; ++t)
+						for (j = 0, t = project_controller->images.begin(); t != project_controller->images.end() && *t != imageSource; ++t)
 							++j;
-						if (j == project->images.size())
+						if (j == project_controller->images.size())
 							j = -1;
 					}
 					// < log
 					if (matrixSource) matrixSource->images.remove(imageSource);
-					else project->images.remove(imageSource);
+					else project_controller->images.remove(imageSource);
 					imageSource->parent = matrixDest;
-					ImageList* images = &project->images;
+					ImageList* images = &project_controller->images;
 					if (matrixDest) images = &matrixDest->images;
 					ImageList::iterator i = images->begin();
 					bool operation_successful = false;
@@ -86,9 +86,9 @@ void PsWinProjectCx::OnLeftMouseButtonUp(PsPoint point)
 						imageSource->y = 0;
 					}
 					else if (matrixDest || matrixSource)
-						imageSource->SetPosition(project->GetWidth() / 2, project->renderer.doc_y / 2);
-					project->LogAdd(new LogSwapImage(*project, imageSource, matrixDest, matrixSource, j));
-					project->SelectImage(imageSource);
+						imageSource->SetPosition(project_controller->GetWidth() / 2, project_controller->renderer.doc_y / 2);
+					project_controller->LogAdd(new LogSwapImage(*project_controller, imageSource, matrixDest, matrixSource, j));
+					project_controller->SelectImage(imageSource);
 				}
 			}
 			else if (this->dragLast)
@@ -110,14 +110,14 @@ void PsWinProjectCx::OnLeftMouseButtonUp(PsPoint point)
 					}
 					else
 					{
-						for (j = 0, t = project->images.begin(); t != project->images.end() && *t != imageSource; ++t)
+						for (j = 0, t = project_controller->images.begin(); t != project_controller->images.end() && *t != imageSource; ++t)
 							++j;
-						if (j == project->images.size())
+						if (j == project_controller->images.size())
 							j = -1;
 					}
 					// < log
 					if (matrixSource) matrixSource->images.remove(imageSource);
-					else project->images.remove(imageSource);
+					else project_controller->images.remove(imageSource);
 					imageSource->parent = matrixDest;
 					matrixDest->images.insert(matrixDest->images.begin(), imageSource);
 					if (imageSource->parent)
@@ -126,9 +126,9 @@ void PsWinProjectCx::OnLeftMouseButtonUp(PsPoint point)
 						imageSource->y = 0;
 					}
 					else if (matrixDest || matrixSource)
-						imageSource->SetPosition(project->GetWidth() / 2, project->renderer.doc_y / 2);
-					project->LogAdd(new LogSwapImage(*project, imageSource, matrixDest, matrixSource, j));
-					project->SelectImage(imageSource);
+						imageSource->SetPosition(project_controller->GetWidth() / 2, project_controller->renderer.doc_y / 2);
+					project_controller->LogAdd(new LogSwapImage(*project_controller, imageSource, matrixDest, matrixSource, j));
+					project_controller->SelectImage(imageSource);
 				}
 			}
 			else if (this->dragTopmost)
@@ -149,31 +149,31 @@ void PsWinProjectCx::OnLeftMouseButtonUp(PsPoint point)
 					}
 					else
 					{
-						for (j = 0, t = project->images.begin(); t != project->images.end() && *t != imageSource; ++t)
+						for (j = 0, t = project_controller->images.begin(); t != project_controller->images.end() && *t != imageSource; ++t)
 							++j;
-						if (j == project->images.size())
+						if (j == project_controller->images.size())
 							j = -1;
 					}
 					// < log
 					if (matrixSource) matrixSource->images.remove(imageSource);
-					else project->images.remove(imageSource);
+					else project_controller->images.remove(imageSource);
 					imageSource->parent = NULL;
-					project->images.push_back(imageSource);
+					project_controller->images.push_back(imageSource);
 					if (imageSource->parent)
 					{
 						imageSource->x = 0;
 						imageSource->y = 0;
 					}
 					else if (matrixSource)
-						imageSource->SetPosition(project->GetWidth() / 2, project->renderer.doc_y / 2);
-					project->LogAdd(new LogSwapImage(*project, imageSource, 0, matrixSource, j));
-					project->SelectImage(imageSource);
+						imageSource->SetPosition(project_controller->GetWidth() / 2, project_controller->renderer.doc_y / 2);
+					project_controller->LogAdd(new LogSwapImage(*project_controller, imageSource, 0, matrixSource, j));
+					project_controller->SelectImage(imageSource);
 				}
 			}
 		}
 		else
 		{
-			if (this->dragLast && project)
+			if (this->dragLast && project_controller)
 			{
 				PsMatrix* matrixSource = (PsMatrix*)this->selected;
 				PsMatrix* matrixDest = (PsMatrix*)this->dragLast;
@@ -182,26 +182,26 @@ void PsWinProjectCx::OnLeftMouseButtonUp(PsPoint point)
 					// > log
 					MatrixList::iterator t;
 					int j;
-					for (j = 0, t = project->matrices.begin(); t != project->matrices.end() && *t != matrixSource; ++t)
+					for (j = 0, t = project_controller->matrices.begin(); t != project_controller->matrices.end() && *t != matrixSource; ++t)
 						++j;
-					if (j == project->matrices.size())
+					if (j == project_controller->matrices.size())
 						j = -1;
 					// < log
-					project->matrices.remove(matrixSource);
-					MatrixList::iterator i = project->matrices.begin();
+					project_controller->matrices.remove(matrixSource);
+					MatrixList::iterator i = project_controller->matrices.begin();
 					bool operation_successful = false;
-					for (; i != project->matrices.end(); ++i)
+					for (; i != project_controller->matrices.end(); ++i)
 					{
 						if (*i == matrixDest)
 						{
-							project->matrices.insert(i, matrixSource);
+							project_controller->matrices.insert(i, matrixSource);
 							operation_successful = true;
 							break;
 						}
 					}
 					if (!operation_successful) // Failsafe
-						project->matrices.push_back(matrixSource);
-					project->LogAdd(new LogSwapMatrix(*project, matrixSource, j));
+						project_controller->matrices.push_back(matrixSource);
+					project_controller->LogAdd(new LogSwapMatrix(*project_controller, matrixSource, j));
 				}
 			}
 		}
