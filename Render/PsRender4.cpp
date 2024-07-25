@@ -55,7 +55,7 @@ GLuint PsRender::CreateDocumentTexture(PsProjectController& project_controller)
 
 /*
  ** Returns the eye position used in MultiLayerRendering mode (see PsPattern)
- ** to project_controller the different layers (see PsLayer).
+ ** to project the different layers (see PsLayer).
  */
 PsVector PsRender::GetEyeLocation()
 {

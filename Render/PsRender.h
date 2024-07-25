@@ -67,7 +67,7 @@ public:
 	void			MonoLayerRendering(PsProjectController&, int, int);
 	void			MultiLayerRendering(PsProjectController&, int, int);
 
-	uint8* GetBuffer(int, int) const;
+	uint8*			GetBuffer(int, int) const;
 	void			GetDocSize(int&, int&) const;
 	void			GetScroll(float&, float&) const;
 	void			GetSize(int&, int&) const;
@@ -81,9 +81,6 @@ public:
 	void			SetZoom(float);
 
 	void			PrepareSurface(PsProjectController&, int, int);
-
-	bool			IsInside(const PsImage&, int, int) const;
-	inline bool		IsInside(int, int) const;
 
 	void			GetMatrixWindow(PsMatrix&, double&, double&, double&, double&);
 

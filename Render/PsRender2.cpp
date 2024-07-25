@@ -33,26 +33,6 @@
 #include "PsMaths.h"
 #include "PsTypes.h"
 
-
-bool PsRender::IsInside(int x, int y) const
-{
-	return x >= this->x1 && x <= this->x2 && y >= this->y2 && y <= this->y1;
-}
-
-bool PsRender::IsInside(const PsImage& image, int x, int y) const
-{
-	if (IsInside(x + FloatToInt(image.corner[0][0]), y + FloatToInt(image.corner[0][1])))
-		return true;
-	else if (IsInside(x + FloatToInt(image.corner[1][0]), y + FloatToInt(image.corner[1][1])))
-		return true;
-	else if (IsInside(x + FloatToInt(image.corner[2][0]), y + FloatToInt(image.corner[2][1])))
-		return true;
-	else if (IsInside(x + FloatToInt(image.corner[3][0]), y + FloatToInt(image.corner[3][1])))
-		return true;
-	return false;
-}
-
-
 /*
  ** Gets the orthonormal dimensions of a matrix
  */

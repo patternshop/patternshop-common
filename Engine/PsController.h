@@ -103,7 +103,7 @@ public:
 #ifndef _MACOSX
 	void					SetActive(CPatternshopView*);
 #else
-	void					SetActive(PsProject*);
+	void					SetActive(PsProjectController*);
 #endif
 	void					SetCursor(PsCursor);
 	void					SetOption(Option, bool);
